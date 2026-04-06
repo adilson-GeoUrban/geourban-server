@@ -1,1 +1,141 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>GeoUrban Application</title>\n</head>\n<body>\n    <header>\n        <h1>Welcome to GeoUrban</h1>\n    </header>\n    <main>\n        <p>This is a basic structure for the GeoUrban application.</p>\n    </main>\n    <footer>\n        <p>&copy; 2026 GeoUrban. All rights reserved.</p>\n    </footer>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonte moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      border: none;
+      padding: 15px;
+      resize: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .result {
+      margin-top: 20px;
+      text-align: left;
+      font-size: 14px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🌍 GeoUrban</h1>
+  <p>Consultoria inteligente urbana com IA</p>
+
+  <textarea id="texto" placeholder="Descreva seu problema urbano..."></textarea>
+
+  <button onclick="enviar()">Analisar com IA</button>
+
+  <div class="result" id="resultado" style="display:none;"></div>
+
+  <div class="footer">© 2026 GeoUrban</div>
+</div>
+
+<script>
+async function enviar() {
+  const texto = document.getElementById("texto").value;
+
+  if (!texto) {
+    alert("Digite algo primeiro");
+    return;
+  }
+
+  const res = await fetch("/consultoria", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ texto })
+  });
+
+  const data = await res.json();
+
+  const box = document.getElementById("resultado");
+  box.style.display = "block";
+  box.innerHTML = `
+    <b>Tipo:</b> ${data.tipo}<br>
+    <b>Diagnóstico:</b> ${data.diagnostico}<br>
+    <b>Sugestões:</b><br> - ${data.sugestoes.join("<br> - ")}<br>
+    <b>Valor:</b> R$ ${data.valor_estimado}<br>
+    <b>Risco:</b> ${data.risco}
+  `;
+}
+</script>
+
+</body>
+</html>
