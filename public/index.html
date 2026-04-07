@@ -86,7 +86,10 @@ app.post("/salvar-b2", express.json(), (req, res) => {
 app.get("/status", (req, res) => {
     res.json({ sistema: "GeoUrban", status: "online", backup: "ativo", hora: new Date() });
 });
-
+{
+  "laboratorio": "ativo",
+  "projetos": ["geo1","geo2"]
+}
 // ================================
 // app.listen → não mexa abaixo disso
 // ================================
