@@ -1,128 +1,94 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') no-repeat center center fixed;
-    background-size: cover;
+    font-family: Arial;
+    background: #000;
     color: #fff;
 }
 
-.overlay {
-    background: rgba(0,0,0,0.75);
-    min-height: 100vh;
-    padding: 40px;
+/* LAYOUT */
+.container {
+    display: flex;
+    height: 100vh;
 }
 
-/* TOPO */
-.topo {
-    margin-bottom: 20px;
+/* ESQUERDA (IA) */
+.chat-area {
+    width: 40%;
+    background: #0d1117;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
 
-/* FORM ESQUERDA */
-.form-box {
-    width: 350px; /* largura controlada */
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
 }
 
-/* CAMPOS EM CASCATA */
-.form-box input,
-.form-box select {
-    width: 100%;
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
     padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    border: none;
 }
 
-/* BOTÃO */
 button {
-    width: 100%;
-    padding: 12px;
-    background: #007bff;
-    border: none;
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
+    padding: 10px;
 }
 
-/* BOTÃO CARTEIRA NO RODAPÉ */
-.footer {
-    position: fixed;
+/* CAMPOS GERADOS */
+.card-dados {
+    background: #161b22;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+/* DIREITA (NETFLIX) */
+.netflix {
+    width: 60%;
+    background: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') no-repeat center;
+    background-size: cover;
+    position: relative;
+}
+
+.slide {
+    position: absolute;
     bottom: 20px;
-    left: 40px;
-}
-
-.footer button {
-    width: auto;
-    padding: 10px 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 10px;
 }
 </style>
 
-<div class="overlay">
+<div class="container">
 
-    <div class="topo">
-        <h1>🚀 GeoUrban</h1>
+    <!-- IA -->
+    <div class="chat-area">
+
+        <div class="chat-box" id="chat">
+            <p>🤖 Olá! Vamos montar seu cadastro?</p>
+        </div>
+
+        <div id="dados"></div>
+
+        <div class="input-area">
+            <input id="entrada" placeholder="Digite algo... ex: sou engenheiro">
+            <button onclick="enviar()">Enviar</button>
+        </div>
+
     </div>
 
-    <div class="form-box">
-        <h2>Cadastro</h2>
-
-        <form onsubmit="salvar(event)">
-
-            <input id="nome" placeholder="Nome completo">
-            <input id="email" placeholder="Email">
-
-            <select id="categoria">
-                <option value="">Categoria</option>
-                <option>Profissional</option>
-                <option>Estudante</option>
-                <option>Outro</option>
-            </select>
-
-            <select id="nivel">
-                <option value="">Nível</option>
-                <option>Técnico</option>
-                <option>Graduação</option>
-                <option>Mestrado</option>
-            </select>
-
-            <input id="profissao" placeholder="Profissão">
-            <input id="especializacao" placeholder="Especialização">
-
-            <select id="registroTipo">
-                <option value="">Registro</option>
-                <option>CREA</option>
-                <option>CAU</option>
-                <option>CRT</option>
-            </select>
-
-            <input id="registroNumero" placeholder="Número do registro">
-
-            <select id="documentoTecnico">
-                <option value="">Documento Técnico</option>
-                <option>ART</option>
-                <option>RRT</option>
-                <option>TRT</option>
-            </select>
-
-            <input id="documentoNumero" placeholder="Número do documento">
-
-            <input id="pais" placeholder="País">
-            <input id="regiao" placeholder="Região">
-
-            <select id="situacao">
-                <option value="">Situação</option>
-                <option>Ativo</option>
-                <option>Aposentado</option>
-            </select>
-
-            <button type="submit">Cadastrar</button>
-
-        </form>
-    </div>
-
-    <!-- RODAPÉ -->
-    <div class="footer">
-        <button onclick="abrirCarteira()">📊 Carteira Digital</button>
+    <!-- NETFLIX -->
+    <div class="netflix">
+        <div class="slide" id="slide">
+            🚀 Plataforma de projetos técnicos
+        </div>
     </div>
 
 </div>
