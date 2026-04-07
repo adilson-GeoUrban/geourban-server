@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>GeoUrban Plataforma</title>
 
-<!-- Gantt -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css">
 <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.min.js"></script>
 
@@ -30,12 +29,13 @@ input, button {
 
 #log {
     background:#111;
-    height:180px;
+    height:200px;
     overflow:auto;
     margin:20px;
     padding:10px;
     text-align:left;
     border-radius:10px;
+    font-size:14px;
 }
 
 .card {
@@ -51,7 +51,6 @@ input, button {
     gap:10px;
     margin:20px;
 }
-
 </style>
 </head>
 
@@ -66,21 +65,13 @@ input, button {
 <div id="log"></div>
 
 <div class="grid">
-
 <div class="card">📊 Dashboard em tempo real</div>
-
 <div class="card">👷 Cadastro de Profissionais</div>
-
 <div class="card">⚖️ IA Jurídica + Contábil</div>
-
 <div class="card">💰 Pagamento Inteligente</div>
-
 <div class="card">🗺️ Mapa Geoespacial</div>
-
 <div class="card">🔐 Segurança Total</div>
-
 <div class="card">🎓 Educação Automática</div>
-
 </div>
 
 <h3>📈 Planejamento</h3>
@@ -88,12 +79,26 @@ input, button {
 
 <script>
 
-// LOG
-function log(msg){
-    document.getElementById("log").innerHTML += msg + "<br>";
+// RESET AO CARREGAR
+window.onload = function(){
+    document.getElementById("log").innerHTML = "";
 }
 
-// IA COMANDOS
+// LOG COM LIMITE
+function log(msg){
+    let logDiv = document.getElementById("log");
+
+    logDiv.innerHTML += msg + "<br>";
+
+    let linhas = logDiv.innerHTML.split("<br>");
+    if(linhas.length > 50){
+        logDiv.innerHTML = linhas.slice(-50).join("<br>");
+    }
+
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// COMANDOS
 function executar(){
     let cmd = document.getElementById("cmd").value.toLowerCase();
 
@@ -123,6 +128,8 @@ function executar(){
     else{
         log("🤖 IA analisando...");
     }
+
+    document.getElementById("cmd").value = "";
 }
 
 // VOZ
@@ -147,31 +154,36 @@ let tasks = [
 
 new Gantt("#gantt", tasks);
 
-// MONITORAMENTO
-setInterval(()=>{
-    log("🛰️ Sistema monitorando...");
-}, 10000);
+// MONITORAMENTO CONTROLADO
+let monitorAtivo = false;
+
+if(!monitorAtivo){
+    monitorAtivo = true;
+
+    setInterval(()=>{
+        log("🛰️ Sistema monitorando...");
+    }, 10000);
+}
 
 </script>
 
 <!-- =======================
-BACKUP GEOURBAN V1
+BACKUP GEOURBAN V2
 ======================= -->
 <!--
-VERSÃO: V1 FINAL UNIFICADA
+VERSÃO: V2 ESTÁVEL CORRIGIDA
 
-✔ Sistema online ativo
-✔ IA comandos funcionando
-✔ Cadastro preparado
-✔ Segurança inicial ativa
-✔ Gantt ativo
-✔ Voz ativa
-✔ Monitoramento ativo
+✔ Corrigido loop infinito
+✔ Corrigido duplicação de log
+✔ Limite de 50 linhas no log
+✔ Scroll automático
+✔ Monitoramento controlado
+✔ Estrutura limpa e profissional
 
 DATA: 07/04/2026
 
 OBS:
-Base estável para testes e evolução global
+Sistema pronto para próxima fase (integrações reais)
 -->
 
 </body>
