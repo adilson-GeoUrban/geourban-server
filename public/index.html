@@ -12,78 +12,122 @@ body{
     color:#fff;
 }
 
-.content{
+.container{
     padding:20px;
 }
 
 .card{
     background:#1f2937;
-    padding:20px;
-    margin:10px;
+    padding:15px;
     border-radius:10px;
     cursor:pointer;
-    display:inline-block;
+    width:200px;
 }
 
-.panel{
+.sistema{
     display:none;
+    margin-top:20px;
 }
 
-.panel.active{
-    display:block;
+.sistema.active{
+    display:flex;
+    gap:20px;
+}
+
+.form-area{
+    width:60%;
+}
+
+.chat-area{
+    width:40%;
+    background:#111827;
+    padding:15px;
+    border-radius:10px;
 }
 
 input, select{
     display:block;
-    margin:10px 0;
+    margin:8px 0;
     padding:8px;
-    width:250px;
+    width:100%;
 }
 
 button{
-    padding:10px;
     margin-top:10px;
+    padding:10px;
+    cursor:pointer;
 }
 
-#log{
-    background:#000;
+.sugestoes{
     margin-top:20px;
-    padding:10px;
-    height:120px;
-    overflow:auto;
+    display:none;
+    background:#1f2937;
+    padding:15px;
+    border-radius:10px;
+}
+
+.popup{
+    display:none;
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#111;
+    padding:15px;
+    border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="content">
+<div class="container">
 
 <h1>🚀 GeoUrban</h1>
 
-<div id="home" class="panel active">
-<div class="card" onclick="abrir('entrada')">🌐 Cadastro</div>
+<div class="card" onclick="abrirSistema()">
+🌐 Iniciar Cadastro
 </div>
 
-<div id="entrada" class="panel">
+<div id="sistema" class="sistema">
 
-<button onclick="voltar()">⬅ Voltar</button>
+<div class="form-area">
 
-<h2>Cadastro</h2>
+<h3>Cadastro Completo</h3>
 
-<form onsubmit="salvarEntrada(event)">
+<form oninput="detectarInteresse()" onsubmit="salvar(event)">
 
-<input placeholder="Nome" required>
-<input placeholder="Email" required>
+<input id="nome" placeholder="Nome completo" required>
+<input id="email" placeholder="Email" required>
 
-<select id="situacao" required>
+<input id="pais" placeholder="País">
+<input id="regiao" placeholder="Região">
+<input id="cep" placeholder="CEP">
+
+<input id="profissao" placeholder="Profissão">
+<input id="especialidade" placeholder="Especialidade">
+
+<select id="tipoRegistro">
+<option value="">Tipo de Registro</option>
+<option>CREA</option>
+<option>CAU</option>
+<option>CFT</option>
+<option>ART</option>
+<option>RRT</option>
+<option>TRT</option>
+</select>
+
+<input id="registro" placeholder="Número do registro">
+
+<input placeholder="Telefone Fixo">
+<input placeholder="Telefone Móvel">
+
+<select id="situacao">
 <option value="">Situação</option>
 <option value="ativo">Ativo</option>
 <option value="autonomo">Autônomo</option>
 <option value="aposentado">Aposentado</option>
+<option value="informal">Atividade informal</option>
 </select>
-
-<input id="registro" placeholder="Registro profissional">
 
 <button type="submit">Cadastrar</button>
 
@@ -93,46 +137,69 @@ button{
 
 </div>
 
-<div id="log"></div>
+<div class="chat-area">
+<h4>🤖 Assistente</h4>
+<div id="chatBox">Olá, posso te ajudar no cadastro 👋</div>
+</div>
+
+</div>
+
+<div id="sugestoes" class="sugestoes"></div>
+
+<div id="popup" class="popup">
+Deseja ver cursos recomendados?
+<br><br>
+<button onclick="mostrarCursos()">Sim</button>
+<button onclick="fecharPopup()">Agora não</button>
+</div>
 
 </div>
 
 <script>
+function abrirSistema(){
+    document.getElementById("sistema").classList.add("active");
 
-function abrir(id){
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    setTimeout(()=>{
+        document.getElementById("popup").style.display = "block";
+    },2000);
 }
 
-function voltar(){
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById('home').classList.add('active');
+function detectarInteresse(){
+    const prof = document.getElementById("profissao").value.toLowerCase();
+
+    if(prof.includes("engenheiro")){
+        document.getElementById("chatBox").innerHTML =
+        "💡 Detectamos perfil técnico. Deseja cursos e certificações?";
+    }
 }
 
-function salvarEntrada(e){
+function mostrarCursos(){
+    document.getElementById("sugestoes").style.display = "block";
+    document.getElementById("sugestoes").innerHTML =
+    "🎓 Engenharia Avançada<br>📊 Gestão de Obras<br>📐 Projetos Urbanos";
+
+    fecharPopup();
+}
+
+function fecharPopup(){
+    document.getElementById("popup").style.display = "none";
+}
+
+function salvar(e){
     e.preventDefault();
 
-    const situacao = document.getElementById("situacao").value;
+    const tipo = document.getElementById("tipoRegistro").value;
     const registro = document.getElementById("registro").value;
 
-    if(situacao === "ativo" && registro.length < 3){
-        alert("Registro obrigatório");
+    if(tipo !== "" && registro.length < 5){
+        alert("Registro profissional inválido");
         return;
     }
 
-    document.getElementById("resposta").innerHTML = "✅ OK";
-    registrar("Cadastro feito");
+    document.getElementById("resposta").innerHTML =
+    "✅ Cadastro realizado com sucesso";
+
 }
-
-let ultimo = "";
-
-function registrar(msg){
-    if(msg !== ultimo){
-        document.getElementById("log").innerHTML += msg + "<br>";
-        ultimo = msg;
-    }
-}
-
 </script>
 
 </body>
