@@ -1,11 +1,11 @@
-<!-- ENTRADA INTELIGENTE COMPLETA PROFISSIONAL -->
+<!-- ENTRADA INTELIGENTE COMPLETA FINAL -->
 
-<div id="entrada" class="panel">
+<div id="entrada" class="panel" style="display:none;">
 
 <button onclick="voltar()">⬅ Voltar</button>
 
-<h2>🌐 Entrada Inteligente</h2>
-<p>Cadastro completo do usuário</p>
+<h2>🌐 Cadastro do Usuário</h2>
+<p>Preencha suas informações</p>
 
 <form id="formEntrada" onsubmit="salvarEntrada(event)">
 
@@ -23,27 +23,30 @@
 <input type="text" placeholder="Profissão"><br><br>
 <input type="text" placeholder="Especialidade"><br><br>
 
-<select>
-<option value="">Registro Profissional</option>
-<option>CREA</option>
-<option>CAU</option>
-<option>CFT</option>
-<option>Outro</option>
+<h3>📊 Situação Profissional</h3>
+<select id="situacao" required>
+<option value="">Selecione</option>
+<option value="formacao">Em formação</option>
+<option value="ativo">Ativo regular</option>
+<option value="autonomo">Autônomo / informal</option>
+<option value="aposentado">Aposentado</option>
+<option value="institucional">Institucional</option>
 </select><br><br>
 
-<input type="text" placeholder="Número do registro"><br><br>
+<h3>🪪 Registro Técnico</h3>
+<select id="registroTipo">
+<option value="">Tipo de registro</option>
+<option value="CREA">CREA (ART)</option>
+<option value="CAU">CAU (RRT)</option>
+<option value="CFT">CFT (TRT)</option>
+<option value="OUTRO">Outro</option>
+</select><br><br>
+
+<input type="text" id="registroNumero" placeholder="Número do registro"><br><br>
 
 <h3>📞 Contato</h3>
 <input type="text" placeholder="Telefone Fixo"><br><br>
 <input type="text" placeholder="Telefone Móvel" required><br><br>
-
-<h3>👤 Tipo de usuário</h3>
-<select required>
-<option value="">Selecione</option>
-<option>Leigo</option>
-<option>Profissional</option>
-<option>Governo</option>
-</select><br><br>
 
 <button type="submit">Cadastrar</button>
 
@@ -57,12 +60,37 @@
 function salvarEntrada(e){
     e.preventDefault();
 
-    document.getElementById("respostaEntrada").innerHTML =
-    "✅ Cadastro completo realizado com sucesso";
+    const situacao = document.getElementById("situacao").value;
+    const tipoRegistro = document.getElementById("registroTipo").value;
+    const numeroRegistro = document.getElementById("registroNumero").value;
 
-    registrar("Novo cadastro completo realizado");
+    // REGRA: somente ativo regular exige validação obrigatória
+    if(situacao === "ativo"){
+
+        if(!tipoRegistro){
+            alert("Selecione o tipo de registro profissional");
+            return;
+        }
+
+        if(!numeroRegistro || numeroRegistro.length < 5){
+            alert("Registro profissional inválido");
+            return;
+        }
+
+        const padrao = /^[0-9A-Za-z\-\/]+$/;
+
+        if(!padrao.test(numeroRegistro)){
+            alert("Formato de registro inválido");
+            return;
+        }
+    }
+
+    document.getElementById("respostaEntrada").innerHTML =
+    "✅ Cadastro realizado com sucesso";
+
+    registrar("Cadastro concluído com validação por situação");
 }
 </script>
 
 <!-- BACKUP -->
-<!-- Versão completa com dados profissionais e endereço -->
+<!-- Versão final com situação profissional e validação inteligente -->
