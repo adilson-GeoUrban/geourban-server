@@ -1,23 +1,75 @@
-geourban_unificado/
-│
-├── index.html               ← Página principal unificada (Bandeja 1 + 2)
-├── assets/
-│   ├── style.css            ← Layout unificado
-│   ├── script.js            ← Scripts unificados (galeria, AI Designer)
-│   └── imagens/             ← Todas as imagens de Bandeja 1 e 2
-│       ├── dashboard.jpg
-│       ├── lab.jpg
-│       ├── shop.jpg
-│       └── ...               ← outras imagens da Bandeja 1
-├── abas/
-│   ├── aba1.html            ← Aba do dashboard Bandeja 2
-│   ├── aba2.html            ← Laboratório Bandeja 2
-│   ├── aba3.html            ← Loja/Shop Bandeja 2
-│   └── ...                  ← Abas Bandeja 1
-└── blocos/
-    ├── bloco1_galeria.html  ← Galeria Bandeja 1
-    ├── bloco2_dashboard.html← Dashboard Bandeja 1
-    ├── bloco3_download.html ← Download Bandeja 1
-    ├── bloco4_galeria.html  ← Galeria Bandeja 2
-    ├── bloco5_dashboard.html← Dashboard Bandeja 2
-    └── bloco6_download.html ← Download Bandeja 2
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoUrban - Painel Administrativo</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <header>
+        <h1>GeoUrban - Painel Administrativo</h1>
+        <p>Bem-vindo ao ambiente interno da sua plataforma</p>
+    </header>
+
+    <main>
+        <!-- Abas Bandeja 2 -->
+        <section id="bandeja2">
+            <h2>Bandeja 2</h2>
+            <div id="aba-dashboard">
+                <iframe src="abas/aba1.html" width="100%" height="400px"></iframe>
+            </div>
+            <div id="aba-laboratorio">
+                <iframe src="abas/aba2.html" width="100%" height="400px"></iframe>
+            </div>
+            <div id="aba-loja">
+                <iframe src="abas/aba3.html" width="100%" height="400px"></iframe>
+            </div>
+        </section>
+
+        <!-- Blocos unificados -->
+        <section id="blocos-unificados">
+            <h2>Blocos Unificados</h2>
+            <iframe src="blocos/bloco1_galeria.html" width="100%" height="300px"></iframe>
+            <iframe src="blocos/bloco2_dashboard.html" width="100%" height="300px"></iframe>
+            <iframe src="blocos/bloco3_download.html" width="100%" height="300px"></iframe>
+            <iframe src="blocos/bloco4_galeria.html" width="100%" height="300px"></iframe>
+            <iframe src="blocos/bloco5_dashboard.html" width="100%" height="300px"></iframe>
+            <iframe src="blocos/bloco6_download.html" width="100%" height="300px"></iframe>
+        </section>
+
+        <!-- Backup / salvar-tudo -->
+        <section id="backup">
+            <h2>Salvar Ambiente</h2>
+            <button id="btn-salvar" onclick="salvarAmbiente()">Salvar Tudo</button>
+            <p id="status-salvar"></p>
+        </section>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script>
+        async function salvarAmbiente() {
+            const dados = {
+                usuarios: ["Admin", "Designers"],
+                configuracoes: { tema: "claro" },
+                env: 1
+            };
+
+            try {
+                const response = await fetch("/salvar-tudo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await response.json();
+                document.getElementById("status-salvar").innerText =
+                    `✅ Ambiente ${resultado.ambiente} salvo com sucesso!`;
+            } catch (erro) {
+                document.getElementById("status-salvar").innerText =
+                    `❌ Erro ao salvar: ${erro.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
