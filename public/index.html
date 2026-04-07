@@ -1,24 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>GeoUrban V2</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
 body {
+  margin: 0;
+  font-family: Arial;
   background: #0f172a;
   color: white;
-  display: flex;
 }
 
 /* SIDEBAR */
@@ -26,44 +17,40 @@ body {
   width: 220px;
   height: 100vh;
   background: #020617;
+  position: fixed;
   padding: 20px;
 }
 
 .sidebar h2 {
-  margin-bottom: 30px;
+  color: #38bdf8;
 }
 
 .sidebar a {
   display: block;
-  margin: 10px 0;
   color: #94a3b8;
+  margin: 10px 0;
   text-decoration: none;
 }
 
 /* MAIN */
 .main {
-  flex: 1;
+  margin-left: 240px;
   padding: 20px;
 }
 
 /* HEADER COM IMAGEM */
-.header {
-  height: 180px;
-  background: url('dashboard.jpg') center/cover;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  font-size: 28px;
-  font-weight: bold;
+.header img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 /* CARDS */
 .cards {
   display: flex;
   gap: 20px;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .card {
@@ -73,8 +60,9 @@ body {
   border-radius: 12px;
 }
 
-/* AREA IA */
-.box {
+/* IA BOX */
+.ai-box {
+  margin-top: 20px;
   background: #1e293b;
   padding: 20px;
   border-radius: 12px;
@@ -83,33 +71,26 @@ body {
 textarea {
   width: 100%;
   height: 100px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
   padding: 10px;
-  margin-top: 10px;
 }
 
 button {
   margin-top: 10px;
-  padding: 12px;
   width: 100%;
-  border: none;
-  border-radius: 10px;
+  padding: 12px;
   background: #3b82f6;
   color: white;
-  font-weight: bold;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-}
-
-.result {
-  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- MENU -->
 <div class="sidebar">
   <h2>🌍 GeoUrban</h2>
   <a href="#">Dashboard</a>
@@ -118,12 +99,13 @@ button {
   <a href="#">Configurações</a>
 </div>
 
-<!-- CONTEÚDO -->
 <div class="main">
 
   <div class="header">
-    Dashboard Urbano Inteligente
+    <img src="Inteligência urbana no futuro.jpg">
   </div>
+
+  <h1>Dashboard Urbano Inteligente</h1>
 
   <div class="cards">
     <div class="card">130+ Relatórios</div>
@@ -131,46 +113,13 @@ button {
     <div class="card">27 Usuários</div>
   </div>
 
-  <div class="box">
+  <div class="ai-box">
     <h3>Análise com IA</h3>
-
-    <textarea id="texto" placeholder="Descreva seu problema urbano..."></textarea>
-
-    <button onclick="enviar()">Analisar</button>
-
-    <div id="resultado" class="result"></div>
+    <textarea placeholder="Descreva seu problema urbano..."></textarea>
+    <button>Analisar</button>
   </div>
 
 </div>
-
-<script>
-async function enviar() {
-  const texto = document.getElementById("texto").value;
-
-  if (!texto) {
-    alert("Digite algo");
-    return;
-  }
-
-  const res = await fetch("/consultoria", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ texto })
-  });
-
-  const data = await res.json();
-
-  document.getElementById("resultado").innerHTML = `
-    <b>Tipo:</b> ${data.tipo}<br>
-    <b>Diagnóstico:</b> ${data.diagnostico}<br>
-    <b>Sugestões:</b><br> - ${data.sugestoes.join("<br> - ")}<br>
-    <b>Valor:</b> R$ ${data.valor_estimado}<br>
-    <b>Risco:</b> ${data.risco}
-  `;
-}
-</script>
 
 </body>
 </html>
