@@ -1,180 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban</title>
+const usuario = {
+    nome: nome.value,
+    email: email.value,
 
-<style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#0a0f1c;
-    color:#fff;
-}
+    categoria: categoria.value,
+    faculdade: faculdade.value,
+    curso: curso.value,
+    nivel: nivel.value,
 
-.topbar{
-    position:fixed;
-    top:0;
-    width:100%;
-    background:#111827;
-    padding:10px;
-    text-align:center;
-}
+    profissao: profissao.value,
+    especializacao: especializacao.value,
 
-.container{
-    padding:60px 20px;
-}
+    registroTipo: registroTipo.value,
+    registroNumero: registroNumero.value,
+    documentoTecnico: documentoTecnico.value,
 
-.card{
-    background:#1f2937;
-    padding:15px;
-    border-radius:10px;
-    cursor:pointer;
-    width:200px;
-}
+    pais: pais.value,
+    regiao: regiao.value,
+    cep: cep.value,
 
-.sistema{
-    display:none;
-    margin-top:20px;
-}
+    telefoneFixo: telefoneFixo.value,
+    telefoneMovel: telefoneMovel.value,
 
-.sistema.active{
-    display:flex;
-    gap:20px;
-}
-
-.form-area{
-    width:60%;
-}
-
-.chat-area{
-    width:40%;
-    background:#111827;
-    padding:15px;
-    border-radius:10px;
-}
-
-input, select{
-    display:block;
-    margin:8px 0;
-    padding:8px;
-    width:100%;
-}
-
-button{
-    margin-top:10px;
-    padding:10px;
-}
-
-.audio-btn{
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    background:#1f2937;
-    padding:10px;
-    border-radius:10px;
-    cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
-🚀 Plataforma inteligente conectando pessoas e conhecimento
-</div>
-
-<div class="container">
-
-<h1>GeoUrban</h1>
-
-<div class="card" onclick="abrirSistema()">
-🌐 Iniciar
-</div>
-
-<div id="sistema" class="sistema">
-
-<div class="form-area">
-
-<h3>Cadastro</h3>
-
-<form onsubmit="salvar(event)">
-<input placeholder="Nome completo" required>
-<input placeholder="Email" required>
-
-<button type="submit">Cadastrar</button>
-</form>
-
-<div id="resposta"></div>
-
-</div>
-
-<div class="chat-area">
-<h4>🤖 Assistente</h4>
-<div id="chatBox"></div>
-</div>
-
-</div>
-
-</div>
-
-<div class="audio-btn" onclick="toggleAudio()">
-🎵 Música
-</div>
-
-<audio id="musica" loop>
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b4c94.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-
-let tocando = false;
-
-function abrirSistema(){
-    document.getElementById("sistema").classList.add("active");
-
-    document.getElementById("chatBox").innerHTML =
-    "👋 Bem-vindo! Explore as possibilidades da plataforma. Posso te ajudar.";
-
-    iniciarAudio();
-}
-
-function iniciarAudio(){
-    const audio = document.getElementById("musica");
-    audio.volume = 0.2;
-
-    if(!tocando){
-        audio.play();
-        tocando = true;
-    }
-}
-
-function toggleAudio(){
-    const audio = document.getElementById("musica");
-
-    if(audio.paused){
-        audio.play();
-    }else{
-        audio.pause();
-    }
-}
-
-function salvar(e){
-    e.preventDefault();
-
-    document.getElementById("resposta").innerHTML =
-    "✅ Cadastro concluído. Obrigado por participar.";
-
-    falar("Cadastro concluído. Seja bem vindo à plataforma.");
-}
-
-function falar(texto){
-    const msg = new SpeechSynthesisUtterance(texto);
-    msg.lang = "pt-BR";
-    speechSynthesis.speak(msg);
-}
-
-</script>
-
-</body>
-</html>
+    situacao: situacao.value
+};
