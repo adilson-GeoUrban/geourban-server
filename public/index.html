@@ -1,38 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban</title>
-
 <style>
-body {
+
+/* FUNDO FULL */
+body{
     margin:0;
     font-family:Arial;
     background:#000;
     color:#fff;
+    overflow:hidden;
 }
 
-/* LAYOUT */
+/* BACKGROUND ANIMADO */
+.bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') center/cover no-repeat;
+    filter:brightness(0.4);
+    z-index:-1;
+}
+
+/* CONTAINER CENTRAL */
 .container{
     display:flex;
     height:100vh;
 }
 
-/* ESQUERDA IA */
+/* CAIXA CADASTRO FLUTUANTE */
 .chat-area{
-    width:40%;
-    background:#0d1117;
+    width:420px;
+    max-width:90%;
+    height:80vh;
+    background:rgba(13,17,23,0.95);
+    border-radius:15px;
+    margin:auto;
     display:flex;
     flex-direction:column;
     padding:15px;
+    box-shadow:0 0 30px rgba(0,0,0,0.8);
 }
 
+/* CHAT */
 .chat-box{
     flex:1;
     overflow-y:auto;
     font-size:14px;
 }
 
+/* INPUT */
 .input-area{
     display:flex;
     gap:5px;
@@ -41,6 +55,8 @@ body {
 input{
     flex:1;
     padding:10px;
+    border-radius:5px;
+    border:none;
 }
 
 /* CARD */
@@ -51,31 +67,48 @@ input{
     border-radius:8px;
 }
 
-/* DIREITA NETFLIX */
-.netflix{
-    width:60%;
-    background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') no-repeat center;
-    background-size:cover;
-    position:relative;
+/* ASSISTENTE (FORA) */
+.assistente{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:260px;
+    background:rgba(0,0,0,0.7);
+    padding:15px;
+    border-radius:12px;
+    backdrop-filter:blur(5px);
+}
+
+/* SLIDES */
+.slides{
+    position:fixed;
+    top:20px;
+    left:20px;
+    width:300px;
 }
 
 .slide{
-    position:absolute;
-    bottom:20px;
-    left:20px;
     background:rgba(0,0,0,0.6);
-    padding:20px;
+    padding:15px;
+    margin-bottom:10px;
     border-radius:10px;
+    animation:fade 1s;
 }
+
+@keyframes fade{
+    from{opacity:0; transform:translateY(10px)}
+    to{opacity:1}
+}
+
 </style>
 
-</head>
+<div class="bg"></div>
 
-<body>
+<!-- SLIDES -->
+<div class="slides" id="slides"></div>
 
+<!-- CADASTRO IA -->
 <div class="container">
-
-    <!-- IA -->
     <div class="chat-area">
 
         <div id="mensagemIA"></div>
@@ -85,126 +118,16 @@ input{
         <div id="dados"></div>
 
         <div class="input-area">
-            <input id="entrada" placeholder="Digite: sou engenheiro...">
+            <input id="entrada" placeholder="Ex: sou engenheiro">
             <button onclick="enviar()">Enviar</button>
         </div>
 
     </div>
-
-    <!-- NETFLIX -->
-    <div class="netflix">
-        <div class="slide" id="slide">🚀 Plataforma GeoUrban</div>
-    </div>
-
 </div>
 
-<script>
-
-// BOAS VINDAS
-const mensagens = [
-"👋 Bem-vindo à GeoUrban",
-"Rede de profissionais e projetos",
-"Você pode evoluir e gerar oportunidades",
-"Vamos montar seu cadastro juntos"
-];
-
-let m=0;
-function iniciarIA(){
-    function loop(){
-        if(m < mensagens.length){
-            mensagemIA.innerText = mensagens[m];
-            m++;
-            setTimeout(loop,3000);
-        }
-    }
-    loop();
-}
-
-// USUÁRIO
-let usuario = {};
-
-function enviar(){
-    const texto = entrada.value;
-
-    chat.innerHTML += `<p>🧑 ${texto}</p>`;
-
-    if(texto.includes("engenheiro")){
-        usuario.categoria="Profissional";
-        usuario.profissao="Engenheiro";
-        resposta("Perfeito. Informe seu registro.");
-    }
-
-    atualizarCard();
-    entrada.value="";
-}
-
-function resposta(msg){
-    chat.innerHTML += `<p>🤖 ${msg}</p>`;
-}
-
-// CARD
-function atualizarCard(){
-    let html="<div class='card'><h4>Dados</h4>";
-
-    for(let k in usuario){
-        html+=`<p>${k}: ${usuario[k]}</p>`;
-    }
-
-    html+="</div>";
-    dados.innerHTML=html;
-}
-
-// FINALIZAÇÃO
-function finalizarCadastro(usuario){
-
-    chat.innerHTML += `<p>🤖 Cadastro finalizado com sucesso</p>`;
-    chat.innerHTML += `<p>🤖 Obrigado por participar da GeoUrban 🚀</p>`;
-
-    if(usuario.categoria){
-        chamarSupervisora(usuario);
-    }
-}
-
-// SUPERVISORA
-function chamarSupervisora(usuario){
-
-    chat.innerHTML += `<p>🧠 IA Supervisora analisando...</p>`;
-
-    setTimeout(()=>{
-
-        let erro=false;
-
-        if(usuario.categoria==="Profissional"){
-            if(!usuario.registroNumero){
-                erro=true;
-                chat.innerHTML += `<p>⚠ Registro obrigatório</p>`;
-            }
-        }
-
-        if(!erro){
-            chat.innerHTML += `<p>🧠 Cadastro validado ✔</p>`;
-        }
-
-    },2000);
-}
-
-// SLIDES
-const slides=[
-"🚀 Plataforma de projetos",
-"📊 Gestão técnica",
-"📎 ART / RRT",
-"🎓 Cursos"
-];
-
-let i=0;
-setInterval(()=>{
-    i=(i+1)%slides.length;
-    slide.innerText=slides[i];
-},3000);
-
-window.onload=iniciarIA;
-
-</script>
-
-</body>
-</html>
+<!-- ASSISTENTE -->
+<div class="assistente">
+    👩‍💼 Assistente GeoUrban<br><br>
+    Estou aqui para te ajudar no cadastro.<br>
+    Vamos criar seu perfil profissional 🚀
+</div>
