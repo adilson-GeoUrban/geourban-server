@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>GeoUrban Plataforma</title>
+<title>GeoUrban</title>
 
 <style>
 body{
@@ -12,34 +12,17 @@ body{
     color:#fff;
 }
 
-.container{
-    display:flex;
-}
-
-.sidebar{
-    width:220px;
-    height:100vh;
-    background:#111827;
-    padding:20px;
-    position:fixed;
-}
-
 .content{
-    margin-left:240px;
     padding:20px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-    gap:20px;
 }
 
 .card{
     background:#1f2937;
     padding:20px;
+    margin:10px;
     border-radius:10px;
     cursor:pointer;
+    display:inline-block;
 }
 
 .panel{
@@ -50,15 +33,16 @@ body{
     display:block;
 }
 
+input, select{
+    display:block;
+    margin:10px 0;
+    padding:8px;
+    width:250px;
+}
+
 button{
     padding:10px;
     margin-top:10px;
-}
-
-input, select{
-    width:100%;
-    padding:8px;
-    margin-top:5px;
 }
 
 #log{
@@ -73,47 +57,33 @@ input, select{
 
 <body>
 
-<div class="sidebar">
-<h2>🧠 GeoUrban</h2>
-</div>
-
 <div class="content">
 
-<h1>🚀 Plataforma</h1>
+<h1>🚀 GeoUrban</h1>
 
 <div id="home" class="panel active">
-<div class="grid">
 <div class="card" onclick="abrir('entrada')">🌐 Cadastro</div>
-</div>
 </div>
 
 <div id="entrada" class="panel">
 
 <button onclick="voltar()">⬅ Voltar</button>
 
-<h2>Cadastro do Usuário</h2>
+<h2>Cadastro</h2>
 
 <form onsubmit="salvarEntrada(event)">
 
-<input type="text" placeholder="Nome completo" required>
-<input type="email" placeholder="Email" required>
+<input placeholder="Nome" required>
+<input placeholder="Email" required>
 
 <select id="situacao" required>
 <option value="">Situação</option>
-<option value="formacao">Em formação</option>
-<option value="ativo">Ativo regular</option>
+<option value="ativo">Ativo</option>
 <option value="autonomo">Autônomo</option>
 <option value="aposentado">Aposentado</option>
 </select>
 
-<select id="registroTipo">
-<option value="">Registro</option>
-<option>CREA</option>
-<option>CAU</option>
-<option>CFT</option>
-</select>
-
-<input id="registroNumero" placeholder="Número registro">
+<input id="registro" placeholder="Registro profissional">
 
 <button type="submit">Cadastrar</button>
 
@@ -143,17 +113,15 @@ function salvarEntrada(e){
     e.preventDefault();
 
     const situacao = document.getElementById("situacao").value;
-    const registro = document.getElementById("registroNumero").value;
+    const registro = document.getElementById("registro").value;
 
-    if(situacao === "ativo" && (!registro || registro.length < 3)){
-        alert("Registro obrigatório para ativo");
+    if(situacao === "ativo" && registro.length < 3){
+        alert("Registro obrigatório");
         return;
     }
 
-    document.getElementById("resposta").innerHTML =
-    "✅ Cadastro OK";
-
-    registrar("Cadastro realizado");
+    document.getElementById("resposta").innerHTML = "✅ OK";
+    registrar("Cadastro feito");
 }
 
 let ultimo = "";
