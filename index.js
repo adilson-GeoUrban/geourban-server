@@ -1,112 +1,106 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>GeoUrban 🚀</title>
-  <style>
-    body { font-family: Arial; background:#0f172a; color:#fff; padding:20px; }
-    input, button { padding:10px; margin:5px; border-radius:8px; border:none; }
-    button { background:#22c55e; cursor:pointer; }
-    .box { background:#1e293b; padding:20px; border-radius:12px; margin-top:20px; }
-  </style>
-</head>
-<body>
+// 🚀 SISTEMA GEOURBAN — BLOCO ÚNICO CORRIGIDO
 
-<h1>GeoUrban Online 🚀</h1>
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
-<div class="box">
-  <input id="descricao" placeholder="Descrição da operação">
-  <input id="valor" type="number" placeholder="Valor (R$)">
-  <button onclick="executar()">Analisar</button>
-</div>
+const app = express();
+app.use(express.json());
 
-<div id="resultado" class="box"></div>
-
-<script>
-
-// 🔐 VALIDAÇÃO SEGURA
-function validarOperacao(dados) {
-  if (!dados) return "erro";
-
-  if (!dados.valor || dados.valor <= 0) {
-    return "valor_invalido";
-  }
-
-  if (!dados.descricao || dados.descricao.trim() === "") {
-    return "descricao_vazia";
-  }
-
-  return "ok";
+// 📂 GARANTIR PASTA BACKUP
+const pastaBackup = path.join(__dirname, "backup");
+if (!fs.existsSync(pastaBackup)) {
+  fs.mkdirSync(pastaBackup);
 }
 
-// 🧠 IA PRINCIPAL CORRIGIDA
+// 🛡️ PROTEÇÃO SIMPLES (SEM BLOQUEIO EXAGERADO)
+function guardian(texto) {
+  const proibidos = [
+    "hack",
+    "fraude",
+    "ataque"
+  ];
+
+  texto = (texto || "").toLowerCase();
+
+  for (let p of proibidos) {
+    if (texto.includes(p)) {
+      return { bloqueado: true, motivo: p };
+    }
+  }
+
+  return { bloqueado: false };
+}
+
+// ⚖️ GOVERNANÇA LEVE (NÃO BLOQUEIA POR QUALQUER COISA)
+function governar(texto) {
+  texto = (texto || "").toLowerCase();
+
+  if (texto.includes("erro crítico")) {
+    return { permitido: false };
+  }
+
+  return { permitido: true };
+}
+
+// 🧠 IA PRINCIPAL
 function sistema(dados) {
   try {
+    const descricao = dados?.descricao || "";
 
-    const status = validarOperacao(dados);
-
-    if (status !== "ok") {
-      return { erro: status };
+    // 🔴 PROTEÇÃO
+    const g = guardian(descricao);
+    if (g.bloqueado) {
+      return {
+        status: "bloqueado",
+        motivo: "Termo sensível detectado: " + g.motivo
+      };
     }
 
-    const valor = Number(dados.valor);
-    const descricao = dados.descricao.toLowerCase();
-
-    let risco = "baixo";
-    let lucro = valor * 0.2;
-    let imposto = valor * 0.1;
-
-    // 🔍 LÓGICA INTELIGENTE
-    if (descricao.includes("importação")) {
-      risco = "medio";
-      imposto = valor * 0.25;
+    // 🟡 GOVERNANÇA
+    const gov = governar(descricao);
+    if (!gov.permitido) {
+      return {
+        status: "bloqueado",
+        motivo: "Regra interna acionada"
+      };
     }
 
-    if (descricao.includes("alto risco")) {
-      risco = "alto";
-      lucro = valor * 0.1;
-    }
-
+    // 🟢 EXECUÇÃO NORMAL
     return {
-      risco,
-      lucro: lucro.toFixed(2),
-      imposto: imposto.toFixed(2),
-      recomendacao: gerarRecomendacao(risco)
+      status: "ok",
+      resposta: "Sistema funcionando 🚀",
+      recebido: descricao
     };
 
   } catch (erro) {
-    console.log("❌ Erro no sistema:", erro.message);
-    return { erro: "falha_sistema" };
-  }
-}
-
-// 🤖 RECOMENDAÇÃO
-function gerarRecomendacao(risco) {
-  if (risco === "alto") return "⚠️ Evitar operação";
-  if (risco === "medio") return "⚠️ Atenção";
-  return "✅ Operação segura";
-}
-
-// ▶️ EXECUÇÃO
-function executar() {
-  try {
-    const dados = {
-      descricao: document.getElementById("descricao").value,
-      valor: parseFloat(document.getElementById("valor").value)
+    return {
+      status: "erro",
+      mensagem: erro.message
     };
-
-    const resposta = sistema(dados);
-
-    document.getElementById("resultado").innerHTML =
-      "<pre>" + JSON.stringify(resposta, null, 2) + "</pre>";
-
-  } catch (erro) {
-    document.getElementById("resultado").innerHTML =
-      "Erro na execução";
   }
 }
 
-</script>
+// 📡 ROTA PRINCIPAL
+app.post("/solicitar", (req, res) => {
+  const dados = req.body;
 
-</body>
-</html>
+  const resultado = sistema(dados);
+
+  if (resultado.status === "bloqueado") {
+    return res.status(403).json(resultado);
+  }
+
+  res.json(resultado);
+});
+
+// 🌐 ROTA TESTE
+app.get("/", (req, res) => {
+  res.send("✅ GeoUrban rodando normal (sem bloqueio excessivo)");
+});
+
+// ▶️ INICIAR
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+});
