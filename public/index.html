@@ -1,96 +1,171 @@
-<!-- ENTRADA INTELIGENTE COMPLETA FINAL -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GeoUrban Plataforma</title>
 
-<div id="entrada" class="panel" style="display:none;">
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0a0f1c;
+    color:#fff;
+}
+
+.container{
+    display:flex;
+}
+
+.sidebar{
+    width:220px;
+    height:100vh;
+    background:#111827;
+    padding:20px;
+    position:fixed;
+}
+
+.content{
+    margin-left:240px;
+    padding:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#1f2937;
+    padding:20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.panel{
+    display:none;
+}
+
+.panel.active{
+    display:block;
+}
+
+button{
+    padding:10px;
+    margin-top:10px;
+}
+
+input, select{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+}
+
+#log{
+    background:#000;
+    margin-top:20px;
+    padding:10px;
+    height:120px;
+    overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>🧠 GeoUrban</h2>
+</div>
+
+<div class="content">
+
+<h1>🚀 Plataforma</h1>
+
+<div id="home" class="panel active">
+<div class="grid">
+<div class="card" onclick="abrir('entrada')">🌐 Cadastro</div>
+</div>
+</div>
+
+<div id="entrada" class="panel">
 
 <button onclick="voltar()">⬅ Voltar</button>
 
-<h2>🌐 Cadastro do Usuário</h2>
-<p>Preencha suas informações</p>
+<h2>Cadastro do Usuário</h2>
 
-<form id="formEntrada" onsubmit="salvarEntrada(event)">
+<form onsubmit="salvarEntrada(event)">
 
-<h3>📌 Dados Básicos</h3>
-<input type="text" placeholder="Nome completo" required><br><br>
-<input type="text" placeholder="CPF" required><br><br>
-<input type="email" placeholder="Email" required><br><br>
+<input type="text" placeholder="Nome completo" required>
+<input type="email" placeholder="Email" required>
 
-<h3>🌍 Endereço</h3>
-<input type="text" placeholder="País" required><br><br>
-<input type="text" placeholder="Região / Estado" required><br><br>
-<input type="text" placeholder="CEP" required><br><br>
-
-<h3>💼 Profissional</h3>
-<input type="text" placeholder="Profissão"><br><br>
-<input type="text" placeholder="Especialidade"><br><br>
-
-<h3>📊 Situação Profissional</h3>
 <select id="situacao" required>
-<option value="">Selecione</option>
+<option value="">Situação</option>
 <option value="formacao">Em formação</option>
 <option value="ativo">Ativo regular</option>
-<option value="autonomo">Autônomo / informal</option>
+<option value="autonomo">Autônomo</option>
 <option value="aposentado">Aposentado</option>
-<option value="institucional">Institucional</option>
-</select><br><br>
+</select>
 
-<h3>🪪 Registro Técnico</h3>
 <select id="registroTipo">
-<option value="">Tipo de registro</option>
-<option value="CREA">CREA (ART)</option>
-<option value="CAU">CAU (RRT)</option>
-<option value="CFT">CFT (TRT)</option>
-<option value="OUTRO">Outro</option>
-</select><br><br>
+<option value="">Registro</option>
+<option>CREA</option>
+<option>CAU</option>
+<option>CFT</option>
+</select>
 
-<input type="text" id="registroNumero" placeholder="Número do registro"><br><br>
-
-<h3>📞 Contato</h3>
-<input type="text" placeholder="Telefone Fixo"><br><br>
-<input type="text" placeholder="Telefone Móvel" required><br><br>
+<input id="registroNumero" placeholder="Número registro">
 
 <button type="submit">Cadastrar</button>
 
 </form>
 
-<div id="respostaEntrada"></div>
+<div id="resposta"></div>
+
+</div>
+
+<div id="log"></div>
 
 </div>
 
 <script>
+
+function abrir(id){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function voltar(){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('home').classList.add('active');
+}
+
 function salvarEntrada(e){
     e.preventDefault();
 
     const situacao = document.getElementById("situacao").value;
-    const tipoRegistro = document.getElementById("registroTipo").value;
-    const numeroRegistro = document.getElementById("registroNumero").value;
+    const registro = document.getElementById("registroNumero").value;
 
-    // REGRA: somente ativo regular exige validação obrigatória
-    if(situacao === "ativo"){
-
-        if(!tipoRegistro){
-            alert("Selecione o tipo de registro profissional");
-            return;
-        }
-
-        if(!numeroRegistro || numeroRegistro.length < 5){
-            alert("Registro profissional inválido");
-            return;
-        }
-
-        const padrao = /^[0-9A-Za-z\-\/]+$/;
-
-        if(!padrao.test(numeroRegistro)){
-            alert("Formato de registro inválido");
-            return;
-        }
+    if(situacao === "ativo" && (!registro || registro.length < 3)){
+        alert("Registro obrigatório para ativo");
+        return;
     }
 
-    document.getElementById("respostaEntrada").innerHTML =
-    "✅ Cadastro realizado com sucesso";
+    document.getElementById("resposta").innerHTML =
+    "✅ Cadastro OK";
 
-    registrar("Cadastro concluído com validação por situação");
+    registrar("Cadastro realizado");
 }
+
+let ultimo = "";
+
+function registrar(msg){
+    if(msg !== ultimo){
+        document.getElementById("log").innerHTML += msg + "<br>";
+        ultimo = msg;
+    }
+}
+
 </script>
 
-<!-- BACKUP -->
-<!-- Versão final com situação profissional e validação inteligente -->
+</body>
+</html>
