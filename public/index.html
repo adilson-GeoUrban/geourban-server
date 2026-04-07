@@ -12,8 +12,17 @@ body{
     color:#fff;
 }
 
+.topbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    background:#111827;
+    padding:10px;
+    text-align:center;
+}
+
 .container{
-    padding:20px;
+    padding:60px 20px;
 }
 
 .card{
@@ -55,82 +64,45 @@ input, select{
 button{
     margin-top:10px;
     padding:10px;
-    cursor:pointer;
 }
 
-.sugestoes{
-    margin-top:20px;
-    display:none;
-    background:#1f2937;
-    padding:15px;
-    border-radius:10px;
-}
-
-.popup{
-    display:none;
+.audio-btn{
     position:fixed;
     bottom:20px;
-    right:20px;
-    background:#111;
-    padding:15px;
+    left:20px;
+    background:#1f2937;
+    padding:10px;
     border-radius:10px;
+    cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
+<div class="topbar">
+🚀 Plataforma inteligente conectando pessoas e conhecimento
+</div>
+
 <div class="container">
 
-<h1>🚀 GeoUrban</h1>
+<h1>GeoUrban</h1>
 
 <div class="card" onclick="abrirSistema()">
-🌐 Iniciar Cadastro
+🌐 Iniciar
 </div>
 
 <div id="sistema" class="sistema">
 
 <div class="form-area">
 
-<h3>Cadastro Completo</h3>
+<h3>Cadastro</h3>
 
-<form oninput="detectarInteresse()" onsubmit="salvar(event)">
-
-<input id="nome" placeholder="Nome completo" required>
-<input id="email" placeholder="Email" required>
-
-<input id="pais" placeholder="País">
-<input id="regiao" placeholder="Região">
-<input id="cep" placeholder="CEP">
-
-<input id="profissao" placeholder="Profissão">
-<input id="especialidade" placeholder="Especialidade">
-
-<select id="tipoRegistro">
-<option value="">Tipo de Registro</option>
-<option>CREA</option>
-<option>CAU</option>
-<option>CFT</option>
-<option>ART</option>
-<option>RRT</option>
-<option>TRT</option>
-</select>
-
-<input id="registro" placeholder="Número do registro">
-
-<input placeholder="Telefone Fixo">
-<input placeholder="Telefone Móvel">
-
-<select id="situacao">
-<option value="">Situação</option>
-<option value="ativo">Ativo</option>
-<option value="autonomo">Autônomo</option>
-<option value="aposentado">Aposentado</option>
-<option value="informal">Atividade informal</option>
-</select>
+<form onsubmit="salvar(event)">
+<input placeholder="Nome completo" required>
+<input placeholder="Email" required>
 
 <button type="submit">Cadastrar</button>
-
 </form>
 
 <div id="resposta"></div>
@@ -139,67 +111,69 @@ button{
 
 <div class="chat-area">
 <h4>🤖 Assistente</h4>
-<div id="chatBox">Olá, posso te ajudar no cadastro 👋</div>
+<div id="chatBox"></div>
 </div>
 
 </div>
 
-<div id="sugestoes" class="sugestoes"></div>
-
-<div id="popup" class="popup">
-Deseja ver cursos recomendados?
-<br><br>
-<button onclick="mostrarCursos()">Sim</button>
-<button onclick="fecharPopup()">Agora não</button>
 </div>
 
+<div class="audio-btn" onclick="toggleAudio()">
+🎵 Música
 </div>
+
+<audio id="musica" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b4c94.mp3" type="audio/mpeg">
+</audio>
 
 <script>
+
+let tocando = false;
+
 function abrirSistema(){
     document.getElementById("sistema").classList.add("active");
 
-    setTimeout(()=>{
-        document.getElementById("popup").style.display = "block";
-    },2000);
+    document.getElementById("chatBox").innerHTML =
+    "👋 Bem-vindo! Explore as possibilidades da plataforma. Posso te ajudar.";
+
+    iniciarAudio();
 }
 
-function detectarInteresse(){
-    const prof = document.getElementById("profissao").value.toLowerCase();
+function iniciarAudio(){
+    const audio = document.getElementById("musica");
+    audio.volume = 0.2;
 
-    if(prof.includes("engenheiro")){
-        document.getElementById("chatBox").innerHTML =
-        "💡 Detectamos perfil técnico. Deseja cursos e certificações?";
+    if(!tocando){
+        audio.play();
+        tocando = true;
     }
 }
 
-function mostrarCursos(){
-    document.getElementById("sugestoes").style.display = "block";
-    document.getElementById("sugestoes").innerHTML =
-    "🎓 Engenharia Avançada<br>📊 Gestão de Obras<br>📐 Projetos Urbanos";
+function toggleAudio(){
+    const audio = document.getElementById("musica");
 
-    fecharPopup();
-}
-
-function fecharPopup(){
-    document.getElementById("popup").style.display = "none";
+    if(audio.paused){
+        audio.play();
+    }else{
+        audio.pause();
+    }
 }
 
 function salvar(e){
     e.preventDefault();
 
-    const tipo = document.getElementById("tipoRegistro").value;
-    const registro = document.getElementById("registro").value;
-
-    if(tipo !== "" && registro.length < 5){
-        alert("Registro profissional inválido");
-        return;
-    }
-
     document.getElementById("resposta").innerHTML =
-    "✅ Cadastro realizado com sucesso";
+    "✅ Cadastro concluído. Obrigado por participar.";
 
+    falar("Cadastro concluído. Seja bem vindo à plataforma.");
 }
+
+function falar(texto){
+    const msg = new SpeechSynthesisUtterance(texto);
+    msg.lang = "pt-BR";
+    speechSynthesis.speak(msg);
+}
+
 </script>
 
 </body>
