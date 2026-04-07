@@ -1,108 +1,19 @@
-<style>
-.grid-form{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:10px;
-    max-width:800px;
-}
-
-.grid-form input, .grid-form select{
-    padding:8px;
-    width:100%;
-}
-
-.full{
-    grid-column:1 / 3;
-}
-</style>
-
-<form class="grid-form" onsubmit="salvar(event)">
-
-<input id="nome" placeholder="Nome completo" class="full" required>
-<input id="email" placeholder="Email" class="full" required>
-
-<select id="categoria">
-<option value="">Categoria</option>
-<option>Estudante</option>
-<option>Profissional</option>
-<option>Outro</option>
-</select>
-
-<select id="nivel">
-<option value="">Nível</option>
-<option>Técnico</option>
-<option>Graduação</option>
-<option>Pós</option>
-<option>Mestrado</option>
-<option>Doutorado</option>
-</select>
-
-<input id="faculdade" placeholder="Faculdade">
-<input id="curso" placeholder="Curso">
-
-<input id="profissao" placeholder="Profissão">
-<input id="especializacao" placeholder="Especialização">
-
-<select id="registroTipo">
-<option value="">Registro</option>
-<option>CREA</option>
-<option>CAU</option>
-<option>CFT</option>
-<option>ART</option>
-<option>RRT</option>
-<option>TRT</option>
-</select>
-
-<input id="registroNumero" placeholder="Número do registro">
-
-<input id="documentoTecnico" placeholder="Planta / Memorial / Laudo" class="full">
-
-<input id="pais" placeholder="País">
-<input id="regiao" placeholder="Região">
-
-<input id="cep" placeholder="CEP">
-<input id="telefoneMovel" placeholder="Telefone">
-
-<select id="situacao" class="full">
-<option value="">Situação</option>
-<option>Ativo</option>
-<option>Autônomo</option>
-<option>Aposentado</option>
-<option>Informal</option>
-</select>
-
-<button type="submit" class="full">Cadastrar</button>
-
-</form>
-
-<div id="resposta"></div>
 <script>
 function salvar(e){
     e.preventDefault();
 
-    const categoria = document.getElementById("categoria").value;
-    const registroTipo = document.getElementById("registroTipo").value;
-    const registroNumero = document.getElementById("registroNumero").value;
-
-    // BLOQUEIO PROFISSIONAL
-    if(categoria === "Profissional"){
-        if(!registroTipo || !registroNumero){
-            alert("Profissional precisa informar registro válido");
-            return;
-        }
-    }
-
+    // 🔹 CAPTURA
     const usuario = {
         nome: document.getElementById("nome").value,
         email: document.getElementById("email").value,
-        categoria,
+        categoria: document.getElementById("categoria").value,
         nivel: document.getElementById("nivel").value,
         faculdade: document.getElementById("faculdade").value,
         curso: document.getElementById("curso").value,
         profissao: document.getElementById("profissao").value,
         especializacao: document.getElementById("especializacao").value,
-        registroTipo,
-        registroNumero,
+        registroTipo: document.getElementById("registroTipo").value,
+        registroNumero: document.getElementById("registroNumero").value,
         documentoTecnico: document.getElementById("documentoTecnico").value,
         pais: document.getElementById("pais").value,
         regiao: document.getElementById("regiao").value,
@@ -111,10 +22,21 @@ function salvar(e){
         situacao: document.getElementById("situacao").value
     };
 
-    console.log(usuario);
+    // 🔹 VALIDAÇÃO PROFISSIONAL
+    if(usuario.categoria === "Profissional"){
+        if(!usuario.registroTipo || !usuario.registroNumero){
+            alert("⚠️ Profissional precisa de registro válido");
+            return;
+        }
+    }
 
+    // 🔹 CARTÃO (PREVIEW)
+    gerarCard(usuario);
+
+    // 🔹 SALVAR (BASE LOCAL)
+    localStorage.setItem("usuarioGeoUrban", JSON.stringify(usuario));
+
+    // 🔹 FEEDBACK
     document.getElementById("resposta").innerHTML =
-    "✅ Cadastro salvo com sucesso";
-
+    "✅ Cadastro salvo e exibido com sucesso";
 }
-</script>
