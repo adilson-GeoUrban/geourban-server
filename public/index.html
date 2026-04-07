@@ -1,133 +1,121 @@
 <style>
-
-/* FUNDO FULL */
-body{
-    margin:0;
-    font-family:Arial;
-    background:#000;
-    color:#fff;
-    overflow:hidden;
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center/cover;
 }
 
-/* BACKGROUND ANIMADO */
-.bg{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') center/cover no-repeat;
-    filter:brightness(0.4);
-    z-index:-1;
+/* OVERLAY */
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
 }
 
-/* CONTAINER CENTRAL */
-.container{
-    display:flex;
-    height:100vh;
+/* IA ESQUERDA */
+.ia-box {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    padding: 20px;
+    color: #fff;
+    overflow-y: auto;
 }
 
-/* CAIXA CADASTRO FLUTUANTE */
-.chat-area{
-    width:420px;
-    max-width:90%;
-    height:80vh;
-    background:rgba(13,17,23,0.95);
-    border-radius:15px;
-    margin:auto;
-    display:flex;
-    flex-direction:column;
-    padding:15px;
-    box-shadow:0 0 30px rgba(0,0,0,0.8);
+.ia-box input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
 }
 
-/* CHAT */
-.chat-box{
-    flex:1;
-    overflow-y:auto;
-    font-size:14px;
+/* CADASTRO CENTRAL */
+.cadastro-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    background: rgba(0,0,0,0.8);
+    padding: 25px;
+    border-radius: 12px;
 }
 
-/* INPUT */
-.input-area{
-    display:flex;
-    gap:5px;
+.cadastro-box input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
 }
 
-input{
-    flex:1;
-    padding:10px;
-    border-radius:5px;
-    border:none;
+/* SLIDES DIREITA */
+.slides {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    overflow: hidden;
 }
 
-/* CARD */
-.card{
-    background:#161b22;
-    padding:10px;
-    margin-top:10px;
-    border-radius:8px;
+.slide {
+    height: 100%;
+    display: none;
+    color: #fff;
+    padding: 20px;
 }
 
-/* ASSISTENTE (FORA) */
-.assistente{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    width:260px;
-    background:rgba(0,0,0,0.7);
-    padding:15px;
-    border-radius:12px;
-    backdrop-filter:blur(5px);
+.slide.active {
+    display: block;
 }
-
-/* SLIDES */
-.slides{
-    position:fixed;
-    top:20px;
-    left:20px;
-    width:300px;
-}
-
-.slide{
-    background:rgba(0,0,0,0.6);
-    padding:15px;
-    margin-bottom:10px;
-    border-radius:10px;
-    animation:fade 1s;
-}
-
-@keyframes fade{
-    from{opacity:0; transform:translateY(10px)}
-    to{opacity:1}
-}
-
 </style>
 
-<div class="bg"></div>
+<div class="overlay"></div>
 
-<!-- SLIDES -->
-<div class="slides" id="slides"></div>
+<!-- IA -->
+<div class="ia-box">
+    <h3>🤖 Assistente</h3>
+    <p>Bem-vindo à GeoUrban</p>
+    <p>Vamos criar seu perfil profissional 🚀</p>
 
-<!-- CADASTRO IA -->
-<div class="container">
-    <div class="chat-area">
-
-        <div id="mensagemIA"></div>
-
-        <div class="chat-box" id="chat"></div>
-
-        <div id="dados"></div>
-
-        <div class="input-area">
-            <input id="entrada" placeholder="Ex: sou engenheiro">
-            <button onclick="enviar()">Enviar</button>
-        </div>
-
-    </div>
+    <input placeholder="Digite aqui..." />
 </div>
 
-<!-- ASSISTENTE -->
-<div class="assistente">
-    👩‍💼 Assistente GeoUrban<br><br>
-    Estou aqui para te ajudar no cadastro.<br>
-    Vamos criar seu perfil profissional 🚀
+<!-- CADASTRO -->
+<div class="cadastro-box">
+    <h2>Cadastro</h2>
+
+    <input id="nome" placeholder="Nome">
+    <input id="email" placeholder="Email">
+
+    <select id="categoria">
+        <option>Profissional</option>
+        <option>Estudante</option>
+    </select>
+
+    <select id="nivel">
+        <option>Básico</option>
+        <option>Mestrado</option>
+    </select>
+
+    <input id="profissao" placeholder="Profissão">
+    <input id="especializacao" placeholder="Especialização">
+
+    <select id="registroTipo">
+        <option>CREA</option>
+        <option>CAU</option>
+    </select>
+
+    <input id="registroNumero" placeholder="Número">
+
+    <button onclick="salvar()">Cadastrar</button>
+</div>
+
+<!-- SLIDES -->
+<div class="slides">
+    <div class="slide active">🚀 Conecte-se com profissionais</div>
+    <div class="slide">📊 Projetos técnicos</div>
+    <div class="slide">📎 Upload de ART/RRT</div>
 </div>
