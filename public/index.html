@@ -4,16 +4,23 @@
 <meta charset="UTF-8">
 <title>GeoUrban Plataforma</title>
 
-<!-- GANTT -->
+<!-- Gantt -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css">
 <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.min.js"></script>
 
 <style>
 body {
+    margin:0;
     font-family: Arial;
     background:#0a0f1c;
     color:#fff;
     text-align:center;
+}
+
+.header {
+    padding:20px;
+    font-size:22px;
+    font-weight:bold;
 }
 
 input, button {
@@ -22,141 +29,128 @@ input, button {
 }
 
 #log {
-    height:200px;
-    overflow:auto;
     background:#111;
-    margin:10px;
+    height:180px;
+    overflow:auto;
+    margin:20px;
     padding:10px;
     text-align:left;
+    border-radius:10px;
 }
 
-#gantt {
-    background:#fff;
-    color:#000;
-    margin-top:20px;
+.card {
+    background:#16213e;
+    margin:10px;
+    padding:15px;
+    border-radius:10px;
 }
+
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:10px;
+    margin:20px;
+}
+
 </style>
 </head>
 
 <body>
 
-<h2>🧠 GeoUrban Sistema Integrado</h2>
+<div class="header">🧠 GeoUrban Sistema Integrado</div>
 
-<!-- COMANDO -->
-<input id="cmd" placeholder="Digite comando ou use voz..." />
-<button onclick="enviar()">Enviar</button>
-<button onclick="ativarVoz()">🎙️ Voz</button>
+<input id="cmd" placeholder="Digite comando ou use voz">
+<button onclick="executar()">Enviar</button>
+<button onclick="voz()">🎙️ Voz</button>
 
-<!-- LOG -->
 <div id="log"></div>
 
-<!-- GANTT -->
-<h3>📊 Planejamento</h3>
-<div id="gantt"></div>
+<div class="grid">
+
+<div class="card">📊 Dashboard em tempo real</div>
+
+<div class="card">👷 Cadastro de Profissionais</div>
+
+<div class="card">⚖️ IA Jurídica + Contábil</div>
+
+<div class="card">💰 Pagamento Inteligente</div>
+
+<div class="card">🗺️ Mapa Geoespacial</div>
+
+<div class="card">🔐 Segurança Total</div>
+
+<div class="card">🎓 Educação Automática</div>
+
+</div>
+
+<h3>📈 Planejamento</h3>
+<svg id="gantt"></svg>
 
 <script>
 
-// =======================
-// LOG VISUAL
-// =======================
+// LOG
 function log(msg){
-    const l = document.getElementById("log");
-    l.innerHTML += "<div>"+msg+"</div>";
-    l.scrollTop = l.scrollHeight;
+    document.getElementById("log").innerHTML += msg + "<br>";
 }
 
-// =======================
-// LOG LEGAL
-// =======================
-function logLegal(acao){
-    const registro = {
-        usuario:"admin",
-        acao:acao,
-        data:new Date().toISOString()
-    };
+// IA COMANDOS
+function executar(){
+    let cmd = document.getElementById("cmd").value.toLowerCase();
 
-    console.log("LOG LEGAL:", registro);
-}
+    log("👤 " + cmd);
 
-// =======================
-// COMANDO
-// =======================
-function enviar(){
-    let c = document.getElementById("cmd").value;
-    log("👤 "+c);
-    interpretar(c);
-}
-
-// =======================
-// IA PRINCIPAL
-// =======================
-function interpretar(c){
-
-    logLegal(c);
-
-    if(c.includes("financeiro")){
-        log("💰 Abrindo financeiro");
+    if(cmd.includes("relatorio")){
+        log("📄 Gerando relatório...");
     }
-    else if(c.includes("bloquear")){
-        log("⛔ Usuário bloqueado");
+    else if(cmd.includes("financeiro")){
+        log("💰 Abrindo financeiro...");
     }
-    else if(c.includes("mapa")){
-        log("🗺️ Abrindo mapa");
+    else if(cmd.includes("mapa")){
+        log("🗺️ Abrindo mapa...");
     }
-    else if(c.includes("relatorio")){
-        log("📄 Gerando relatório");
+    else if(cmd.includes("cadastro")){
+        log("👷 Abrindo cadastro de profissionais...");
+    }
+    else if(cmd.includes("pagamento")){
+        log("💳 Processando pagamento...");
+    }
+    else if(cmd.includes("curso")){
+        log("🎓 Gerando curso automático...");
+    }
+    else if(cmd.includes("seguranca") || cmd.includes("hack")){
+        log("🚨 ALERTA DE SEGURANÇA!");
     }
     else{
-        log("🤖 IA aprendendo...");
+        log("🤖 IA analisando...");
     }
-
-    analisarSeguranca(c);
 }
 
-// =======================
-// IA SEGURANÇA
-// =======================
-function analisarSeguranca(c){
-
-    if(c.includes("hack") || c.includes("burlar")){
-        log("🚨 ALERTA DE SEGURANÇA");
-        logLegal("Tentativa suspeita");
-    }
-
-}
-
-// =======================
-// GANTT
-// =======================
-new Gantt("#gantt", [
-    {id:"1",name:"Fundação",start:"2026-05-01",end:"2026-05-10"},
-    {id:"2",name:"Estrutura",start:"2026-05-11",end:"2026-05-25"},
-    {id:"3",name:"Acabamento",start:"2026-05-26",end:"2026-06-10"}
-]);
-
-// =======================
 // VOZ
-// =======================
-function ativarVoz(){
-
+function voz(){
     const rec = new webkitSpeechRecognition();
     rec.lang = "pt-BR";
 
-    rec.onresult = (e)=>{
-        let t = e.results[0][0].transcript;
-        log("🎙️ "+t);
-        interpretar(t);
+    rec.onresult = function(e){
+        let texto = e.results[0][0].transcript;
+        document.getElementById("cmd").value = texto;
+        executar();
     };
 
     rec.start();
 }
 
-// =======================
+// GANTT
+let tasks = [
+    {id:'1', name:'Projeto', start:'2026-04-01', end:'2026-04-05', progress:20},
+    {id:'2', name:'Execução', start:'2026-04-06', end:'2026-04-15', progress:10}
+];
+
+new Gantt("#gantt", tasks);
+
 // MONITORAMENTO
-// =======================
 setInterval(()=>{
     log("🛰️ Sistema monitorando...");
-},15000);
+}, 10000);
 
 </script>
 
@@ -166,17 +160,18 @@ BACKUP GEOURBAN V1
 <!--
 VERSÃO: V1 FINAL UNIFICADA
 
-✔ IA de comando ativa
-✔ Segurança básica ativa
-✔ Log legal funcionando
-✔ Gantt funcionando
+✔ Sistema online ativo
+✔ IA comandos funcionando
+✔ Cadastro preparado
+✔ Segurança inicial ativa
+✔ Gantt ativo
 ✔ Voz ativa
 ✔ Monitoramento ativo
 
-DATA: HOJE
+DATA: 07/04/2026
 
 OBS:
-Base estável para testes e evolução
+Base estável para testes e evolução global
 -->
 
 </body>
