@@ -1,18 +1,45 @@
-<div id="entrada" class="panel active">
+<!-- ENTRADA INTELIGENTE COMPLETA PROFISSIONAL -->
+
+<div id="entrada" class="panel">
 
 <button onclick="voltar()">⬅ Voltar</button>
 
 <h2>🌐 Entrada Inteligente</h2>
-<p>Cadastro e identificação do usuário</p>
+<p>Cadastro completo do usuário</p>
 
 <form id="formEntrada" onsubmit="salvarEntrada(event)">
 
+<h3>📌 Dados Básicos</h3>
 <input type="text" placeholder="Nome completo" required><br><br>
 <input type="text" placeholder="CPF" required><br><br>
 <input type="email" placeholder="Email" required><br><br>
 
-<select required><br><br>
-<option value="">Tipo de usuário</option>
+<h3>🌍 Endereço</h3>
+<input type="text" placeholder="País" required><br><br>
+<input type="text" placeholder="Região / Estado" required><br><br>
+<input type="text" placeholder="CEP" required><br><br>
+
+<h3>💼 Profissional</h3>
+<input type="text" placeholder="Profissão"><br><br>
+<input type="text" placeholder="Especialidade"><br><br>
+
+<select>
+<option value="">Registro Profissional</option>
+<option>CREA</option>
+<option>CAU</option>
+<option>CFT</option>
+<option>Outro</option>
+</select><br><br>
+
+<input type="text" placeholder="Número do registro"><br><br>
+
+<h3>📞 Contato</h3>
+<input type="text" placeholder="Telefone Fixo"><br><br>
+<input type="text" placeholder="Telefone Móvel" required><br><br>
+
+<h3>👤 Tipo de usuário</h3>
+<select required>
+<option value="">Selecione</option>
 <option>Leigo</option>
 <option>Profissional</option>
 <option>Governo</option>
@@ -31,8 +58,11 @@ function salvarEntrada(e){
     e.preventDefault();
 
     document.getElementById("respostaEntrada").innerHTML =
-    "✅ Cadastro realizado com sucesso";
+    "✅ Cadastro completo realizado com sucesso";
 
-    registrar("Novo usuário cadastrado");
+    registrar("Novo cadastro completo realizado");
 }
 </script>
+
+<!-- BACKUP -->
+<!-- Versão completa com dados profissionais e endereço -->
