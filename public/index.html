@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>GeoUrban Sistema Global</title>
+<title>GeoUrban Plataforma</title>
 
 <style>
 body {
@@ -15,41 +15,46 @@ body {
 /* Layout */
 .container {
     display:flex;
-    height:100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width:250px;
+    width:220px;
+    height:100vh;
     background:#111827;
     padding:20px;
+    position:fixed;
 }
 
 .sidebar h2 {
-    font-size:18px;
     margin-bottom:20px;
-}
-
-.menu button {
-    width:100%;
-    margin-bottom:10px;
-    padding:10px;
-    background:#1f2937;
-    border:none;
-    color:#fff;
-    cursor:pointer;
-    text-align:left;
-}
-
-.menu button:hover {
-    background:#2563eb;
 }
 
 /* Conteúdo */
 .content {
-    flex:1;
+    margin-left:240px;
     padding:20px;
-    overflow:auto;
+}
+
+/* GRID estilo Netflix */
+.grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap:20px;
+}
+
+/* Cards */
+.card {
+    background:#1f2937;
+    padding:20px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.card:hover {
+    transform:scale(1.05);
+    background:#2563eb;
 }
 
 /* Painel */
@@ -59,6 +64,16 @@ body {
 
 .panel.active {
     display:block;
+}
+
+/* Botão voltar */
+.voltar {
+    margin-bottom:20px;
+    padding:10px;
+    background:#2563eb;
+    border:none;
+    color:#fff;
+    cursor:pointer;
 }
 
 /* Log */
@@ -75,67 +90,68 @@ body {
 
 <body>
 
-<div class="container">
-
-<!-- MENU -->
 <div class="sidebar">
 <h2>🧠 GeoUrban</h2>
-
-<div class="menu">
-<button onclick="abrir('entrada')">🌐 Entrada</button>
-<button onclick="abrir('acesso')">🔐 Acesso</button>
-<button onclick="abrir('profissionais')">👷 Profissionais</button>
-<button onclick="abrir('ia')">🤖 IA Central</button>
-<button onclick="abrir('processo')">📊 Processamento</button>
-<button onclick="abrir('pagamento')">💳 Pagamento</button>
-</div>
+<p>Sistema Global</p>
 </div>
 
-<!-- CONTEÚDO -->
 <div class="content">
 
-<h1>🚀 GeoUrban Sistema Global Integrado</h1>
+<h1>🎬 Plataforma Inteligente</h1>
 
-<!-- ENTRADA -->
-<div id="entrada" class="panel active">
+<!-- HOME -->
+<div id="home" class="panel active">
+<div class="grid">
+
+<div class="card" onclick="abrir('entrada')">🌐 Entrada Inteligente</div>
+<div class="card" onclick="abrir('acesso')">🔐 Controle de Acesso</div>
+<div class="card" onclick="abrir('profissionais')">👷 Profissionais</div>
+<div class="card" onclick="abrir('ia')">🤖 IA Central</div>
+<div class="card" onclick="abrir('processo')">📊 Processamento</div>
+<div class="card" onclick="abrir('pagamento')">💳 Pagamento</div>
+
+</div>
+</div>
+
+<!-- PÁGINAS -->
+<div id="entrada" class="panel">
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
 <h2>🌐 Entrada Inteligente</h2>
-<p>Identificação, intenção do usuário e filtro de acesso.</p>
+<p>Identificação e análise do usuário</p>
 </div>
 
-<!-- ACESSO -->
 <div id="acesso" class="panel">
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
 <h2>🔐 Controle de Acesso</h2>
-<p>Login, certificado digital e aceite legal.</p>
+<p>Login e validações legais</p>
 </div>
 
-<!-- PROFISSIONAIS -->
 <div id="profissionais" class="panel">
-<h2>👷 Cadastro de Profissionais</h2>
-<p>Validação CREA / CAU e banco global.</p>
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
+<h2>👷 Profissionais</h2>
+<p>Cadastro técnico validado</p>
 </div>
 
-<!-- IA -->
 <div id="ia" class="panel">
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
 <h2>🤖 IA Central</h2>
-<p>IA jurídica, contábil e segurança.</p>
+<p>Motor inteligente da plataforma</p>
 </div>
 
-<!-- PROCESSO -->
 <div id="processo" class="panel">
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
 <h2>📊 Processamento</h2>
-<p>Análise automática e geração de custo.</p>
+<p>Análise automática de projetos</p>
 </div>
 
-<!-- PAGAMENTO -->
 <div id="pagamento" class="panel">
+<button class="voltar" onclick="voltar()">⬅ Voltar</button>
 <h2>💳 Pagamento</h2>
-<p>Validação antes da liberação de relatórios.</p>
+<p>Liberação de serviços</p>
 </div>
 
-<!-- LOG -->
 <div id="log"></div>
 
-</div>
 </div>
 
 <script>
@@ -144,10 +160,16 @@ body {
 function abrir(id){
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    registrar("Abrindo módulo: " + id);
+    registrar("Entrou em: " + id);
 }
 
-/* LOG CONTROLADO (SEM LOOP) */
+function voltar(){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('home').classList.add('active');
+    registrar("Voltou para home");
+}
+
+/* LOG CONTROLADO */
 let ultimo = "";
 
 function registrar(msg){
@@ -157,26 +179,9 @@ function registrar(msg){
     }
 }
 
-/* INICIAL */
-registrar("Sistema iniciado com sucesso");
+registrar("Sistema Netflix carregado");
 
 </script>
-
-<!-- ========================= -->
-<!-- BACKUP GEOURBAN V1 -->
-<!-- ========================= -->
-<!--
-Versão segura antes de integrações avançadas
-
-✔ Sistema navegável
-✔ Sem repetição de log
-✔ Estrutura modular
-✔ Base para IA real
-✔ Pronto para expansão
-
-DATA: HOJE
-STATUS: ESTÁVEL
--->
 
 </body>
 </html>
