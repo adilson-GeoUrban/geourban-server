@@ -1,75 +1,134 @@
-// ==============================
-// GeoUrban - Bloco Único Blindado
-// Substitui Bandeja 1 + Bandeja 2
-// ==============================
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban - Painel</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    header {
+      background: #020617;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 2px solid #1e293b;
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    .card {
+      background: #1e293b;
+      margin: 15px;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      width: 250px;
+    }
+
+    button {
+      background: #22c55e;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  🚀 GeoUrban - Sistema Unificado
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>📊 Dashboard</h2>
+    <p>Status do sistema</p>
+    <button onclick="alert('Sistema rodando!')">Ver status</button>
+  </div>
+
+  <div class="card">
+    <h2>🧪 Laboratório</h2>
+    <p>Área de testes</p>
+    <button onclick="alert('Modo teste ativo')">Testar</button>
+  </div>
+
+  <div class="card">
+    <h2>🛒 Loja</h2>
+    <p>Área comercial</p>
+    <button onclick="alert('Em breve')">Abrir</button>
+  </div>
+
+</div>
+
+<script>
+  console.log("✅ GeoUrban carregado com sucesso");
+</script>
+
+</body>
+</html>
+// =======================================
+// 🔐 BLOCO SALVAR (BACKUP AUTOMÁTICO)
+// =======================================
 
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
 
-// Caminhos principais
+// 📁 Caminhos
 const pastaBackup = path.join(__dirname, "backup");
-const caminhoDados = path.join(__dirname, "dados.json");
+const arquivoDados = path.join(__dirname, "dados.json");
 
-// Cria pastas se não existirem
-if (!fs.existsSync(pastaBackup)) fs.mkdirSync(pastaBackup);
-
-/**
- * Função única: salva dados e cria backup blindado
- * @param {Object} novosDados - dados a salvar (usuarios, configuracoes)
- */
-function salvarBlindado(novosDados) {
-    try {
-        // Lê dados existentes
-        let dadosExistentes = {};
-        if (fs.existsSync(caminhoDados)) {
-            dadosExistentes = JSON.parse(fs.readFileSync(caminhoDados, "utf-8"));
-        }
-
-        // Auditoria e mescla usuários/designers
-        if (novosDados.usuarios) {
-            dadosExistentes.usuarios = dadosExistentes.usuarios || [];
-            dadosExistentes.usuarios.push(...novosDados.usuarios);
-        }
-
-        // Auditoria e mescla configurações
-        if (novosDados.configuracoes) {
-            dadosExistentes.configuracoes = { ...(dadosExistentes.configuracoes || {}), ...novosDados.configuracoes };
-        }
-
-        // Salva no JSON
-        fs.writeFileSync(caminhoDados, JSON.stringify(dadosExistentes, null, 2), "utf-8");
-        console.log("💾 Dados salvos com sucesso!");
-
-        // Cria backup .zip
-        const arquivoZip = path.join(pastaBackup, `geourban_backup_${Date.now()}.zip`);
-        const saida = fs.createWriteStream(arquivoZip);
-        const zip = zlib.createGzip({ level: 9 });
-        zip.pipe(saida);
-        zip.write(fs.readFileSync(caminhoDados));
-        zip.end();
-
-        saida.on("close", () => console.log("✅ Backup finalizado:", arquivoZip));
-
-    } catch (erro) {
-        console.error("❌ Erro no salvamento blindado:", erro);
-    }
+// 📁 Criar pasta se não existir
+if (!fs.existsSync(pastaBackup)) {
+  fs.mkdirSync(pastaBackup);
 }
 
-// ==============================
-// Exemplo de uso
-// ==============================
+// 💾 Função principal de salvar
+function salvarDados(dados) {
+  try {
+    // Salva JSON
+    fs.writeFileSync(arquivoDados, JSON.stringify(dados, null, 2));
 
-const exemploDados = {
-    usuarios: [
-        { id: Date.now(), nome: "Designer Teste" },
-        { id: Date.now() + 1, nome: "Designer GeoUrban" }
-    ],
-    configuracoes: { tema: "claro", versao: "1.0" }
-};
+    // Cria nome do backup
+    const nome = `backup_${Date.now()}.json.gz`;
+    const caminhoBackup = path.join(pastaBackup, nome);
 
-// Salva e cria backup
-salvarBlindado(exemploDados);
+    // Compacta e salva
+    const gzip = zlib.createGzip();
+    const stream = fs.createReadStream(arquivoDados);
+    const destino = fs.createWriteStream(caminhoBackup);
 
-// Exporta função para usar no restante do servidor
-module.exports = { salvarBlindado };
+    stream.pipe(gzip).pipe(destino);
+
+    console.log("✅ Backup salvo:", nome);
+
+  } catch (erro) {
+    console.log("❌ Erro ao salvar:", erro.message);
+  }
+}
+
+// 🌐 Rota para salvar (teste)
+app.post("/salvar", express.json(), (req, res) => {
+  const dados = req.body;
+
+  salvarDados(dados);
+
+  res.json({ status: "ok", mensagem: "Dados salvos com backup!" });
+});
