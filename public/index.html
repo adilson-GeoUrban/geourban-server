@@ -1,178 +1,163 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban</title>
-
 <style>
-
-/* FUNDO */
-body{
-    margin:0;
-    font-family:Arial;
-    color:#fff;
-    background:linear-gradient(-45deg,#0a0f1c,#0d1b2a,#1b263b);
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
 }
 
-/* HERO */
-.hero{
-    padding:20px;
-    font-size:22px;
-    font-weight:bold;
+.overlay {
+    background: rgba(0,0,0,0.75);
+    min-height: 100vh;
+    padding: 40px;
 }
 
-/* GRID BASE (NÃO QUEBRA) */
-.grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-    max-width:800px;
-    margin:20px;
+/* topo */
+.topo {
+    margin-bottom: 30px;
 }
 
-/* INPUTS */
-input, select{
-    padding:10px;
-    border:none;
-    border-radius:5px;
+/* FORM */
+.form-box {
+    background: rgba(0,0,0,0.6);
+    padding: 25px;
+    border-radius: 12px;
 }
 
-/* BOTÃO */
-button{
-    padding:12px;
-    background:#1e90ff;
-    color:#fff;
-    border:none;
-    border-radius:6px;
+/* GRID 2 colunas */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
-/* CARD */
-.card{
-    margin:20px;
-    padding:15px;
-    background:#102a44;
-    border-radius:10px;
+.form-grid input,
+.form-grid select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
 }
 
-/* CHAT */
-.chat{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    width:220px;
-    background:#0b1a2a;
-    padding:10px;
-    border-radius:10px;
+button {
+    grid-column: span 2;
+    padding: 12px;
+    background: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-/* RODAPÉ BASE */
-.footer-card{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    text-align:center;
-    padding:10px;
-    background:#000;
+/* ÁREA INFERIOR (ASSISTENTE + CARTEIRA) */
+.bottom-area {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
 }
 
+/* assistente agora embaixo */
+.assistente {
+    flex: 1;
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* carteira digital (placeholder) */
+.carteira {
+    flex: 2;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 12px;
+    min-height: 180px;
+}
 </style>
 
-</head>
+<div class="overlay">
 
-<body>
+    <!-- TOPO -->
+    <div class="topo">
+        <h1>🚀 GeoUrban</h1>
+    </div>
 
-<div class="hero">🚀 GeoUrban</div>
+    <!-- FORMULÁRIO -->
+    <div class="form-box">
+        <h2>Cadastro</h2>
 
-<form class="grid" onsubmit="salvar(event)">
+        <form onsubmit="salvar(event)">
+            <div class="form-grid">
 
-<input id="nome" placeholder="Nome completo">
-<input id="email" placeholder="Email">
+                <input id="nome" placeholder="Nome completo">
+                <input id="email" placeholder="Email">
 
-<select id="categoria">
-<option>Categoria</option>
-<option>Estudante</option>
-<option>Profissional</option>
-</select>
+                <select id="categoria">
+                    <option value="">Categoria</option>
+                    <option>Profissional</option>
+                    <option>Estudante</option>
+                    <option>Outro</option>
+                </select>
 
-<select id="nivel">
-<option>Nível</option>
-<option>Graduação</option>
-<option>Mestrado</option>
-</select>
+                <select id="nivel">
+                    <option value="">Nível</option>
+                    <option>Técnico</option>
+                    <option>Graduação</option>
+                    <option>Mestrado</option>
+                </select>
 
-<input id="profissao" placeholder="Profissão">
-<input id="especializacao" placeholder="Especialização">
+                <input id="profissao" placeholder="Profissão">
+                <input id="especializacao" placeholder="Especialização">
 
-<select id="registroTipo">
-<option>Registro</option>
-<option>CREA</option>
-<option>CAU</option>
-<option>CFT</option>
-</select>
+                <select id="registroTipo">
+                    <option value="">Registro</option>
+                    <option>CREA</option>
+                    <option>CAU</option>
+                    <option>CRT</option>
+                </select>
 
-<input id="registroNumero" placeholder="Número do registro">
+                <input id="registroNumero" placeholder="Número do registro">
 
-<select id="docTipo">
-<option>Documento</option>
-<option>ART</option>
-<option>RRT</option>
-<option>TRT</option>
-</select>
+                <select id="documentoTecnico">
+                    <option value="">Documento Técnico</option>
+                    <option>ART</option>
+                    <option>RRT</option>
+                    <option>TRT</option>
+                </select>
 
-<input id="docNumero" placeholder="Número do documento">
+                <input id="documentoNumero" placeholder="Número do documento">
 
-<input id="pais" placeholder="País">
-<input id="regiao" placeholder="Região">
+                <input id="pais" placeholder="País">
+                <input id="regiao" placeholder="Região">
 
-<select id="situacao">
-<option>Situação</option>
-<option>Ativo</option>
-<option>Autônomo</option>
-<option>Aposentado</option>
-</select>
+                <select id="situacao">
+                    <option value="">Situação</option>
+                    <option>Ativo</option>
+                    <option>Aposentado</option>
+                </select>
 
-<button>Cadastrar</button>
+                <button type="submit">Cadastrar</button>
 
-</form>
+            </div>
+        </form>
+    </div>
 
-<div id="cardUsuario"></div>
-<div id="resposta"></div>
+    <!-- PARTE INFERIOR -->
+    <div class="bottom-area">
 
-<div class="chat">🤖 Assistente ativo</div>
+        <!-- ASSISTENTE -->
+        <div class="assistente">
+            <h3>🤖 Assistente</h3>
+            <p>Estamos criando sua identidade digital.</p>
+            <p>Dica: profissionais precisam de registro válido.</p>
+        </div>
 
-<div class="footer-card">
-<button onclick="baixarCarteira()">💳 Carteira Digital</button>
+        <!-- CARTEIRA DIGITAL (VAI APARECER DEPOIS) -->
+        <div class="carteira" id="carteira">
+            <h3>📊 Carteira Digital</h3>
+            <p>Seus dados aparecerão aqui após o cadastro.</p>
+        </div>
+
+    </div>
+
 </div>
-
-<script>
-
-/* SALVAR BASE */
-function salvar(e){
-    e.preventDefault();
-
-    const usuario = {
-        nome: nome.value,
-        categoria: categoria.value
-    };
-
-    localStorage.setItem("usuarioGeoUrban", JSON.stringify(usuario));
-
-    cardUsuario.innerHTML = "<div class='card'>Cadastro salvo</div>";
-}
-
-/* DOWNLOAD */
-function baixarCarteira(){
-    const dados = localStorage.getItem("usuarioGeoUrban");
-    if(!dados) return alert("Cadastre primeiro");
-
-    const blob = new Blob([dados]);
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "carteira.json";
-    a.click();
-}
-
-</script>
-
-</body>
-</html>
