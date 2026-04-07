@@ -1,3 +1,6 @@
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 /public
    ├── index.html
    ├── abas/
