@@ -1,1 +1,176 @@
-Criar VERSÃO V2 COMPLETA
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GeoUrban V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: white;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #020617;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 30px;
+}
+
+.sidebar a {
+  display: block;
+  margin: 10px 0;
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* HEADER COM IMAGEM */
+.header {
+  height: 180px;
+  background: url('dashboard.jpg') center/cover;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* CARDS */
+.cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* AREA IA */
+.box {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  border-radius: 10px;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.result {
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div class="sidebar">
+  <h2>🌍 GeoUrban</h2>
+  <a href="#">Dashboard</a>
+  <a href="#">Relatórios</a>
+  <a href="#">Mapas</a>
+  <a href="#">Configurações</a>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="main">
+
+  <div class="header">
+    Dashboard Urbano Inteligente
+  </div>
+
+  <div class="cards">
+    <div class="card">130+ Relatórios</div>
+    <div class="card">95% Precisão IA</div>
+    <div class="card">27 Usuários</div>
+  </div>
+
+  <div class="box">
+    <h3>Análise com IA</h3>
+
+    <textarea id="texto" placeholder="Descreva seu problema urbano..."></textarea>
+
+    <button onclick="enviar()">Analisar</button>
+
+    <div id="resultado" class="result"></div>
+  </div>
+
+</div>
+
+<script>
+async function enviar() {
+  const texto = document.getElementById("texto").value;
+
+  if (!texto) {
+    alert("Digite algo");
+    return;
+  }
+
+  const res = await fetch("/consultoria", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ texto })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("resultado").innerHTML = `
+    <b>Tipo:</b> ${data.tipo}<br>
+    <b>Diagnóstico:</b> ${data.diagnostico}<br>
+    <b>Sugestões:</b><br> - ${data.sugestoes.join("<br> - ")}<br>
+    <b>Valor:</b> R$ ${data.valor_estimado}<br>
+    <b>Risco:</b> ${data.risco}
+  `;
+}
+</script>
+
+</body>
+</html>
