@@ -5,8 +5,9 @@
   <title>GeoUrban</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Fonte moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     * {
@@ -17,94 +18,137 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
+      background: #0f172a;
       color: white;
+    }
+
+    .layout {
       display: flex;
-      align-items: center;
-      justify-content: center;
       height: 100vh;
     }
 
-    .container {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(20px);
-      padding: 40px;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    .sidebar {
+      width: 220px;
+      background: #020617;
+      padding: 20px;
     }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+    .sidebar h2 {
+      margin-bottom: 20px;
     }
 
-    p {
+    .sidebar p {
+      margin: 10px 0;
       opacity: 0.7;
-      margin-bottom: 30px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
     }
 
     textarea {
       width: 100%;
-      height: 120px;
-      border-radius: 12px;
-      border: none;
-      padding: 15px;
-      resize: none;
-      outline: none;
-      font-size: 14px;
+      height: 100px;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 20px;
     }
 
     button {
-      margin-top: 20px;
+      margin-top: 10px;
       width: 100%;
-      padding: 15px;
-      border-radius: 12px;
+      padding: 12px;
+      border-radius: 10px;
       border: none;
       background: #3b82f6;
       color: white;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #2563eb;
     }
 
     .result {
       margin-top: 20px;
-      text-align: left;
-      font-size: 14px;
       background: rgba(0,0,0,0.3);
       padding: 15px;
       border-radius: 10px;
-    }
-
-    .footer {
-      margin-top: 20px;
-      font-size: 12px;
-      opacity: 0.5;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>🌍 GeoUrban</h1>
-  <p>Consultoria inteligente urbana com IA</p>
+<div class="layout">
 
-  <textarea id="texto" placeholder="Descreva seu problema urbano..."></textarea>
+  <div class="sidebar">
+    <h2>🌍 GeoUrban</h2>
+    <p>🏠 Dashboard</p>
+    <p>📊 Relatórios</p>
+    <p>🗺️ Mapas</p>
+    <p>⚙️ Configurações</p>
+  </div>
 
-  <button onclick="enviar()">Analisar com IA</button>
+  <div class="main">
 
-  <div class="result" id="resultado" style="display:none;"></div>
+    <h1>Dashboard Urbano</h1>
 
-  <div class="footer">© 2026 GeoUrban</div>
+    <div class="cards">
+      <div class="card">
+        <h2>130+</h2>
+        <p>Relatórios</p>
+      </div>
+
+      <div class="card">
+        <h2>95%</h2>
+        <p>Precisão IA</p>
+      </div>
+
+      <div class="card">
+        <h2>27</h2>
+        <p>Usuários</p>
+      </div>
+    </div>
+
+    <div style="margin-top:30px;">
+      <canvas id="grafico"></canvas>
+    </div>
+
+    <textarea id="texto" placeholder="Descreva seu problema urbano..."></textarea>
+
+    <button onclick="enviar()">Analisar com IA</button>
+
+    <div class="result" id="resultado" style="display:none;"></div>
+
+  </div>
 </div>
+
+<script>
+const ctx = document.getElementById('grafico');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+    datasets: [{
+      label: 'Crescimento',
+      data: [10, 20, 15, 30, 40],
+      borderWidth: 2
+    }]
+  }
+});
+</script>
 
 <script>
 async function enviar() {
