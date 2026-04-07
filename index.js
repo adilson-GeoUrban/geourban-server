@@ -1,5 +1,8 @@
+const express = require("express");
+const app = express();
 // =======================================
 // 🟢 BLOCO UNIFICADO FINAL - GEO URBAN
+// Bandeja 1 + Bandeja 2 + Backup + Rotas
 // =======================================
 
 const fs = require("fs");
@@ -10,87 +13,97 @@ const zlib = require("zlib");
 // Caminhos principais
 // ================================
 const pastaBackup = path.join(__dirname, "backup");
-const arquivoDadosB1 = path.join(__dirname, "dados.json");
-const arquivoDadosB2 = path.join(__dirname, "dados_bandeja2.json");
+const arquivoB1 = path.join(__dirname, "dados.json");
+const arquivoB2 = path.join(__dirname, "dados_bandeja2.json");
 
 // Criar pasta backup se não existir
-if (!fs.existsSync(pastaBackup)) fs.mkdirSync(pastaBackup);
+if (!fs.existsSync(pastaBackup)) {
+    fs.mkdirSync(pastaBackup);
+}
 
 // ================================
-// Função auxiliar: criar backup compactado
+// Função de BACKUP
 // ================================
-function criarBackup(arquivo, env) {
+function criarBackup(arquivo, ambiente) {
     try {
-        const nomeBackup = `env${env}_${Date.now()}.json.gz`;
-        const caminhoBackup = path.join(pastaBackup, nomeBackup);
+        const nome = `backup_env${ambiente}_${Date.now()}.json.gz`;
+        const destino = path.join(pastaBackup, nome);
+
         const gzip = zlib.createGzip();
         const origem = fs.createReadStream(arquivo);
-        const destino = fs.createWriteStream(caminhoBackup);
-        origem.pipe(gzip).pipe(destino);
-        console.log(`✅ Backup do ambiente ${env} gerado: ${nomeBackup}`);
+        const saida = fs.createWriteStream(destino);
+
+        origem.pipe(gzip).pipe(saida);
+
+        console.log(`✅ Backup criado (${ambiente}): ${nome}`);
     } catch (erro) {
-        console.error(`❌ Erro ao criar backup ambiente ${env}:`, erro.message);
+        console.log("❌ Erro no backup:", erro.message);
     }
 }
 
 // ================================
-// Função principal de salvamento unificado
+// SALVAR DADOS (UNIFICADO)
 // ================================
-function salvarTudo(dados, env = 1) {
+function salvarTudo(dados, ambiente = 1) {
     try {
-        // Seleciona arquivo correto
-        const arquivo = env === 2 ? arquivoDadosB2 : arquivoDadosB1;
+        const arquivo = ambiente === 2 ? arquivoB2 : arquivoB1;
 
-        // Lê dados existentes
-        let dadosExistentes = {};
+        let atual = {};
+
         if (fs.existsSync(arquivo)) {
-            dadosExistentes = JSON.parse(fs.readFileSync(arquivo, "utf-8"));
+            atual = JSON.parse(fs.readFileSync(arquivo, "utf-8"));
         }
 
-        // Mescla dados
-        const dadosFinais = { ...dadosExistentes, ...dados, atualizadoEm: new Date().toISOString() };
+        const final = {
+            ...atual,
+            ...dados,
+            atualizadoEm: new Date().toISOString()
+        };
 
-        // Salva arquivo
-        fs.writeFileSync(arquivo, JSON.stringify(dadosFinais, null, 2), "utf-8");
+        fs.writeFileSync(arquivo, JSON.stringify(final, null, 2));
 
-        // Cria backup
-        criarBackup(arquivo, env);
+        criarBackup(arquivo, ambiente);
 
-        console.log(`✅ Ambiente ${env} salvo com sucesso!`);
+        console.log(`✅ Dados salvos (Bandeja ${ambiente})`);
+
     } catch (erro) {
-        console.error(`❌ Erro ao salvar ambiente ${env}:`, erro.message);
+        console.log("❌ Erro ao salvar:", erro.message);
     }
 }
 
 // ================================
-// Rota /salvar-tudo
+// ROTA SALVAR TUDO
 // ================================
 app.post("/salvar-tudo", express.json(), (req, res) => {
     const dados = req.body;
-    const env = req.body.env === 2 ? 2 : 1;
+    const ambiente = req.body.env === 2 ? 2 : 1;
 
-    salvarTudo(dados, env);
+    salvarTudo(dados, ambiente);
 
     res.json({
         status: "ok",
-        ambiente: env,
-        mensagem: "Dados salvos e backup gerado!"
+        ambiente,
+        mensagem: "Salvo + backup criado"
     });
 });
 
 // ================================
-// Rota de status do sistema
+// ROTA STATUS
 // ================================
 app.get("/status", (req, res) => {
     res.json({
         sistema: "GeoUrban",
         status: "online",
-        backup: "ativo",
+        bandejas: ["1 ativa", "2 ativa"],
+        backup: "ok",
         hora: new Date()
     });
 });
-{
-  "usuarios": ["Adilson", "GeoUrban"],
-  "configuracoes": {"tema":"claro"},
-  "env": 1
-}
+
+// ================================
+// LOG INICIAL
+// ================================
+console.log("🚀 BLOCO UNIFICADO ATIVO - GEOURBAN");
+app.listen(3000, () => {
+    console.log("Servidor rodando");
+});
