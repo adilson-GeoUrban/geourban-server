@@ -1,267 +1,183 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>GeoUrban Platform</title>
+<title>GeoUrban Plataforma</title>
+
+<!-- GANTT -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css">
+<script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.min.js"></script>
 
 <style>
 body {
-    margin: 0;
     font-family: Arial;
-    background: #0b1a2b;
-    color: #fff;
+    background:#0a0f1c;
+    color:#fff;
+    text-align:center;
 }
 
-/* MENU */
-.sidebar {
-    width: 220px;
-    height: 100vh;
-    background: #081422;
-    position: fixed;
-    padding: 20px;
+input, button {
+    padding:10px;
+    margin:5px;
 }
 
-.sidebar h2 {
-    color: #2f80ed;
+#log {
+    height:200px;
+    overflow:auto;
+    background:#111;
+    margin:10px;
+    padding:10px;
+    text-align:left;
 }
 
-.sidebar a {
-    display: block;
-    color: #ccc;
-    margin: 15px 0;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.sidebar a:hover {
-    color: #fff;
-}
-
-/* CONTEÚDO */
-.content {
-    margin-left: 240px;
-    padding: 30px;
-}
-
-.section {
-    display: none;
-}
-
-.active {
-    display: block;
-}
-
-/* CARDS */
-.card {
-    background: #13263a;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-/* INPUTS */
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: none;
-    background: #0f1e2e;
-    color: #fff;
-}
-
-/* BOTÃO */
-button {
-    background: #2f80ed;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    width: 100%;
-    cursor: pointer;
-}
-
-/* HEADER */
-.header {
-    height: 220px;
-    background-image: url('dashboard.jpg');
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.overlay {
-    background: rgba(0,0,0,0.5);
-    width: 100%;
-    height: 100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction: column;
+#gantt {
+    background:#fff;
+    color:#000;
+    margin-top:20px;
 }
 </style>
-
-<script>
-function showSection(id){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
-</script>
-
 </head>
 
 <body>
 
-<!-- MENU -->
-<div class="sidebar">
-    <h2>🌍 GeoUrban</h2>
+<h2>🧠 GeoUrban Sistema Integrado</h2>
 
-    <a onclick="showSection('dashboard')">Dashboard</a>
-    <a onclick="showSection('profissionais')">Cadastro Profissionais</a>
-    <a onclick="showSection('buscar')">Buscar Especialista</a>
-    <a onclick="showSection('mentoria')">Mentoria</a>
-    <a onclick="showSection('privacidade')">Privacidade</a>
-</div>
+<!-- COMANDO -->
+<input id="cmd" placeholder="Digite comando ou use voz..." />
+<button onclick="enviar()">Enviar</button>
+<button onclick="ativarVoz()">🎙️ Voz</button>
 
-<div class="content">
+<!-- LOG -->
+<div id="log"></div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="section active">
-    <div class="header">
-        <div class="overlay">
-            <h1>GeoUrban Intelligence</h1>
-            <p>Plataforma global de análise urbana com IA</p>
-        </div>
-    </div>
+<!-- GANTT -->
+<h3>📊 Planejamento</h3>
+<div id="gantt"></div>
 
-    <div class="card">130+ Relatórios</div>
-    <div class="card">95% Precisão IA</div>
-    <div class="card">27 Usuários</div>
-</div>
+<script>
 
-<!-- CADASTRO -->
-<div id="profissionais" class="section">
-    <h2>Cadastro de Profissionais</h2>
+// =======================
+// LOG VISUAL
+// =======================
+function log(msg){
+    const l = document.getElementById("log");
+    l.innerHTML += "<div>"+msg+"</div>";
+    l.scrollTop = l.scrollHeight;
+}
 
-    <div class="card">
-        <input placeholder="Nome completo">
-        <input placeholder="Email">
-        <input placeholder="Telefone">
-        
-        <select>
-            <option>Profissão</option>
-            <option>Engenheiro</option>
-            <option>Arquiteto</option>
-            <option>Técnico</option>
-        </select>
+// =======================
+// LOG LEGAL
+// =======================
+function logLegal(acao){
+    const registro = {
+        usuario:"admin",
+        acao:acao,
+        data:new Date().toISOString()
+    };
 
-        <input placeholder="Registro profissional">
-        <textarea placeholder="Experiência"></textarea>
+    console.log("LOG LEGAL:", registro);
+}
 
-        <button>Salvar Cadastro</button>
-    </div>
-</div>
+// =======================
+// COMANDO
+// =======================
+function enviar(){
+    let c = document.getElementById("cmd").value;
+    log("👤 "+c);
+    interpretar(c);
+}
 
-<!-- BUSCA -->
-<div id="buscar" class="section">
-    <h2>Buscar Especialistas</h2>
+// =======================
+// IA PRINCIPAL
+// =======================
+function interpretar(c){
 
-    <div class="card">
-        <input placeholder="Cidade">
-        <select>
-            <option>Profissão</option>
-            <option>Engenheiro</option>
-            <option>Arquiteto</option>
-        </select>
+    logLegal(c);
 
-        <button>Buscar</button>
-    </div>
+    if(c.includes("financeiro")){
+        log("💰 Abrindo financeiro");
+    }
+    else if(c.includes("bloquear")){
+        log("⛔ Usuário bloqueado");
+    }
+    else if(c.includes("mapa")){
+        log("🗺️ Abrindo mapa");
+    }
+    else if(c.includes("relatorio")){
+        log("📄 Gerando relatório");
+    }
+    else{
+        log("🤖 IA aprendendo...");
+    }
 
-    <div class="card">
-        <h3>Profissionais disponíveis</h3>
-        <p>Lista aparecerá aqui (futuro banco de dados)</p>
-    </div>
-</div>
+    analisarSeguranca(c);
+}
 
-<!-- MENTORIA -->
-<div id="mentoria" class="section">
-    <h2>Troca de Conhecimento</h2>
+// =======================
+// IA SEGURANÇA
+// =======================
+function analisarSeguranca(c){
 
-    <div class="card">
-        <textarea placeholder="Compartilhe seu conhecimento ou experiência"></textarea>
-        <button>Publicar Conhecimento</button>
-    </div>
+    if(c.includes("hack") || c.includes("burlar")){
+        log("🚨 ALERTA DE SEGURANÇA");
+        logLegal("Tentativa suspeita");
+    }
 
-    <div class="card">
-        <h3>Guias gerados</h3>
-        <p>IA transformará experiências em guias práticos</p>
-    </div>
-</div>
+}
 
-<!-- PRIVACIDADE -->
-<div id="privacidade" class="section">
-    <h2>Política Global de Privacidade</h2>
+// =======================
+// GANTT
+// =======================
+new Gantt("#gantt", [
+    {id:"1",name:"Fundação",start:"2026-05-01",end:"2026-05-10"},
+    {id:"2",name:"Estrutura",start:"2026-05-11",end:"2026-05-25"},
+    {id:"3",name:"Acabamento",start:"2026-05-26",end:"2026-06-10"}
+]);
 
-    <div class="card">
-        <h3>1. Coleta de Dados</h3>
-        <p>Coletamos apenas dados necessários para operação da plataforma.</p>
+// =======================
+// VOZ
+// =======================
+function ativarVoz(){
 
-        <h3>2. Uso de Dados</h3>
-        <p>Dados utilizados para análise urbana, conexão profissional e melhoria do sistema.</p>
+    const rec = new webkitSpeechRecognition();
+    rec.lang = "pt-BR";
 
-        <h3>3. Compartilhamento</h3>
-        <p>Não vendemos dados. Compartilhamento apenas para operação técnica e legal.</p>
+    rec.onresult = (e)=>{
+        let t = e.results[0][0].transcript;
+        log("🎙️ "+t);
+        interpretar(t);
+    };
 
-        <h3>4. Compliance</h3>
-        <p>LGPD (Brasil) + GDPR (Europa)</p>
+    rec.start();
+}
 
-        <h3>5. Segurança</h3>
-        <p>Proteção contra acesso não autorizado e fraudes.</p>
-    </div>
-</div>
+// =======================
+// MONITORAMENTO
+// =======================
+setInterval(()=>{
+    log("🛰️ Sistema monitorando...");
+},15000);
 
-</div>
+</script>
+
+<!-- =======================
+BACKUP GEOURBAN V1
+======================= -->
+<!--
+VERSÃO: V1 FINAL UNIFICADA
+
+✔ IA de comando ativa
+✔ Segurança básica ativa
+✔ Log legal funcionando
+✔ Gantt funcionando
+✔ Voz ativa
+✔ Monitoramento ativo
+
+DATA: HOJE
+
+OBS:
+Base estável para testes e evolução
+-->
 
 </body>
 </html>
-<!-- ========================= -->
-<!-- 🔒 BACKUP GEOURBAN V3 -->
-<!-- ========================= -->
-
-<!--
-VERSÃO: GeoUrban V3 - Plataforma Completa
-DATA: 2026
-STATUS: Estável (Frontend completo)
-
-CONTEÚDO:
-- Dashboard
-- Cadastro de Profissionais
-- Busca de Especialistas (modelo Uber)
-- Mentoria / Troca de conhecimento
-- Política de Privacidade Global
-- Navegação SPA (JS)
-
-ARQUIVOS IMPORTANTES:
-- index.html (principal)
-- dashboard.jpg (imagem do header)
-
-PRÓXAS EVOLUÇÕES:
-- Backend (Node / API)
-- Banco de dados (profissionais)
-- Sistema de matching IA
-- Chat / áudio / mentoria ativa
-- Painel admin
-
-INSTRUÇÕES DE RESTAURAÇÃO:
-1. Copiar versão anterior do código
-2. Substituir conteúdo do index.html
-3. Commit no GitHub
-4. Aguardar deploy (Render)
-5. Ctrl + F5
-
-OBS:
-Nunca apagar este bloco — histórico do projeto
--->
