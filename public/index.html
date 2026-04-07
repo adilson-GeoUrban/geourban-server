@@ -1,138 +1,182 @@
-<!-- ===============================
-GEOURBAN - ORGANOGRAMA GLOBAL V1
-VISÃO ESTRATÉGICA COMPLETA
-=============================== -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GeoUrban Sistema Global</title>
 
-<div style="background:#0a0f1c;color:#fff;padding:20px;font-family:Arial">
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#0a0f1c;
+    color:#fff;
+}
 
-<h1>🧠 GEOURBAN — SISTEMA GLOBAL INTEGRADO</h1>
+/* Layout */
+.container {
+    display:flex;
+    height:100vh;
+}
 
-<h2>🌐 1. CAMADA DE ENTRADA (PORTARIA INTELIGENTE)</h2>
-<ul>
-<li>👤 Identificação: Nome / CPF / Email</li>
-<li>🎯 Intenção do usuário (IA interpreta)</li>
-<li>🧠 Classificação: Leigo / Técnico / Governo</li>
-<li>🚫 Bloqueio de acesso técnico indevido</li>
-</ul>
+/* Sidebar */
+.sidebar {
+    width:250px;
+    background:#111827;
+    padding:20px;
+}
 
-<h2>🔐 2. CONTROLE DE ACESSO</h2>
-<ul>
-<li>🔑 Login padrão</li>
-<li>🔏 Certificado Digital (A1 / A3)</li>
-<li>🧾 Registro de aceite legal</li>
-<li>📜 Termo de responsabilidade obrigatório</li>
-</ul>
+.sidebar h2 {
+    font-size:18px;
+    margin-bottom:20px;
+}
 
-<h2>👷 3. CADASTRO DE PROFISSIONAIS</h2>
-<ul>
-<li>📋 Cadastro padronizado</li>
-<li>📎 Validação de habilitação (CREA / CAU / etc)</li>
-<li>🏆 Nível de experiência</li>
-<li>💼 Banco global de especialistas</li>
-</ul>
+.menu button {
+    width:100%;
+    margin-bottom:10px;
+    padding:10px;
+    background:#1f2937;
+    border:none;
+    color:#fff;
+    cursor:pointer;
+    text-align:left;
+}
 
-<h2>🤖 4. MOTOR DE IA CENTRAL</h2>
-<ul>
-<li>🧠 IA interpretadora de comandos</li>
-<li>⚖️ IA jurídica (leis locais e internacionais)</li>
-<li>💰 IA contábil / fiscal</li>
-<li>🛡️ IA de segurança cibernética</li>
-</ul>
+.menu button:hover {
+    background:#2563eb;
+}
 
-<h2>📊 5. PROCESSAMENTO DE SOLICITAÇÕES</h2>
-<ul>
-<li>📥 Entrada do pedido</li>
-<li>🧠 Análise técnica automática</li>
-<li>📐 Pré-validação de projeto</li>
-<li>💲 Geração de custo automático</li>
-</ul>
+/* Conteúdo */
+.content {
+    flex:1;
+    padding:20px;
+    overflow:auto;
+}
 
-<h2>💳 6. PAGAMENTO REAL</h2>
-<ul>
-<li>💰 Cálculo validado (jurídico + contábil)</li>
-<li>🧾 Liberação após pagamento</li>
-<li>📄 Relatórios desbloqueados</li>
-</ul>
+/* Painel */
+.panel {
+    display:none;
+}
 
-<h2>📄 7. ENTREGA DE RESULTADOS</h2>
-<ul>
-<li>📊 Relatórios técnicos em tela</li>
-<li>📁 Exportação PDF</li>
-<li>📋 Checklist automático</li>
-<li>📌 Registro legal de emissão</li>
-</ul>
+.panel.active {
+    display:block;
+}
 
-<h2>🗺️ 8. AMBIENTE GEOESPACIAL</h2>
-<ul>
-<li>🛰️ Mapas com camadas técnicas</li>
-<li>📍 Criação de polígonos</li>
-<li>📏 Cálculo de área e volume</li>
-<li>🌊 Simulação (cheias, obras, etc)</li>
-</ul>
+/* Log */
+#log {
+    background:#000;
+    padding:10px;
+    height:120px;
+    overflow:auto;
+    margin-top:20px;
+    font-size:13px;
+}
+</style>
+</head>
 
-<h2>🏗️ 9. LABORATÓRIO DE ORÇAMENTO</h2>
-<ul>
-<li>📊 Planilhas completas</li>
-<li>📅 Cronograma físico-financeiro</li>
-<li>📈 Gantt automático</li>
-<li>📚 Integração com sistemas oficiais (SINAPI etc)</li>
-</ul>
+<body>
 
-<h2>🎓 10. EDUCAÇÃO INTELIGENTE</h2>
-<ul>
-<li>📚 Cursos gerados por IA em tempo real</li>
-<li>🎤 Interação por texto e voz</li>
-<li>📖 Guias práticos automáticos</li>
-<li>👴 Valorização de profissionais experientes</li>
-</ul>
+<div class="container">
 
-<h2>🌍 11. MODO GOVERNO / PREFEITURAS</h2>
-<ul>
-<li>🏛️ Adequação a leis locais</li>
-<li>📜 Integração com planos diretores</li>
-<li>📡 Uso em planejamento urbano e rural</li>
-</ul>
+<!-- MENU -->
+<div class="sidebar">
+<h2>🧠 GeoUrban</h2>
 
-<h2>🛡️ 12. SEGURANÇA TOTAL</h2>
-<ul>
-<li>🟢 comportamento normal</li>
-<li>🟡 alerta de risco</li>
-<li>🔴 bloqueio automático</li>
-<li>🚫 proteção contra fraudes e ataques</li>
-</ul>
-
-<h2>📡 13. MONITORAMENTO GLOBAL</h2>
-<ul>
-<li>📊 Dashboard em tempo real</li>
-<li>🌎 Mapa com usuários ativos</li>
-<li>💰 Controle financeiro</li>
-<li>📈 Logs completos</li>
-</ul>
-
-<h2>🧪 14. LABORATÓRIO SECRETO (SEU)</h2>
-<ul>
-<li>🧠 criação de novas soluções</li>
-<li>🏗️ montagem de módulos</li>
-<li>🔄 reorganização automática da plataforma</li>
-<li>💡 inovação contínua</li>
-</ul>
-
+<div class="menu">
+<button onclick="abrir('entrada')">🌐 Entrada</button>
+<button onclick="abrir('acesso')">🔐 Acesso</button>
+<button onclick="abrir('profissionais')">👷 Profissionais</button>
+<button onclick="abrir('ia')">🤖 IA Central</button>
+<button onclick="abrir('processo')">📊 Processamento</button>
+<button onclick="abrir('pagamento')">💳 Pagamento</button>
+</div>
 </div>
 
-<!-- ===============================
-BACKUP GEOURBAN - ORGANOGRAMA V1
-=============================== -->
+<!-- CONTEÚDO -->
+<div class="content">
+
+<h1>🚀 GeoUrban Sistema Global Integrado</h1>
+
+<!-- ENTRADA -->
+<div id="entrada" class="panel active">
+<h2>🌐 Entrada Inteligente</h2>
+<p>Identificação, intenção do usuário e filtro de acesso.</p>
+</div>
+
+<!-- ACESSO -->
+<div id="acesso" class="panel">
+<h2>🔐 Controle de Acesso</h2>
+<p>Login, certificado digital e aceite legal.</p>
+</div>
+
+<!-- PROFISSIONAIS -->
+<div id="profissionais" class="panel">
+<h2>👷 Cadastro de Profissionais</h2>
+<p>Validação CREA / CAU e banco global.</p>
+</div>
+
+<!-- IA -->
+<div id="ia" class="panel">
+<h2>🤖 IA Central</h2>
+<p>IA jurídica, contábil e segurança.</p>
+</div>
+
+<!-- PROCESSO -->
+<div id="processo" class="panel">
+<h2>📊 Processamento</h2>
+<p>Análise automática e geração de custo.</p>
+</div>
+
+<!-- PAGAMENTO -->
+<div id="pagamento" class="panel">
+<h2>💳 Pagamento</h2>
+<p>Validação antes da liberação de relatórios.</p>
+</div>
+
+<!-- LOG -->
+<div id="log"></div>
+
+</div>
+</div>
+
+<script>
+
+/* NAVEGAÇÃO */
+function abrir(id){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    registrar("Abrindo módulo: " + id);
+}
+
+/* LOG CONTROLADO (SEM LOOP) */
+let ultimo = "";
+
+function registrar(msg){
+    if(msg !== ultimo){
+        document.getElementById('log').innerHTML += "🧠 " + msg + "<br>";
+        ultimo = msg;
+    }
+}
+
+/* INICIAL */
+registrar("Sistema iniciado com sucesso");
+
+</script>
+
+<!-- ========================= -->
+<!-- BACKUP GEOURBAN V1 -->
+<!-- ========================= -->
 <!--
-VERSÃO: V1 VISÃO COMPLETA GLOBAL
+Versão segura antes de integrações avançadas
 
-✔ Plataforma estruturada do início ao fim
-✔ Fluxo completo definido
-✔ Integração IA + humano + legal
-✔ Base pronta para execução real
+✔ Sistema navegável
+✔ Sem repetição de log
+✔ Estrutura modular
+✔ Base para IA real
+✔ Pronto para expansão
 
-DATA: 07/04/2026
-
-OBS:
-Este é o mapa mestre da plataforma.
-Usar como referência para todas evoluções futuras.
+DATA: HOJE
+STATUS: ESTÁVEL
 -->
+
+</body>
+</html>
