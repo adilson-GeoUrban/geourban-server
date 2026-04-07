@@ -1,11 +1,38 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban Plataforma</title>
+<div id="entrada" class="panel">
 
-<style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#0a0f1
+<button onclick="voltar()">⬅ Voltar</button>
+
+<h2>🌐 Entrada Inteligente</h2>
+<p>Cadastro e identificação do usuário</p>
+
+<form id="formEntrada" onsubmit="salvarEntrada(event)">
+
+<input type="text" placeholder="Nome completo" required>
+<input type="text" placeholder="CPF" required>
+<input type="email" placeholder="Email" required>
+
+<select required>
+<option value="">Tipo de usuário</option>
+<option>Leigo</option>
+<option>Profissional</option>
+<option>Governo</option>
+</select>
+
+<button type="submit">Cadastrar</button>
+
+</form>
+
+<div id="respostaEntrada"></div>
+
+</div>
+
+<script>
+function salvarEntrada(e){
+    e.preventDefault();
+
+    document.getElementById("respostaEntrada").innerHTML =
+    "✅ Cadastro realizado com sucesso";
+
+    registrar("Novo usuário cadastrado");
+}
+</script>
