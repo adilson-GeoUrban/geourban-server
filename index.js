@@ -103,6 +103,14 @@ app.get("/status", (req, res) => {
 // ================================
 // LOG INICIAL
 // ================================
+const express = require("express");
+const app = express();
+
+// outras funções...
+
+app.listen(PORT, () => {
+    console.log("Servidor rodando");
+});
 console.log("🚀 BLOCO UNIFICADO ATIVO - GEOURBAN");
 app.listen(3000, () => {
     console.log("Servidor rodando");
