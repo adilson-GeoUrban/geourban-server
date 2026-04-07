@@ -1,7 +1,3 @@
-// ========================================
-// GEOURBAN - INDEX.JS FINAL UNIFICADO
-// ========================================
-
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,20 +7,21 @@ const path = require("path");
 const zlib = require("zlib");
 
 // ================================
-// CAMINHOS PRINCIPAIS
+// Caminhos principais
 // ================================
 const pastaBackup = path.join(__dirname, "backup");
 const arquivoDadosB1 = path.join(__dirname, "dados.json");
 const arquivoDadosB2 = path.join(__dirname, "dados_bandeja2.json");
 
+// Criar pasta backup se não existir
 if (!fs.existsSync(pastaBackup)) fs.mkdirSync(pastaBackup);
 
 // ================================
-// FUNÇÕES DE BACKUP
+// Função auxiliar: criar backup compactado
 // ================================
 function criarBackup(arquivo, env) {
     try {
-        const nomeBackup = `${env === 2 ? "bandeja2" : "bandeja1"}_${Date.now()}.json.gz`;
+        const nomeBackup = `env${env}_${Date.now()}.json.gz`;
         const caminhoBackup = path.join(pastaBackup, nomeBackup);
         const gzip = zlib.createGzip();
         const origem = fs.createReadStream(arquivo);
@@ -37,20 +34,25 @@ function criarBackup(arquivo, env) {
 }
 
 // ================================
-// FUNÇÃO DE SALVAR DADOS
+// Função principal de salvamento unificado
 // ================================
 function salvarTudo(dados, env = 1) {
     try {
         const arquivo = env === 2 ? arquivoDadosB2 : arquivoDadosB1;
 
+        // Lê dados existentes
         let dadosExistentes = {};
         if (fs.existsSync(arquivo)) {
             dadosExistentes = JSON.parse(fs.readFileSync(arquivo, "utf-8"));
         }
 
+        // Mescla dados
         const dadosFinais = { ...dadosExistentes, ...dados, atualizadoEm: new Date().toISOString() };
+
+        // Salva arquivo
         fs.writeFileSync(arquivo, JSON.stringify(dadosFinais, null, 2), "utf-8");
 
+        // Cria backup
         criarBackup(arquivo, env);
 
         console.log(`✅ Ambiente ${env} salvo com sucesso!`);
@@ -60,128 +62,34 @@ function salvarTudo(dados, env = 1) {
 }
 
 // ================================
-// ROTAS
+// Rota /salvar-tudo → salva Bandeja 1 + 2
 // ================================
-app.use(express.json());
-
-// Salvar Bandeja 1 ou tudo
-app.post("/salvar-tudo", (req, res) => {
+app.post("/salvar-tudo", express.json(), (req, res) => {
     const dados = req.body;
     const env = req.body.env === 2 ? 2 : 1;
     salvarTudo(dados, env);
-
     res.json({ status: "ok", ambiente: env, mensagem: "Dados salvos e backup gerado!" });
 });
 
-// Salvar apenas Bandeja 2
-app.post("/salvar-b2", (req, res) => {
+// ================================
+// Rota /salvar-b2 → salva apenas Bandeja 2
+// ================================
+app.post("/salvar-b2", express.json(), (req, res) => {
     const dados = req.body;
     salvarTudo(dados, 2);
-    res.json({ status: "ok", ambiente: 2, mensagem: "Bandeja 2 salva e backup gerado!" });
+    res.json({ status: "ok", ambiente: 2, mensagem: "BD2 salvo e backup gerado!" });
 });
 
-// Status do sistema
+// ================================
+// Rota /status → verifica servidor
+// ================================
 app.get("/status", (req, res) => {
     res.json({ sistema: "GeoUrban", status: "online", backup: "ativo", hora: new Date() });
 });
 
 // ================================
-// INICIAR SERVIDOR
+// app.listen → não mexa abaixo disso
 // ================================
 app.listen(PORT, () => {
-    console.log(`🌐 GeoUrban Server rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
-// ========================================
-// GEOURBAN - INDEX.JS FINAL UNIFICADO
-// ========================================
-
-const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-const fs = require("fs");
-const path = require("path");
-const zlib = require("zlib");
-
-// ================================
-// CAMINHOS PRINCIPAIS
-// ================================
-const pastaBackup = path.join(__dirname, "backup");
-const arquivoDadosB1 = path.join(__dirname, "dados.json");
-const arquivoDadosB2 = path.join(__dirname, "dados_bandeja2.json");
-
-if (!fs.existsSync(pastaBackup)) fs.mkdirSync(pastaBackup);
-
-// ================================
-// FUNÇÕES DE BACKUP
-// ================================
-function criarBackup(arquivo, env) {
-    try {
-        const nomeBackup = `${env === 2 ? "bandeja2" : "bandeja1"}_${Date.now()}.json.gz`;
-        const caminhoBackup = path.join(pastaBackup, nomeBackup);
-        const gzip = zlib.createGzip();
-        const origem = fs.createReadStream(arquivo);
-        const destino = fs.createWriteStream(caminhoBackup);
-        origem.pipe(gzip).pipe(destino);
-        console.log(`✅ Backup do ambiente ${env} gerado: ${nomeBackup}`);
-    } catch (erro) {
-        console.error(`❌ Erro ao criar backup ambiente ${env}:`, erro.message);
-    }
-}
-
-// ================================
-// FUNÇÃO DE SALVAR DADOS
-// ================================
-function salvarTudo(dados, env = 1) {
-    try {
-        const arquivo = env === 2 ? arquivoDadosB2 : arquivoDadosB1;
-
-        let dadosExistentes = {};
-        if (fs.existsSync(arquivo)) {
-            dadosExistentes = JSON.parse(fs.readFileSync(arquivo, "utf-8"));
-        }
-
-        const dadosFinais = { ...dadosExistentes, ...dados, atualizadoEm: new Date().toISOString() };
-        fs.writeFileSync(arquivo, JSON.stringify(dadosFinais, null, 2), "utf-8");
-
-        criarBackup(arquivo, env);
-
-        console.log(`✅ Ambiente ${env} salvo com sucesso!`);
-    } catch (erro) {
-        console.error(`❌ Erro ao salvar ambiente ${env}:`, erro.message);
-    }
-}
-
-// ================================
-// ROTAS
-// ================================
-app.use(express.json());
-
-// Salvar Bandeja 1 ou tudo
-app.post("/salvar-tudo", (req, res) => {
-    const dados = req.body;
-    const env = req.body.env === 2 ? 2 : 1;
-    salvarTudo(dados, env);
-
-    res.json({ status: "ok", ambiente: env, mensagem: "Dados salvos e backup gerado!" });
-});
-
-// Salvar apenas Bandeja 2
-app.post("/salvar-b2", (req, res) => {
-    const dados = req.body;
-    salvarTudo(dados, 2);
-    res.json({ status: "ok", ambiente: 2, mensagem: "Bandeja 2 salva e backup gerado!" });
-});
-
-// Status do sistema
-app.get("/status", (req, res) => {
-    res.json({ sistema: "GeoUrban", status: "online", backup: "ativo", hora: new Date() });
-});
-
-// ================================
-// INICIAR SERVIDOR
-// ================================
-app.listen(PORT, () => {
-    console.log(`🌐 GeoUrban Server rodando na porta ${PORT}`);
-});
-https://seu-site.onrender.com/status
