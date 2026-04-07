@@ -6,28 +6,69 @@
 
 <style>
 body{
+    margin:0;
     font-family:Arial;
     background:#0a0f1c;
     color:#fff;
+}
+
+/* HERO */
+.hero{
+    height:120px;
+    position:relative;
+    background:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.slide{
+    position:absolute;
+    opacity:0;
+    font-size:20px;
+    transition:1s;
+}
+
+.slide.ativo{
+    opacity:1;
+}
+
+/* FORM */
+.container{
     padding:20px;
 }
 
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    max-width:800px;
+}
+
+.full{ grid-column:1/3; }
+
 input, select{
-    display:block;
-    margin:5px 0;
     padding:8px;
-    width:300px;
+    width:100%;
 }
 
-button{
-    padding:10px;
-    margin-top:10px;
-}
-
+/* CARD */
 .card{
     margin-top:20px;
     background:#0b1a2a;
     padding:20px;
+    border-radius:10px;
+}
+
+/* CHAT */
+.chat{
+    position:fixed;
+    right:20px;
+    top:150px;
+    width:250px;
+    background:#0b1a2a;
+    padding:15px;
+    border-radius:10px;
 }
 </style>
 
@@ -35,55 +76,129 @@ button{
 
 <body>
 
+<!-- HERO -->
+<div class="hero">
+    <div class="slide ativo">🚀 Bem-vindo à GeoUrban</div>
+    <div class="slide">🏗️ Conectando profissionais e cidades</div>
+    <div class="slide">📊 Gestão inteligente urbana</div>
+    <div class="slide">📎 Projetos técnicos e laudos</div>
+</div>
+
+<div class="container">
+
 <h2>Cadastro</h2>
 
-<form onsubmit="salvar(event)">
+<form class="grid" onsubmit="salvar(event)">
 
-<input id="nome" placeholder="Nome" required>
-<input id="email" placeholder="Email" required>
+<input id="nome" placeholder="Nome completo" class="full" required>
+<input id="email" placeholder="Email" class="full" required>
 
 <select id="categoria">
 <option value="">Categoria</option>
 <option>Estudante</option>
 <option>Profissional</option>
+<option>Outro</option>
 </select>
 
 <select id="nivel">
 <option value="">Nível</option>
 <option>Graduação</option>
 <option>Mestrado</option>
+<option>Doutorado</option>
 </select>
 
 <input id="profissao" placeholder="Profissão">
+<input id="especializacao" placeholder="Especialização">
 
 <select id="registroTipo">
 <option value="">Registro</option>
 <option>CREA</option>
 <option>CAU</option>
+<option>CFT</option>
 </select>
 
-<input id="registroNumero" placeholder="Número registro">
+<input id="registroNumero" placeholder="Número do registro">
 
-<button type="submit">Cadastrar</button>
+<select id="docTipo">
+<option value="">Documento Técnico</option>
+<option>ART</option>
+<option>RRT</option>
+<option>TRT</option>
+</select>
+
+<input id="docNumero" placeholder="Número do documento">
+
+<input id="pais" placeholder="País">
+<input id="regiao" placeholder="Região">
+
+<select id="situacao" class="full">
+<option value="">Situação</option>
+<option>Ativo</option>
+<option>Autônomo</option>
+<option>Aposentado</option>
+<option>Informal</option>
+</select>
+
+<button class="full">Cadastrar</button>
 
 </form>
 
 <div id="resposta"></div>
 <div id="cardUsuario"></div>
 
+</div>
+
+<!-- CHAT -->
+<div class="chat">
+<h4>🤖 Assistente</h4>
+<p id="chatMsg">Posso te ajudar 👋</p>
+</div>
+
 <script>
 
+/* SLIDES */
+let index = 0;
+const slides = document.querySelectorAll(".slide");
+
+setInterval(()=>{
+    slides.forEach(s=>s.classList.remove("ativo"));
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("ativo");
+},3000);
+
+/* CHAT */
+function falar(msg){
+    document.getElementById("chatMsg").innerText = msg;
+}
+
+setTimeout(()=>falar("Preencha seus dados 👇"),3000);
+setTimeout(()=>falar("Você é profissional ou estudante?"),6000);
+setTimeout(()=>falar("Profissionais precisam de registro"),9000);
+
+/* ÁUDIO */
+function audio(msg){
+    const fala = new SpeechSynthesisUtterance(msg);
+    speechSynthesis.speak(fala);
+}
+
+/* SALVAR */
 function salvar(e){
     e.preventDefault();
 
     const usuario = {
-        nome: document.getElementById("nome").value,
-        email: document.getElementById("email").value,
-        categoria: document.getElementById("categoria").value,
-        nivel: document.getElementById("nivel").value,
-        profissao: document.getElementById("profissao").value,
-        registroTipo: document.getElementById("registroTipo").value,
-        registroNumero: document.getElementById("registroNumero").value
+        nome: nome.value,
+        email: email.value,
+        categoria: categoria.value,
+        nivel: nivel.value,
+        profissao: profissao.value,
+        especializacao: especializacao.value,
+        registroTipo: registroTipo.value,
+        registroNumero: registroNumero.value,
+        docTipo: docTipo.value,
+        docNumero: docNumero.value,
+        pais: pais.value,
+        regiao: regiao.value,
+        situacao: situacao.value
     };
 
     if(usuario.categoria === "Profissional"){
@@ -91,14 +206,26 @@ function salvar(e){
             alert("Informe registro profissional");
             return;
         }
+        if(!usuario.docTipo || !usuario.docNumero){
+            alert("Informe ART/RRT/TRT");
+            return;
+        }
     }
-
-    document.getElementById("cardUsuario").innerHTML =
-    "<div class='card'><h3>"+usuario.nome+"</h3><p>"+usuario.categoria+"</p></div>";
 
     localStorage.setItem("usuarioGeoUrban", JSON.stringify(usuario));
 
-    document.getElementById("resposta").innerHTML = "OK";
+    document.getElementById("cardUsuario").innerHTML =
+    `<div class="card">
+        <h3>${usuario.nome}</h3>
+        <p>${usuario.categoria} - ${usuario.nivel}</p>
+        <p>${usuario.profissao}</p>
+        <p>${usuario.registroTipo} ${usuario.registroNumero}</p>
+        <p>${usuario.docTipo} ${usuario.docNumero}</p>
+    </div>`;
+
+    const msg = "Cadastro concluído. Bem-vindo à GeoUrban.";
+    document.getElementById("resposta").innerHTML = msg;
+    audio(msg);
 }
 
 </script>
