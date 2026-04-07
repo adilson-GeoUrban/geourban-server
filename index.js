@@ -16,3 +16,4 @@ archive.directory(pastaBackup, false);
 
 // Finaliza
 archive.finalize();
+criarTela("Nome da Tela")
