@@ -1,138 +1,19 @@
-// 🚀 SISTEMA GEOURBAN — BLOCO ÚNICO FINAL
+bandeja1/
+│
+├── index.html          ← principal estável
+├── assets/
+│   └── (CSS/JS/imagens)
+└── blocos/
+    ├── bloco1_galeria.html
+    ├── bloco2_dashboard.html
+    └── bloco3_download.html
 
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
-const app = express();
-app.use(express.json());
-
-// 📂 GARANTIR PASTA BACKUP
-const pastaBackup = path.join(__dirname, "backup");
-
-if (!fs.existsSync(pastaBackup)) {
-  fs.mkdirSync(pastaBackup);
-}
-
-// 🛡️ IA PROTEÇÃO (GUARDIAN)
-function guardian(texto) {
-
-  const proibidos = [
-    "hack", "fraude", "ataque",
-    "pornografia", "racismo", "ódio"
-  ];
-
-  texto = (texto || "").toLowerCase();
-
-  for (let p of proibidos) {
-    if (texto.includes(p)) {
-      return { bloqueado: true };
-    }
-  }
-
-  return { bloqueado: false };
-}
-
-// ⚖️ GOVERNANÇA
-function governar(texto) {
-
-  texto = (texto || "").toLowerCase();
-
-  if (texto.includes("erro")) {
-    return { permitido: false };
-  }
-
-  return { permitido: true };
-}
-
-// 💾 BACKUP SEGURO
-function salvarBackup(dados) {
-
-  try {
-    const nome = `backup-${Date.now()}.json`;
-    const caminho = path.join(pastaBackup, nome);
-
-    fs.writeFileSync(caminho, JSON.stringify(dados, null, 2));
-
-    console.log("📦 Backup salvo:", nome);
-
-  } catch (erro) {
-    console.log("❌ Erro ao salvar backup:", erro.message);
-  }
-}
-
-// 🧠 IA PRINCIPAL
-function sistema(dados) {
-
-  const descricao = dados?.descricao || "";
-
-  // 🔴 PROTEÇÃO
-  const g = guardian(descricao);
-  if (g.bloqueado) {
-    return { status: "bloqueado", motivo: "Conteúdo proibido" };
-  }
-
-  // 🟡 GOVERNANÇA
-  const gov = governar(descricao);
-  if (!gov.permitido) {
-    return { status: "bloqueado", motivo: "Violação de regra" };
-  }
-
-  // 🟢 EXECUÇÃO
-  return {
-    status: "ok",
-    resposta: "Sistema funcionando 🚀",
-    recebido: descricao
-  };
-}
-
-// 📡 ROTA PRINCIPAL
-app.post("/solicitar", (req, res) => {
-
-  const dados = req.body;
-
-  // 💾 salva tudo primeiro (segurança)
-  salvarBackup(dados);
-
-  const resultado = sistema(dados);
-
-  if (resultado.status === "bloqueado") {
-    return res.status(403).json(resultado);
-  }
-
-  res.json(resultado);
-});
-
-// 🌐 ROTA TESTE
-app.get("/", (req, res) => {
-  res.send("✅ GeoUrban rodando com proteção ativa");
-});
-
-// ▶️ INICIAR
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-});<script>
-const gallery = document.getElementById("gallery");
-fetch("/imagens")
-  .then(res => res.json())
-  .then(imagens => {
-    imagens.forEach(img => {
-      const imageElem = document.createElement("img");
-      imageElem.src = img;
-      imageElem.alt = img;
-      gallery.appendChild(imageElem);
-    });
-  });
-</script><!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Teste GeoUrban</title>
-</head>
-<body>
-    <h1>✅ GeoUrban funcionando!</h1>
-    <p>Se você ver isso, o HTML está carregando.</p>
-</body>
-</html>
+bandeja2/
+│
+├── index_bandeja2.html  ← experimental, AI Designer
+├── assets/
+│   └── (CSS/JS/imagens)
+└── blocos/
+    ├── bloco1_galeria.html
+    ├── bloco2_dashboard.html
+    └── bloco3_download.html
