@@ -2,10 +2,9 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center/cover;
+    background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
 }
 
-/* OVERLAY */
 .overlay {
     position: fixed;
     width: 100%;
@@ -13,12 +12,12 @@ body {
     background: rgba(0,0,0,0.7);
 }
 
-/* IA ESQUERDA */
-.ia-box {
+/* COLUNA ESQUERDA */
+.left-panel {
     position: fixed;
     left: 0;
     top: 0;
-    width: 300px;
+    width: 400px;
     height: 100%;
     background: rgba(0,0,0,0.85);
     padding: 20px;
@@ -26,25 +25,20 @@ body {
     overflow-y: auto;
 }
 
-.ia-box input {
+/* IA */
+.ia-top {
+    margin-bottom: 20px;
+}
+
+.ia-top input {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
 }
 
-/* CADASTRO CENTRAL */
-.cadastro-box {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    background: rgba(0,0,0,0.8);
-    padding: 25px;
-    border-radius: 12px;
-}
-
-.cadastro-box input, select {
+/* CADASTRO */
+.cadastro-box input, 
+.cadastro-box select {
     width: 100%;
     padding: 10px;
     margin: 5px 0;
@@ -55,16 +49,20 @@ body {
     position: fixed;
     right: 0;
     top: 0;
-    width: 300px;
+    width: calc(100% - 400px);
     height: 100%;
     overflow: hidden;
 }
 
 .slide {
+    position: absolute;
+    width: 100%;
     height: 100%;
     display: none;
     color: #fff;
-    padding: 20px;
+    padding: 40px;
+    font-size: 28px;
+    background: rgba(0,0,0,0.5);
 }
 
 .slide.active {
@@ -74,48 +72,54 @@ body {
 
 <div class="overlay"></div>
 
-<!-- IA -->
-<div class="ia-box">
-    <h3>🤖 Assistente</h3>
-    <p>Bem-vindo à GeoUrban</p>
-    <p>Vamos criar seu perfil profissional 🚀</p>
+<!-- ESQUERDA -->
+<div class="left-panel">
 
-    <input placeholder="Digite aqui..." />
-</div>
+    <!-- IA -->
+    <div class="ia-top">
+        <h3>👩 Assistente GeoUrban</h3>
+        <p>Bem-vindo 👋</p>
+        <p>Vamos criar sua identidade profissional 🚀</p>
 
-<!-- CADASTRO -->
-<div class="cadastro-box">
-    <h2>Cadastro</h2>
+        <input placeholder="Ex: sou engenheiro..." />
+    </div>
 
-    <input id="nome" placeholder="Nome">
-    <input id="email" placeholder="Email">
+    <!-- CADASTRO -->
+    <div class="cadastro-box">
+        <h3>Cadastro</h3>
 
-    <select id="categoria">
-        <option>Profissional</option>
-        <option>Estudante</option>
-    </select>
+        <input id="nome" placeholder="Nome">
+        <input id="email" placeholder="Email">
 
-    <select id="nivel">
-        <option>Básico</option>
-        <option>Mestrado</option>
-    </select>
+        <select id="categoria">
+            <option>Profissional</option>
+            <option>Estudante</option>
+        </select>
 
-    <input id="profissao" placeholder="Profissão">
-    <input id="especializacao" placeholder="Especialização">
+        <select id="nivel">
+            <option>Básico</option>
+            <option>Avançado</option>
+        </select>
 
-    <select id="registroTipo">
-        <option>CREA</option>
-        <option>CAU</option>
-    </select>
+        <input id="profissao" placeholder="Profissão">
+        <input id="especializacao" placeholder="Especialização">
 
-    <input id="registroNumero" placeholder="Número">
+        <select id="registroTipo">
+            <option>CREA</option>
+            <option>CAU</option>
+        </select>
 
-    <button onclick="salvar()">Cadastrar</button>
+        <input id="registroNumero" placeholder="Número do registro">
+
+        <button onclick="salvar()">Cadastrar</button>
+    </div>
+
 </div>
 
 <!-- SLIDES -->
 <div class="slides">
     <div class="slide active">🚀 Conecte-se com profissionais</div>
-    <div class="slide">📊 Projetos técnicos</div>
-    <div class="slide">📎 Upload de ART/RRT</div>
+    <div class="slide">📊 Plataforma técnica completa</div>
+    <div class="slide">📎 Upload de ART / RRT</div>
+    <div class="slide">🤝 Network profissional</div>
 </div>
