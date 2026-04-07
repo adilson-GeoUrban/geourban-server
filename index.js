@@ -1,12 +1,13 @@
-{
-  "usuarios": ["adilson"]
-}
+// =======================================
+// 🟢 BLOCO UNIFICADO FINAL - GEO URBAN
+// =======================================
+
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
 
 // ================================
-// 🟢 Caminhos principais
+// Caminhos principais
 // ================================
 const pastaBackup = path.join(__dirname, "backup");
 const arquivoDadosB1 = path.join(__dirname, "dados.json");
@@ -16,11 +17,28 @@ const arquivoDadosB2 = path.join(__dirname, "dados_bandeja2.json");
 if (!fs.existsSync(pastaBackup)) fs.mkdirSync(pastaBackup);
 
 // ================================
-// 🟢 Função unificada salvar-tudo
+// Função auxiliar: criar backup compactado
+// ================================
+function criarBackup(arquivo, env) {
+    try {
+        const nomeBackup = `env${env}_${Date.now()}.json.gz`;
+        const caminhoBackup = path.join(pastaBackup, nomeBackup);
+        const gzip = zlib.createGzip();
+        const origem = fs.createReadStream(arquivo);
+        const destino = fs.createWriteStream(caminhoBackup);
+        origem.pipe(gzip).pipe(destino);
+        console.log(`✅ Backup do ambiente ${env} gerado: ${nomeBackup}`);
+    } catch (erro) {
+        console.error(`❌ Erro ao criar backup ambiente ${env}:`, erro.message);
+    }
+}
+
+// ================================
+// Função principal de salvamento unificado
 // ================================
 function salvarTudo(dados, env = 1) {
     try {
-        // Escolhe arquivo certo
+        // Seleciona arquivo correto
         const arquivo = env === 2 ? arquivoDadosB2 : arquivoDadosB1;
 
         // Lê dados existentes
@@ -32,25 +50,20 @@ function salvarTudo(dados, env = 1) {
         // Mescla dados
         const dadosFinais = { ...dadosExistentes, ...dados, atualizadoEm: new Date().toISOString() };
 
-        // Salva JSON
+        // Salva arquivo
         fs.writeFileSync(arquivo, JSON.stringify(dadosFinais, null, 2), "utf-8");
 
-        // Cria backup compactado
-        const nomeBackup = `backup_env${env}_${Date.now()}.json.gz`;
-        const caminhoBackup = path.join(pastaBackup, nomeBackup);
-        const gzip = zlib.createGzip();
-        const stream = fs.createReadStream(arquivo);
-        const destino = fs.createWriteStream(caminhoBackup);
-        stream.pipe(gzip).pipe(destino);
+        // Cria backup
+        criarBackup(arquivo, env);
 
-        console.log(`✅ Ambiente ${env} salvo com backup: ${nomeBackup}`);
+        console.log(`✅ Ambiente ${env} salvo com sucesso!`);
     } catch (erro) {
         console.error(`❌ Erro ao salvar ambiente ${env}:`, erro.message);
     }
 }
 
 // ================================
-// 🌐 Rota /salvar-tudo
+// Rota /salvar-tudo
 // ================================
 app.post("/salvar-tudo", express.json(), (req, res) => {
     const dados = req.body;
@@ -64,3 +77,20 @@ app.post("/salvar-tudo", express.json(), (req, res) => {
         mensagem: "Dados salvos e backup gerado!"
     });
 });
+
+// ================================
+// Rota de status do sistema
+// ================================
+app.get("/status", (req, res) => {
+    res.json({
+        sistema: "GeoUrban",
+        status: "online",
+        backup: "ativo",
+        hora: new Date()
+    });
+});
+{
+  "usuarios": ["Adilson", "GeoUrban"],
+  "configuracoes": {"tema":"claro"},
+  "env": 1
+}
