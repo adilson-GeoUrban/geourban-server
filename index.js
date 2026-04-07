@@ -1,120 +1,112 @@
-const express = require("express");
-const path = require("path");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban 🚀</title>
+  <style>
+    body { font-family: Arial; background:#0f172a; color:#fff; padding:20px; }
+    input, button { padding:10px; margin:5px; border-radius:8px; border:none; }
+    button { background:#22c55e; cursor:pointer; }
+    .box { background:#1e293b; padding:20px; border-radius:12px; margin-top:20px; }
+  </style>
+</head>
+<body>
 
-const app = express();
+<h1>GeoUrban Online 🚀</h1>
 
-const OpenAI = require("openai");
-const Stripe = require("stripe");
+<div class="box">
+  <input id="descricao" placeholder="Descrição da operação">
+  <input id="valor" type="number" placeholder="Valor (R$)">
+  <button onclick="executar()">Analisar</button>
+</div>
 
-// 🔐 ENV
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+<div id="resultado" class="box"></div>
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+<script>
 
-/**
-📦 MIDDLEWARE
-*/
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+// 🔐 VALIDAÇÃO SEGURA
+function validarOperacao(dados) {
+  if (!dados) return "erro";
 
-/**
-🔥 ROTA PRINCIPAL (CORREÇÃO DO RENDER)
-*/
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+  if (!dados.valor || dados.valor <= 0) {
+    return "valor_invalido";
+  }
 
-/**
-🧠 IA GEOURBAN
-*/
-app.post("/consultoria", async (req, res) => {
-  const { texto } = req.body;
+  if (!dados.descricao || dados.descricao.trim() === "") {
+    return "descricao_vazia";
+  }
 
-  if (!texto) return res.status(400).json({ error: "Texto vazio" });
-
-  try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
-Responda SOMENTE JSON válido:
-
-{
-  "tipo": "juridico | tecnico | operacional | geral",
-  "diagnostico": "texto profissional",
-  "sugestoes": ["acao 1", "acao 2", "acao 3"],
-  "valor_estimado": 0,
-  "risco": "baixo | medio | alto"
+  return "ok";
 }
-`
-        },
-        { role: "user", content: texto }
-      ],
-      temperature: 0.3
-    });
 
-    let content = response.choices[0].message.content;
-    content = content.replace(/```json/g, "").replace(/```/g, "");
-
-    try {
-      return res.json(JSON.parse(content));
-    } catch {
-      return res.status(500).json({
-        error: "IA retornou JSON inválido",
-        raw: content
-      });
-    }
-  } catch (err) {
-    return res.status(500).json({
-      error: "Falha IA",
-      detalhe: err.message
-    });
-  }
-});
-
-/**
-💳 STRIPE CHECKOUT
-*/
-app.post("/create-checkout-session", async (req, res) => {
+// 🧠 IA PRINCIPAL CORRIGIDA
+function sistema(dados) {
   try {
-    const { valor = 97, descricao = "Consulta GeoUrban" } = req.body;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency: "brl",
-            product_data: { name: descricao },
-            unit_amount: valor * 100
-          },
-          quantity: 1
-        }
-      ],
-      success_url: "https://seu-dominio.com/sucesso",
-      cancel_url: "https://seu-dominio.com/cancelado"
-    });
+    const status = validarOperacao(dados);
 
-    return res.json({ url: session.url });
+    if (status !== "ok") {
+      return { erro: status };
+    }
 
-  } catch (err) {
-    return res.status(500).json({
-      error: "Stripe error",
-      detalhe: err.message
-    });
+    const valor = Number(dados.valor);
+    const descricao = dados.descricao.toLowerCase();
+
+    let risco = "baixo";
+    let lucro = valor * 0.2;
+    let imposto = valor * 0.1;
+
+    // 🔍 LÓGICA INTELIGENTE
+    if (descricao.includes("importação")) {
+      risco = "medio";
+      imposto = valor * 0.25;
+    }
+
+    if (descricao.includes("alto risco")) {
+      risco = "alto";
+      lucro = valor * 0.1;
+    }
+
+    return {
+      risco,
+      lucro: lucro.toFixed(2),
+      imposto: imposto.toFixed(2),
+      recomendacao: gerarRecomendacao(risco)
+    };
+
+  } catch (erro) {
+    console.log("❌ Erro no sistema:", erro.message);
+    return { erro: "falha_sistema" };
   }
-});
+}
 
-/**
-🚀 START SERVER
-*/
-const PORT = process.env.PORT || 3000;
+// 🤖 RECOMENDAÇÃO
+function gerarRecomendacao(risco) {
+  if (risco === "alto") return "⚠️ Evitar operação";
+  if (risco === "medio") return "⚠️ Atenção";
+  return "✅ Operação segura";
+}
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("GEOURBAN ONLINE 🚀 PORT:", PORT);
-});
+// ▶️ EXECUÇÃO
+function executar() {
+  try {
+    const dados = {
+      descricao: document.getElementById("descricao").value,
+      valor: parseFloat(document.getElementById("valor").value)
+    };
+
+    const resposta = sistema(dados);
+
+    document.getElementById("resultado").innerHTML =
+      "<pre>" + JSON.stringify(resposta, null, 2) + "</pre>";
+
+  } catch (erro) {
+    document.getElementById("resultado").innerHTML =
+      "Erro na execução";
+  }
+}
+
+</script>
+
+</body>
+</html>
