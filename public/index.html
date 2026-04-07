@@ -13,35 +13,29 @@ body {
     padding: 40px;
 }
 
-/* topo */
+/* TOPO */
 .topo {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
-/* FORM */
+/* FORM ESQUERDA */
 .form-box {
-    background: rgba(0,0,0,0.6);
-    padding: 25px;
-    border-radius: 12px;
+    width: 350px; /* largura controlada */
 }
 
-/* GRID 2 colunas */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.form-grid input,
-.form-grid select {
+/* CAMPOS EM CASCATA */
+.form-box input,
+.form-box select {
     width: 100%;
     padding: 10px;
+    margin-bottom: 10px;
     border-radius: 6px;
     border: none;
 }
 
+/* BOTÃO */
 button {
-    grid-column: span 2;
+    width: 100%;
     padding: 12px;
     background: #007bff;
     border: none;
@@ -50,114 +44,85 @@ button {
     cursor: pointer;
 }
 
-/* ÁREA INFERIOR (ASSISTENTE + CARTEIRA) */
-.bottom-area {
-    margin-top: 30px;
-    display: flex;
-    gap: 20px;
+/* BOTÃO CARTEIRA NO RODAPÉ */
+.footer {
+    position: fixed;
+    bottom: 20px;
+    left: 40px;
 }
 
-/* assistente agora embaixo */
-.assistente {
-    flex: 1;
-    background: rgba(0,0,0,0.7);
-    padding: 20px;
-    border-radius: 12px;
-}
-
-/* carteira digital (placeholder) */
-.carteira {
-    flex: 2;
-    background: rgba(0,0,0,0.6);
-    padding: 20px;
-    border-radius: 12px;
-    min-height: 180px;
+.footer button {
+    width: auto;
+    padding: 10px 20px;
 }
 </style>
 
 <div class="overlay">
 
-    <!-- TOPO -->
     <div class="topo">
         <h1>🚀 GeoUrban</h1>
     </div>
 
-    <!-- FORMULÁRIO -->
     <div class="form-box">
         <h2>Cadastro</h2>
 
         <form onsubmit="salvar(event)">
-            <div class="form-grid">
 
-                <input id="nome" placeholder="Nome completo">
-                <input id="email" placeholder="Email">
+            <input id="nome" placeholder="Nome completo">
+            <input id="email" placeholder="Email">
 
-                <select id="categoria">
-                    <option value="">Categoria</option>
-                    <option>Profissional</option>
-                    <option>Estudante</option>
-                    <option>Outro</option>
-                </select>
+            <select id="categoria">
+                <option value="">Categoria</option>
+                <option>Profissional</option>
+                <option>Estudante</option>
+                <option>Outro</option>
+            </select>
 
-                <select id="nivel">
-                    <option value="">Nível</option>
-                    <option>Técnico</option>
-                    <option>Graduação</option>
-                    <option>Mestrado</option>
-                </select>
+            <select id="nivel">
+                <option value="">Nível</option>
+                <option>Técnico</option>
+                <option>Graduação</option>
+                <option>Mestrado</option>
+            </select>
 
-                <input id="profissao" placeholder="Profissão">
-                <input id="especializacao" placeholder="Especialização">
+            <input id="profissao" placeholder="Profissão">
+            <input id="especializacao" placeholder="Especialização">
 
-                <select id="registroTipo">
-                    <option value="">Registro</option>
-                    <option>CREA</option>
-                    <option>CAU</option>
-                    <option>CRT</option>
-                </select>
+            <select id="registroTipo">
+                <option value="">Registro</option>
+                <option>CREA</option>
+                <option>CAU</option>
+                <option>CRT</option>
+            </select>
 
-                <input id="registroNumero" placeholder="Número do registro">
+            <input id="registroNumero" placeholder="Número do registro">
 
-                <select id="documentoTecnico">
-                    <option value="">Documento Técnico</option>
-                    <option>ART</option>
-                    <option>RRT</option>
-                    <option>TRT</option>
-                </select>
+            <select id="documentoTecnico">
+                <option value="">Documento Técnico</option>
+                <option>ART</option>
+                <option>RRT</option>
+                <option>TRT</option>
+            </select>
 
-                <input id="documentoNumero" placeholder="Número do documento">
+            <input id="documentoNumero" placeholder="Número do documento">
 
-                <input id="pais" placeholder="País">
-                <input id="regiao" placeholder="Região">
+            <input id="pais" placeholder="País">
+            <input id="regiao" placeholder="Região">
 
-                <select id="situacao">
-                    <option value="">Situação</option>
-                    <option>Ativo</option>
-                    <option>Aposentado</option>
-                </select>
+            <select id="situacao">
+                <option value="">Situação</option>
+                <option>Ativo</option>
+                <option>Aposentado</option>
+            </select>
 
-                <button type="submit">Cadastrar</button>
+            <button type="submit">Cadastrar</button>
 
-            </div>
         </form>
     </div>
 
-    <!-- PARTE INFERIOR -->
-    <div class="bottom-area">
-
-        <!-- ASSISTENTE -->
-        <div class="assistente">
-            <h3>🤖 Assistente</h3>
-            <p>Estamos criando sua identidade digital.</p>
-            <p>Dica: profissionais precisam de registro válido.</p>
-        </div>
-
-        <!-- CARTEIRA DIGITAL (VAI APARECER DEPOIS) -->
-        <div class="carteira" id="carteira">
-            <h3>📊 Carteira Digital</h3>
-            <p>Seus dados aparecerão aqui após o cadastro.</p>
-        </div>
-
+    <!-- RODAPÉ -->
+    <div class="footer">
+        <button onclick="abrirCarteira()">📊 Carteira Digital</button>
     </div>
 
 </div>
