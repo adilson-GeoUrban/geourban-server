@@ -4,7 +4,7 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Servir arquivos estáticos
+// Servir arquivos da pasta publico
 app.use(express.static(path.join(__dirname, "publico")));
 
 // Rota principal
@@ -13,5 +13,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor rodando");
+  console.log("Servidor rodando na porta " + PORT);
 });
