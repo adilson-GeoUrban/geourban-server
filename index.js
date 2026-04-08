@@ -1,29 +1,13 @@
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
-/public
-   ├── index.html
-   ├── abas/
-   ├── blocos/
-   └── assets/
-<button onclick="salvar()">💾 SALVAR</button>
-<script>
-function salvar() {
-    fetch('/salvar-tudo', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            nome: "Adilson",
-            sistema: "GeoUrban"
-        })
-    })
-    .then(res => res.json())
-    .then(d => {
-        alert("✅ Salvo com sucesso!");
-        console.log(d);
-    })
-    .catch(() => {
-        alert("❌ Erro ao salvar");
-    });
-}
-</script>
+<!-- AVISO LEGAL -->
+<footer style="font-size:12px; text-align:center; margin-top:20px;">
+© 2026 GeoUrban - Todos os direitos reservados.<br><br>
+
+Este sistema, incluindo seu código-fonte, estrutura, design e funcionalidades,
+é de propriedade exclusiva do autor.
+
+É proibida a cópia, reprodução, modificação, distribuição ou utilização,
+total ou parcial, sem autorização expressa do titular.
+
+O uso indevido poderá resultar em responsabilização civil e criminal,
+conforme a legislação vigente.
+</footer>
