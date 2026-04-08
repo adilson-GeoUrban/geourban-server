@@ -11,35 +11,56 @@ body {
     font-family: Arial;
     background: linear-gradient(135deg, #1b5e20, #4caf50);
     color: white;
-    text-align: center;
 }
 
+/* TELAS */
+.tela { display: none; padding: 20px; }
+#home { display: block; text-align: center; }
+
+/* HEADER */
 header {
     background: #2e7d32;
     padding: 20px;
-    font-size: 22px;
+    text-align: center;
 }
 
-.container {
-    margin-top: 60px;
-}
-
+/* BOTÕES */
 button {
-    padding: 15px;
+    padding: 12px;
     margin: 10px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
     font-weight: bold;
-    width: 180px;
     background: white;
     color: #2e7d32;
-    transition: 0.3s;
 }
 
-button:hover {
-    background: #c8e6c9;
-    transform: scale(1.05);
+/* CARD */
+.card {
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+/* LISTA */
+.lista {
+    margin-top: 20px;
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
 }
 </style>
 </head>
@@ -48,19 +69,87 @@ button:hover {
 
 <header>🚀 GeoUrban</header>
 
-<div class="container">
+<!-- HOME -->
+<div id="home" class="tela">
     <h2>Painel Inicial</h2>
+    <button onclick="abrir('usuarios')">👤 Usuários</button>
+    <button onclick="abrir('financeiro')">💳 Financeiro</button>
+    <button onclick="abrir('relatorios')">📊 Relatórios</button>
+</div>
 
-    <button onclick="acao('Usuários')">👤 Usuários</button>
-    <button onclick="acao('Financeiro')">💳 Financeiro</button>
-    <button onclick="acao('Relatórios')">📊 Relatórios</button>
-    <button onclick="acao('Configurações')">⚙️ Config</button>
+<!-- USUÁRIOS -->
+<div id="usuarios" class="tela">
+    <button onclick="abrir('home')">⬅ Voltar</button>
+
+    <div class="card">
+        <h3>Cadastro de Usuário</h3>
+
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="text" id="email" placeholder="Email">
+
+        <button onclick="salvar()">Salvar</button>
+
+        <div id="lista" class="lista"></div>
+    </div>
+</div>
+
+<!-- FINANCEIRO -->
+<div id="financeiro" class="tela">
+    <button onclick="abrir('home')">⬅ Voltar</button>
+    <h2>Financeiro</h2>
+    <p>Área em construção</p>
+</div>
+
+<!-- RELATÓRIOS -->
+<div id="relatorios" class="tela">
+    <button onclick="abrir('home')">⬅ Voltar</button>
+    <h2>Relatórios</h2>
+    <p>Área em construção</p>
 </div>
 
 <script>
-function acao(nome) {
-    alert("Abrindo: " + nome);
+// TROCAR TELAS
+function abrir(tela) {
+    document.querySelectorAll(".tela").forEach(t => t.style.display = "none");
+    document.getElementById(tela).style.display = "block";
 }
+
+// SALVAR DADOS
+function salvar() {
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+
+    if (!nome || !email) {
+        alert("Preencha os campos");
+        return;
+    }
+
+    let lista = JSON.parse(localStorage.getItem("usuarios") || "[]");
+
+    lista.push({ nome, email });
+
+    localStorage.setItem("usuarios", JSON.stringify(lista));
+
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+
+    carregar();
+}
+
+// CARREGAR LISTA
+function carregar() {
+    let lista = JSON.parse(localStorage.getItem("usuarios") || "[]");
+
+    let html = "";
+    lista.forEach(u => {
+        html += `<p>${u.nome} - ${u.email}</p>`;
+    });
+
+    document.getElementById("lista").innerHTML = html;
+}
+
+// INICIAR
+window.onload = carregar;
 </script>
 
 </body>
