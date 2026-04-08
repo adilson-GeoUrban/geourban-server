@@ -11,7 +11,6 @@ const SECRET = "geo_urban_chave_ultra_segura";
 
 // 🛡️ CONTROLE
 let logs = [];
-let tentativas = {};
 let inteligencia = {};
 
 // 🧠 REGISTRO
@@ -24,17 +23,47 @@ function registrar(tipo, msg, ip){
     });
 }
 
-// 🚫 BLOQUEIO INTELIGENTE
+// 🧠 INTELIGÊNCIA
 function analisarIP(ip){
     if(!inteligencia[ip]){
-        inteligencia[ip] = { risco: 0 };
+        inteligencia[ip] = {
+            risco: 0,
+            bloqueadoAte: 0,
+            permanente: false
+        };
     }
     return inteligencia[ip];
 }
 
-function bloqueado(ip){
+// 🚫 BLOQUEIO DINÂMICO
+function verificarBloqueio(ip){
     const intel = analisarIP(ip);
-    return intel.risco >= 5;
+
+    if (intel.permanente) return true;
+
+    if (Date.now() < intel.bloqueadoAte) return true;
+
+    return false;
+}
+
+// 🔥 RESPOSTA AUTOMÁTICA
+function reagirAtaque(ip){
+    const intel = analisarIP(ip);
+
+    intel.risco += 1;
+
+    if (intel.risco >= 20){
+        intel.permanente = true;
+        registrar("CRÍTICO","IP banido permanente", ip);
+    }
+    else if (intel.risco >= 10){
+        intel.bloqueadoAte = Date.now() + (60 * 60 * 1000); // 1h
+        registrar("ALTO","Bloqueio 1h", ip);
+    }
+    else if (intel.risco >= 5){
+        intel.bloqueadoAte = Date.now() + (5 * 60 * 1000); // 5 min
+        registrar("MÉDIO","Bloqueio 5min", ip);
+    }
 }
 
 // 🔐 TOKEN
@@ -56,49 +85,47 @@ function verificarToken(req, res, next){
 
 // 🌐 HOME
 app.get("/", (req, res) => {
-    res.send("🛡️ BD2 NÍVEL 3 ATIVO");
+    res.send("🛡️ EXÉRCITO DIGITAL ATIVO");
 });
 
-// 🔐 LOGIN COM IA
+// 🔐 LOGIN
 app.post("/login", (req, res) => {
     const { user, pass } = req.body;
     const ip = req.ip;
 
-    const intel = analisarIP(ip);
-
-    if (bloqueado(ip)) {
-        registrar("BLOQUEADO","Risco alto detectado", ip);
-        return res.status(403).json({ erro: "Acesso bloqueado" });
+    if (verificarBloqueio(ip)) {
+        registrar("BLOQUEADO","Acesso negado", ip);
+        return res.status(403).json({ erro: "Bloqueado" });
     }
 
     if (user === USER && pass === PASS) {
-        intel.risco = 0;
-
         const token = jwt.sign({ user }, SECRET, { expiresIn: "30m" });
+
+        const intel = analisarIP(ip);
+        intel.risco = 0;
 
         registrar("SUCESSO","Login OK", ip);
 
         return res.json({ token });
     } else {
-        intel.risco += 1;
-
-        registrar("ERRO","Login inválido | risco: " + intel.risco, ip);
+        reagirAtaque(ip);
+        registrar("ERRO","Login inválido", ip);
 
         return res.status(401).json({ erro: true });
     }
 });
 
-// 📊 LOGS PROTEGIDO
+// 📊 LOGS
 app.get("/logs", verificarToken, (req, res) => {
     res.json(logs);
 });
 
-// 👁️ INTELIGÊNCIA VISUAL
+// 👁️ INTEL
 app.get("/intel", verificarToken, (req, res) => {
     res.json(inteligencia);
 });
 
 // 🚀 START
 app.listen(3000, () => {
-    console.log("🛡️ BD2 NÍVEL 3 rodando em http://localhost:3000");
+    console.log("🛡️ EXÉRCITO DIGITAL rodando em http://localhost:3000");
 });
