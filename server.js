@@ -2,25 +2,17 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-
-// pasta pública
-const publicPath = path.join(__dirname, "public");
-
-// servir arquivos estáticos
-app.use(express.static(publicPath));
-
-// rota principal
-app.get("/", (req, res) => {
-  res.sendFile(path.join(publicPath, "index.html"));
-});
-
-// fallback (SPA ou segurança)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(publicPath, "index.html"));
-});
-
 const PORT = process.env.PORT || 3000;
 
+// 📁 Servir arquivos da pasta public
+app.use(express.static(path.join(__dirname, "publico")));
+
+// 🏠 Rota principal
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "publico", "index.html"));
+});
+
+// 🚀 Start
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
