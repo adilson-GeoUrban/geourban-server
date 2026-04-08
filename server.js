@@ -1,17 +1,10 @@
 const express = require("express");
-const path = require("path");
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Servir arquivos da pasta publico
-app.use(express.static(path.join(__dirname, "publico")));
-
-// Rota principal
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "publico", "index.html"));
+  res.send("GEOURBAN ONLINE 🚀");
 });
 
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
+app.listen(3000, () => {
+  console.log("Rodando");
 });
