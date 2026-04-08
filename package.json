@@ -1,1 +1,11 @@
-{"name":"geourban","version":"1.0.0","main":"index.js","scripts":{"start":"node index.js"},"dependencies":{"express":"^4.22.1","openai":"^6.33.0","stripe":"^14.0.0"}}
+{
+  "name": "geourban",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
