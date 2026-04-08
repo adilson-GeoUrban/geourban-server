@@ -11,117 +11,53 @@ body {
     font-family: Arial;
     background: linear-gradient(135deg, #1b5e20, #4caf50);
     color: white;
-}
-
-/* LOGIN */
-#login {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.login-box {
-    background: rgba(0,0,0,0.3);
-    padding: 30px;
-    border-radius: 15px;
-    width: 300px;
-    text-align: center;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: none;
-}
-
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* PAINEL */
-#painel {
-    display: none;
     text-align: center;
 }
 
 header {
     background: #2e7d32;
     padding: 20px;
-    font-size: 20px;
+    font-size: 22px;
 }
 
-.dashboard {
-    margin-top: 40px;
+.container {
+    margin-top: 60px;
 }
 
-.dashboard button {
+button {
+    padding: 15px;
     margin: 10px;
-    width: 150px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    width: 180px;
     background: white;
     color: #2e7d32;
+    transition: 0.3s;
 }
 
-.erro {
-    color: red;
+button:hover {
+    background: #c8e6c9;
+    transform: scale(1.05);
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-    <div class="login-box">
-        <h2>🔐 GeoUrban</h2>
+<header>🚀 GeoUrban</header>
 
-        <input type="text" id="user" placeholder="Usuário">
-        <input type="password" id="pass" placeholder="Senha">
+<div class="container">
+    <h2>Painel Inicial</h2>
 
-        <button onclick="login()">Entrar</button>
-
-        <div id="erro" class="erro"></div>
-    </div>
-</div>
-
-<!-- PAINEL -->
-<div id="painel">
-    <header>🚀 Painel GeoUrban</header>
-
-    <div class="dashboard">
-        <h2>Bem-vindo</h2>
-
-        <button onclick="acao('Usuários')">👤 Usuários</button>
-        <button onclick="acao('Financeiro')">💳 Financeiro</button>
-        <button onclick="acao('Relatórios')">📊 Relatórios</button>
-        <button onclick="logout()">🚪 Sair</button>
-    </div>
+    <button onclick="acao('Usuários')">👤 Usuários</button>
+    <button onclick="acao('Financeiro')">💳 Financeiro</button>
+    <button onclick="acao('Relatórios')">📊 Relatórios</button>
+    <button onclick="acao('Configurações')">⚙️ Config</button>
 </div>
 
 <script>
-function login() {
-    const user = document.getElementById("user").value;
-    const pass = document.getElementById("pass").value;
-
-    if (user === "admin" && pass === "1234") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("painel").style.display = "block";
-    } else {
-        document.getElementById("erro").innerText = "Erro no login";
-    }
-}
-
-function logout() {
-    document.getElementById("painel").style.display = "none";
-    document.getElementById("login").style.display = "flex";
-}
-
 function acao(nome) {
     alert("Abrindo: " + nome);
 }
