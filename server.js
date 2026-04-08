@@ -3,8 +3,10 @@ const path = require("path");
 
 const app = express();
 
+// pasta pública
 const publicPath = path.join(__dirname, "public");
 
+// servir arquivos estáticos
 app.use(express.static(publicPath));
 
 // rota principal
@@ -12,7 +14,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
 
-// fallback (garantia total)
+// fallback (SPA ou segurança)
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
