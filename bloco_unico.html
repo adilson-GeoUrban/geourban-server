@@ -1,173 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: linear-gradient(135deg, #1b5e20, #4caf50);
-    color: white;
-}
-
-.tela { display: none; padding: 20px; }
-#login { display: flex; justify-content: center; align-items: center; height: 100vh; }
-
-.box {
-    background: rgba(0,0,0,0.4);
-    padding: 25px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: none;
-}
-
-button {
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    background: white;
-    color: #2e7d32;
-}
-
-.card {
-    background: rgba(0,0,0,0.3);
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
-<div id="login" class="tela">
-  <div class="box">
-    <h2>GeoUrban</h2>
-    <input id="user" placeholder="Usuário">
-    <input id="pass" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="tela">
-  <h2>Painel GeoUrban</h2>
-
-  <div class="card">
-    <h3>Cadastrar</h3>
-    <input id="nome" placeholder="Nome">
-    <input id="email" placeholder="Email">
-    <button onclick="salvar()">Salvar</button>
-  </div>
-
-  <div class="card">
-    <h3>Lista</h3>
-    <div id="lista"></div>
-  </div>
-
-  <button onclick="logout()">Sair</button>
-</div>
-
-<script>
-// LOGIN
-function entrar() {
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
-
-    if (u === "admin" && p === "123") {
-        sessionStorage.setItem("auth", "ok");
-        iniciar();
-    } else {
-        alert("Login inválido");
-    }
-}
-
-// INICIAR SISTEMA
-function iniciar() {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    carregar();
-}
-
-// LOGOUT
-function logout() {
-    sessionStorage.removeItem("auth");
-    location.reload();
-}
-
-// SALVAR DADOS (BD1)
-function salvar() {
-    const nome = document.getElementById("nome").value.trim();
-    const email = document.getElementById("email").value.trim();
-
-    if (!nome || !email) {
-        alert("Preencha todos os campos");
-        return;
-    }
-
-    let lista = JSON.parse(localStorage.getItem("dados") || "[]");
-
-    lista.push({
-        nome,
-        email,
-        data: new Date().toISOString()
-    });
-
-    localStorage.setItem("dados", JSON.stringify(lista));
-
-    backup(lista);
-
-    document.getElementById("nome").value = "";
-    document.getElementById("email").value = "";
-
-    carregar();
-}
-
-// BACKUP AUTOMÁTICO (BD2)
+// 🚀 BD2 - BACKUP AUTOMÁTICO MELHORADO
 function backup(dados) {
-    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "backup_geourban.json";
-    a.click();
-}
+    try {
+        const json = JSON.stringify(dados, null, 2);
 
-// CARREGAR DADOS
-function carregar() {
-    let lista = JSON.parse(localStorage.getItem("dados") || "[]");
+        const blob = new Blob([json], {
+            type: "application/json"
+        });
 
-    let html = "";
-    lista.forEach(item => {
-        html += `<p>${item.nome} - ${item.email}</p>`;
-    });
+        const url = URL.createObjectURL(blob);
 
-    document.getElementById("lista").innerHTML = html;
-}
+        const a = document.createElement("a");
+        a.href = url;
 
-// AUTO LOGIN
-window.onload = function() {
-    if (sessionStorage.getItem("auth") === "ok") {
-        iniciar();
-    } else {
-        document.getElementById("login").style.display = "flex";
+        // nome com data (controle real)
+        const data = new Date().toISOString().slice(0,10);
+        a.download = `backup_geourban_${data}.json`;
+
+        document.body.appendChild(a);
+        a.click();
+
+        // limpeza (EVITA TRAVAMENTO)
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        console.log("✅ Backup OK");
+    } catch (erro) {
+        console.error("❌ Erro backup:", erro);
+        alert("Erro ao gerar backup");
     }
-};
-</script>
-
-</body>
-</html>
+}
