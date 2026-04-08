@@ -1,5 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #1b5e20, #4caf50);
+    color: white;
+}
+
+/* TELAS */
+.tela { display: none; padding: 20px; }
+#login { display: flex; justify-content: center; align-items: center; height: 100vh; }
+#home { display: none; text-align: center; }
+
+/* BOX */
+.box {
+    background: rgba(0,0,0,0.4);
+    padding: 25px;
+    border-radius: 15px;
+    width: 300px;
+    text-align: center;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+/* BOTÕES */
+button {
+    padding: 12px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    background: white;
+    color: #2e7d32;
+}
+
+/* CARD */
+.card {
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.lista {
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+    <div class="box">
+        <h2>🔐 GeoUrban</h2>
+        <input id="user" placeholder="Usuário">
+        <input id="pass" type="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="erro" style="color:red;"></p>
+    </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="tela">
+    <h2>Painel</h2>
+    <button onclick="abrir('usuarios')">👤 Usuários</button>
+    <button onclick="logout()">🚪 Sair</button>
+</div>
+
+<!-- USUÁRIOS -->
+<div id="usuarios" class="tela">
+    <button onclick="abrir('home')">⬅ Voltar</button>
+
+    <div class="card">
+        <h3>Cadastro</h3>
+        <input id="nome" placeholder="Nome">
+        <input id="email" placeholder="Email">
+        <button onclick="salvar()">Salvar</button>
+        <div id="lista" class="lista"></div>
+    </div>
+</div>
+
 <script>
-// LOGIN SEGURO
+// LOGIN
 function login() {
     const u = document.getElementById("user").value.trim();
     const p = document.getElementById("pass").value.trim();
@@ -7,7 +108,7 @@ function login() {
     document.getElementById("erro").innerText = "";
 
     if (u === "admin" && p === "1234") {
-        sessionStorage.setItem("auth", "ok"); // mais seguro que localStorage
+        sessionStorage.setItem("auth", "ok");
         iniciar();
     } else {
         document.getElementById("erro").innerText = "Login inválido";
@@ -33,7 +134,7 @@ function abrir(t) {
     document.getElementById(t).style.display = "block";
 }
 
-// SALVAR COM VALIDAÇÃO
+// SALVAR
 function salvar() {
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -49,7 +150,7 @@ function salvar() {
 
     localStorage.setItem("dados", JSON.stringify(lista));
 
-    backupAutomatico(lista);
+    backup(lista);
 
     document.getElementById("nome").value = "";
     document.getElementById("email").value = "";
@@ -58,7 +159,7 @@ function salvar() {
 }
 
 // BACKUP AUTOMÁTICO
-function backupAutomatico(dados) {
+function backup(dados) {
     const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -75,7 +176,10 @@ function carregar() {
         html += `<p>${u.nome} - ${u.email}</p>`;
     });
 
-    document.getElementById("lista").innerHTML = html;
+    const listaDiv = document.getElementById("lista");
+    if (listaDiv) {
+        listaDiv.innerHTML = html;
+    }
 }
 
 // AUTO LOGIN
@@ -85,3 +189,6 @@ window.onload = function() {
     }
 }
 </script>
+
+</body>
+</html>
