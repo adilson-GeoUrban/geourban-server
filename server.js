@@ -12,6 +12,7 @@ const SECRET = "geo_urban_chave_ultra_segura";
 // 🛡️ CONTROLE
 let logs = [];
 let tentativas = {};
+let inteligencia = {};
 
 // 🧠 REGISTRO
 function registrar(tipo, msg, ip){
@@ -23,14 +24,20 @@ function registrar(tipo, msg, ip){
     });
 }
 
-// 🚫 BLOQUEIO
-function bloqueado(ip){
-    if(!tentativas[ip]) return false;
-    const t = tentativas[ip];
-    return t.count >= 3 && (Date.now() - t.time) < 300000;
+// 🚫 BLOQUEIO INTELIGENTE
+function analisarIP(ip){
+    if(!inteligencia[ip]){
+        inteligencia[ip] = { risco: 0 };
+    }
+    return inteligencia[ip];
 }
 
-// 🔐 MIDDLEWARE TOKEN
+function bloqueado(ip){
+    const intel = analisarIP(ip);
+    return intel.risco >= 5;
+}
+
+// 🔐 TOKEN
 function verificarToken(req, res, next){
     const token = req.headers["authorization"];
 
@@ -49,21 +56,23 @@ function verificarToken(req, res, next){
 
 // 🌐 HOME
 app.get("/", (req, res) => {
-    res.send("🛡️ BD2 NÍVEL 2 ATIVO");
+    res.send("🛡️ BD2 NÍVEL 3 ATIVO");
 });
 
-// 🔐 LOGIN
+// 🔐 LOGIN COM IA
 app.post("/login", (req, res) => {
     const { user, pass } = req.body;
     const ip = req.ip;
 
+    const intel = analisarIP(ip);
+
     if (bloqueado(ip)) {
-        registrar("BLOQUEADO","IP bloqueado", ip);
-        return res.status(403).json({ erro: "Bloqueado" });
+        registrar("BLOQUEADO","Risco alto detectado", ip);
+        return res.status(403).json({ erro: "Acesso bloqueado" });
     }
 
     if (user === USER && pass === PASS) {
-        tentativas[ip] = { count: 0, time: Date.now() };
+        intel.risco = 0;
 
         const token = jwt.sign({ user }, SECRET, { expiresIn: "30m" });
 
@@ -71,12 +80,10 @@ app.post("/login", (req, res) => {
 
         return res.json({ token });
     } else {
-        tentativas[ip] = {
-            count: (tentativas[ip]?.count || 0) + 1,
-            time: Date.now()
-        };
+        intel.risco += 1;
 
-        registrar("ERRO","Login inválido", ip);
+        registrar("ERRO","Login inválido | risco: " + intel.risco, ip);
+
         return res.status(401).json({ erro: true });
     }
 });
@@ -86,7 +93,12 @@ app.get("/logs", verificarToken, (req, res) => {
     res.json(logs);
 });
 
+// 👁️ INTELIGÊNCIA VISUAL
+app.get("/intel", verificarToken, (req, res) => {
+    res.json(inteligencia);
+});
+
 // 🚀 START
 app.listen(3000, () => {
-    console.log("🛡️ BD2 NÍVEL 2 rodando em http://localhost:3000");
+    console.log("🛡️ BD2 NÍVEL 3 rodando em http://localhost:3000");
 });
