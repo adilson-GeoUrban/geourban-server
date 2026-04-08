@@ -1,30 +1,33 @@
-<script>
-async function login(){
-    const res = await fetch("http://localhost:3000/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({user:"admin", pass:"1234"})
-    });
+const express = require("express");
+const app = express();
 
-    if(res.ok){
-        tela.innerHTML = "🔐 Login REAL OK";
+app.use(express.json());
+
+const USER = "admin";
+const PASS = "1234";
+
+let logs = [];
+
+app.get("/", (req, res) => {
+    res.send("BD2 rodando");
+});
+
+app.post("/login", (req, res) => {
+    const { user, pass } = req.body;
+
+    if (user === USER && pass === PASS) {
+        logs.push("LOGIN OK");
+        return res.json({ ok: true });
     } else {
-        tela.innerHTML = "❌ Erro login";
+        logs.push("LOGIN ERRO");
+        return res.status(401).json({ erro: "Login inválido" });
     }
-}
+});
 
-async function ia(){
-    let tema = prompt("Tema:");
-    tela.innerHTML = "📘 Aula sobre " + tema;
-}
+app.get("/logs", (req, res) => {
+    res.json(logs);
+});
 
-async function logs(){
-    const res = await fetch("http://localhost:3000/logs");
-    const data = await res.json();
-
-    let html = "<h3>📊 Logs</h3>";
-    data.forEach(l => html += "<p>"+l+"</p>");
-
-    tela.innerHTML = html;
-}
-</script>
+app.listen(3000, () => {
+    console.log("BD2 rodando em http://localhost:3000");
+});
