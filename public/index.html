@@ -13,12 +13,10 @@ body {
     color: white;
 }
 
-/* TELAS */
 .tela { display: none; padding: 20px; }
 #login { display: flex; justify-content: center; align-items: center; height: 100vh; }
 #home { display: none; text-align: center; }
 
-/* BOX */
 .box {
     background: rgba(0,0,0,0.4);
     padding: 25px;
@@ -27,7 +25,6 @@ body {
     text-align: center;
 }
 
-/* INPUT */
 input {
     width: 100%;
     padding: 10px;
@@ -36,7 +33,6 @@ input {
     border: none;
 }
 
-/* BOTÕES */
 button {
     padding: 12px;
     margin: 10px;
@@ -48,7 +44,6 @@ button {
     color: #2e7d32;
 }
 
-/* CARD */
 .card {
     background: rgba(0,0,0,0.4);
     padding: 20px;
@@ -112,8 +107,8 @@ function login() {
 
 // INICIAR
 function iniciar() {
-    loginDiv.style.display = "none";
-    home.style.display = "block";
+    document.getElementById("login").style.display = "none";
+    document.getElementById("home").style.display = "block";
     carregar();
 }
 
@@ -132,22 +127,38 @@ function abrir(t) {
 // SALVAR
 function salvar() {
     let lista = JSON.parse(localStorage.getItem("dados") || "[]");
-    lista.push({ nome: nome.value, email: email.value });
+
+    lista.push({
+        nome: document.getElementById("nome").value,
+        email: document.getElementById("email").value
+    });
+
     localStorage.setItem("dados", JSON.stringify(lista));
-    nome.value = ""; email.value = "";
+
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+
     carregar();
 }
 
 // CARREGAR
 function carregar() {
     let lista = JSON.parse(localStorage.getItem("dados") || "[]");
-    listaHTML.innerHTML = lista.map(u => `<p>${u.nome} - ${u.email}</p>`).join("");
+
+    let html = "";
+    lista.forEach(u => {
+        html += `<p>${u.nome} - ${u.email}</p>`;
+    });
+
+    document.getElementById("lista").innerHTML = html;
 }
 
 // AUTO
-window.onload = () => {
-    if (localStorage.getItem("auth") === "ok") iniciar();
-};
+window.onload = function() {
+    if (localStorage.getItem("auth") === "ok") {
+        iniciar();
+    }
+}
 </script>
 
 </body>
