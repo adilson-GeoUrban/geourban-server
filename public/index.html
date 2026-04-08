@@ -15,13 +15,25 @@ body {
 
 /* TELAS */
 .tela { display: none; padding: 20px; }
-#home { display: block; text-align: center; }
+#login { display: flex; justify-content: center; align-items: center; height: 100vh; }
+#home { display: none; text-align: center; }
 
-/* HEADER */
-header {
-    background: #2e7d32;
-    padding: 20px;
+/* BOX */
+.box {
+    background: rgba(0,0,0,0.4);
+    padding: 25px;
+    border-radius: 15px;
+    width: 300px;
     text-align: center;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
 }
 
 /* BOTÕES */
@@ -45,18 +57,7 @@ button {
     margin: 20px auto;
 }
 
-/* INPUT */
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: none;
-}
-
-/* LISTA */
 .lista {
-    margin-top: 20px;
     background: white;
     color: black;
     padding: 10px;
@@ -67,14 +68,22 @@ input {
 
 <body>
 
-<header>🚀 GeoUrban</header>
+<!-- LOGIN -->
+<div id="login">
+    <div class="box">
+        <h2>🔐 GeoUrban</h2>
+        <input id="user" placeholder="Usuário">
+        <input id="pass" type="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="erro" style="color:red;"></p>
+    </div>
+</div>
 
 <!-- HOME -->
 <div id="home" class="tela">
-    <h2>Painel Inicial</h2>
+    <h2>Painel</h2>
     <button onclick="abrir('usuarios')">👤 Usuários</button>
-    <button onclick="abrir('financeiro')">💳 Financeiro</button>
-    <button onclick="abrir('relatorios')">📊 Relatórios</button>
+    <button onclick="logout()">🚪 Sair</button>
 </div>
 
 <!-- USUÁRIOS -->
@@ -82,74 +91,63 @@ input {
     <button onclick="abrir('home')">⬅ Voltar</button>
 
     <div class="card">
-        <h3>Cadastro de Usuário</h3>
-
-        <input type="text" id="nome" placeholder="Nome">
-        <input type="text" id="email" placeholder="Email">
-
+        <h3>Cadastro</h3>
+        <input id="nome" placeholder="Nome">
+        <input id="email" placeholder="Email">
         <button onclick="salvar()">Salvar</button>
-
         <div id="lista" class="lista"></div>
     </div>
 </div>
 
-<!-- FINANCEIRO -->
-<div id="financeiro" class="tela">
-    <button onclick="abrir('home')">⬅ Voltar</button>
-    <h2>Financeiro</h2>
-    <p>Área em construção</p>
-</div>
-
-<!-- RELATÓRIOS -->
-<div id="relatorios" class="tela">
-    <button onclick="abrir('home')">⬅ Voltar</button>
-    <h2>Relatórios</h2>
-    <p>Área em construção</p>
-</div>
-
 <script>
-// TROCAR TELAS
-function abrir(tela) {
-    document.querySelectorAll(".tela").forEach(t => t.style.display = "none");
-    document.getElementById(tela).style.display = "block";
-}
-
-// SALVAR DADOS
-function salvar() {
-    const nome = document.getElementById("nome").value;
-    const email = document.getElementById("email").value;
-
-    if (!nome || !email) {
-        alert("Preencha os campos");
-        return;
+// LOGIN
+function login() {
+    if (user.value === "admin" && pass.value === "1234") {
+        localStorage.setItem("auth", "ok");
+        iniciar();
+    } else {
+        erro.innerText = "Login inválido";
     }
-
-    let lista = JSON.parse(localStorage.getItem("usuarios") || "[]");
-
-    lista.push({ nome, email });
-
-    localStorage.setItem("usuarios", JSON.stringify(lista));
-
-    document.getElementById("nome").value = "";
-    document.getElementById("email").value = "";
-
-    carregar();
-}
-
-// CARREGAR LISTA
-function carregar() {
-    let lista = JSON.parse(localStorage.getItem("usuarios") || "[]");
-
-    let html = "";
-    lista.forEach(u => {
-        html += `<p>${u.nome} - ${u.email}</p>`;
-    });
-
-    document.getElementById("lista").innerHTML = html;
 }
 
 // INICIAR
-window.onload = carregar;
+function iniciar() {
+    loginDiv.style.display = "none";
+    home.style.display = "block";
+    carregar();
+}
+
+// LOGOUT
+function logout() {
+    localStorage.removeItem("auth");
+    location.reload();
+}
+
+// TELAS
+function abrir(t) {
+    document.querySelectorAll(".tela").forEach(e => e.style.display = "none");
+    document.getElementById(t).style.display = "block";
+}
+
+// SALVAR
+function salvar() {
+    let lista = JSON.parse(localStorage.getItem("dados") || "[]");
+    lista.push({ nome: nome.value, email: email.value });
+    localStorage.setItem("dados", JSON.stringify(lista));
+    nome.value = ""; email.value = "";
+    carregar();
+}
+
+// CARREGAR
+function carregar() {
+    let lista = JSON.parse(localStorage.getItem("dados") || "[]");
+    listaHTML.innerHTML = lista.map(u => `<p>${u.nome} - ${u.email}</p>`).join("");
+}
+
+// AUTO
+window.onload = () => {
+    if (localStorage.getItem("auth") === "ok") iniciar();
+};
 </script>
 
 </body>
