@@ -1,5 +1,9 @@
-const IP_PERMITIDO = "127.0.0.1";
-const ip = req.ip;
+require("dotenv").config();
+
+const express = require("express");
+const app = express();
+
+// 🔒 IP permitido (seu acesso)
 const IP_PERMITIDO = "127.0.0.1";
 
 app.use((req, res, next) => {
@@ -10,4 +14,11 @@ app.use((req, res, next) => {
     }
 
     next();
+});
+
+// Porta obrigatória do Render
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log("Servidor rodando na porta", PORT);
 });
