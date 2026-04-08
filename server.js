@@ -1,2 +1,1 @@
-npm install express jsonwebtoken bcryptjs
-node server.js
+server.js
