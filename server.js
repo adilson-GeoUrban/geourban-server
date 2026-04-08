@@ -1,34 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban Ultra</title>
-</head>
-
-<body style="background:black;color:lime;text-align:center;font-family:Arial">
-
-<h2>🚀 GeoUrban - Painel</h2>
-
-<button onclick="login()">Entrar</button>
-<button onclick="ia()">IA</button>
-<button onclick="logs()">Logs</button>
-
-<div id="tela"></div>
-
 <script>
-function login(){
-    tela.innerHTML = "🔐 Login realizado";
+async function login(){
+    const res = await fetch("http://localhost:3000/login",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({user:"admin", pass:"1234"})
+    });
+
+    if(res.ok){
+        tela.innerHTML = "🔐 Login REAL OK";
+    } else {
+        tela.innerHTML = "❌ Erro login";
+    }
 }
 
-function ia(){
+async function ia(){
     let tema = prompt("Tema:");
     tela.innerHTML = "📘 Aula sobre " + tema;
 }
 
-function logs(){
-    tela.innerHTML = "📊 Logs ativos";
+async function logs(){
+    const res = await fetch("http://localhost:3000/logs");
+    const data = await res.json();
+
+    let html = "<h3>📊 Logs</h3>";
+    data.forEach(l => html += "<p>"+l+"</p>");
+
+    tela.innerHTML = html;
 }
 </script>
-
-</body>
-</html>
