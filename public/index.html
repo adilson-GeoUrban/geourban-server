@@ -9,23 +9,33 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(135deg, #1b5e20, #4caf50);
-    color: white;
     text-align: center;
+    color: white;
+}
+
+/* FUNDO COM IMAGEM */
+.fundo {
+    background: url("sua-imagem.jpg") no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* CAIXA ESCURA POR CIMA */
+.overlay {
+    background: rgba(0,0,0,0.5);
     padding: 40px;
+    border-radius: 20px;
+    display: inline-block;
 }
 
-h1 {
-    font-size: 28px;
-}
-
-.botao {
-    margin-top: 30px;
-}
-
+/* BOTÃO */
 button {
-    padding: 18px;
-    font-size: 20px;
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
     background: #00e676;
     border: none;
     border-radius: 10px;
@@ -36,14 +46,15 @@ button {
 
 <body>
 
-<h1>🚀 GEOURBAN ONLINE</h1>
+<div class="fundo">
+    <div class="overlay">
+        <h1>🚀 GEOURBAN ONLINE</h1>
+        <p>Sistema ativo e funcionando</p>
 
-<p>Sistema ativo e funcionando</p>
-
-<div class="botao">
-    <a href="/ia.html">
-        <button>🤖 Abrir IA</button>
-    </a>
+        <a href="/ia.html">
+            <button>🤖 Abrir IA</button>
+        </a>
+    </div>
 </div>
 
 </body>
