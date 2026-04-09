@@ -13,34 +13,31 @@ body {
     color: white;
 }
 
-/* TELAS */
 .tela { display: none; padding: 30px; }
 .ativa { display: block; }
 
-/* BOTÕES */
 button {
-    padding: 12px 20px;
+    padding: 12px;
     border: none;
     border-radius: 6px;
     background: #00c853;
     color: white;
     cursor: pointer;
-    margin-top: 15px;
+    width: 100%;
+    margin-top: 10px;
 }
 
-/* INPUT */
-input, select {
+input, select, textarea {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
 }
 
-/* CARD */
 .card {
     background: #1e1e1e;
     padding: 20px;
     border-radius: 10px;
-    max-width: 500px;
+    max-width: 600px;
     margin: auto;
 }
 </style>
@@ -52,77 +49,66 @@ input, select {
 <div id="login" class="tela ativa">
   <div class="card">
     <h2>🔒 GeoUrban</h2>
-
-    <p>
-      Sua segurança é nossa prioridade.<br>
-      Seus dados são protegidos com padrão avançado.
-    </p>
-
+    <p>Sua segurança é prioridade.</p>
     <input placeholder="Usuário">
     <input type="password" placeholder="Senha">
-
-    <button onclick="entrar()">Entrar</button>
+    <button onclick="trocarTela('atendimento')">Entrar</button>
   </div>
 </div>
 
 <!-- 🤝 ATENDIMENTO -->
 <div id="atendimento" class="tela">
   <div class="card">
-
-    <h2>🤝 Atendimento GeoUrban</h2>
-
-    <p>
-      Olá, seja muito bem-vindo 👋<br><br>
-
-      É um prazer ter você conosco.<br><br>
-
-      👉 Você possui alguma limitação que devemos considerar?
-    </p>
-
+    <h2>🤝 Atendimento</h2>
+    <p>Você possui alguma limitação?</p>
     <select id="limitacao">
-      <option value="">Selecione</option>
+      <option>Não possuo</option>
       <option>Visual</option>
       <option>Auditiva</option>
       <option>Motora</option>
-      <option>Outra</option>
-      <option>Não possuo</option>
     </select>
-
-    <button onclick="continuar()">Continuar</button>
+    <button onclick="trocarTela('contexto')">Continuar</button>
   </div>
 </div>
 
 <!-- 🌱 CONTEXTO -->
 <div id="contexto" class="tela">
   <div class="card">
-
-    <h2>🌱 Sobre a Plataforma</h2>
-
-    <p>
-      A GeoUrban está em constante desenvolvimento.<br><br>
-
-      Sua participação é extremamente importante para nós.<br>
-      Suas sugestões ajudam diretamente na evolução da plataforma.<br><br>
-
-      🤝 Ficaremos honrados em ter você como um membro parceiro deste projeto.
-    </p>
-
-    <button onclick="irCadastro()">Continuar</button>
+    <h2>🌱 Sobre</h2>
+    <p>Plataforma em desenvolvimento. Sua opinião é essencial.</p>
+    <button onclick="trocarTela('cadastro')">Continuar</button>
   </div>
 </div>
 
 <!-- 📝 CADASTRO -->
 <div id="cadastro" class="tela">
   <div class="card">
-
     <h2>📝 Cadastro</h2>
-
-    <p>Vamos iniciar seu atendimento.</p>
-
-    <input placeholder="Nome completo">
+    <input placeholder="Nome">
     <input placeholder="Email">
+    <button onclick="iniciarIA()">Finalizar</button>
+  </div>
+</div>
 
-    <button onclick="finalizar()">Finalizar Cadastro</button>
+<!-- 🤖 IA GEOURBAN -->
+<div id="ia" class="tela">
+  <div class="card">
+
+    <h2>🤖 IA GeoUrban</h2>
+
+    <textarea id="entrada" placeholder="Descreva seu projeto..."></textarea>
+
+    <button onclick="gerar()">Gerar Conteúdo</button>
+
+    <div id="resposta" style="margin-top:15px;"></div>
+
+    <hr>
+
+    <h3>🧠 Monitor do Sistema</h3>
+    <p>IA: ATIVA</p>
+    <p>Servidor: OK</p>
+    <p>Motor: OPERANDO</p>
+
   </div>
 </div>
 
@@ -132,27 +118,17 @@ function trocarTela(id) {
     document.getElementById(id).classList.add('ativa');
 }
 
-function entrar() {
-    trocarTela('atendimento');
+function iniciarIA() {
+    trocarTela('ia');
 }
 
-function continuar() {
-    const lim = document.getElementById("limitacao").value;
+function gerar() {
+    const texto = document.getElementById("entrada").value;
 
-    // 🧠 adaptação básica
-    if (lim === "Visual") {
-        document.body.style.fontSize = "20px";
-    }
-
-    trocarTela('contexto');
-}
-
-function irCadastro() {
-    trocarTela('cadastro');
-}
-
-function finalizar() {
-    alert("Cadastro realizado com sucesso!");
+    document.getElementById("resposta").innerHTML =
+        "📊 Projeto recebido:<br><br>" +
+        texto +
+        "<br><br>✅ Análise inicial gerada com sucesso.";
 }
 </script>
 
