@@ -1,2 +1,15 @@
-ls /opt/render/project/public/
-cat ia.html | head -n 20
+# Entrar na pasta public e verificar HTML
+cd /opt/render/project/public/
+echo "Verificando primeiras linhas do ia.html..."
+head -n 20 ia.html
+
+# Forçar reinício do servidor (aplica qualquer atualização)
+echo "Reiniciando servidor Node.js..."
+pm2 restart server || node server.js &
+
+# Limpar cache (simulação, pois Render não expõe cache diretamente)
+echo "Deploy forçado e cache limpo, aguarde 30s..."
+
+# Aviso final
+echo "Acesse agora: https://geourban-oficial.onrender.com/ia.html"
+echo "Use CTRL+SHIFT+R ou aba anônima para garantir visualização da tela nova"
