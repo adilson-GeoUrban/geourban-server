@@ -1,21 +1,12 @@
-<input id="chave" placeholder="Chave do soberano">
-<button onclick="login()">Entrar</button>
+function executar(){
+    const ordem = document.getElementById("ordem").value;
 
-<script>
-let TOKEN = null;
-
-function login(){
-    const chave = document.getElementById("chave").value;
-
-    fetch("/login", {
+    fetch("/executar", {
         method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ chave })
-    })
-    .then(r=>r.json())
-    .then(d=>{
-        TOKEN = d.token;
-        alert("👑 Acesso liberado");
+        headers:{
+            "Content-Type":"application/json",
+            "x-token": TOKEN
+        },
+        body: JSON.stringify({ ordem })
     });
 }
-</script>
