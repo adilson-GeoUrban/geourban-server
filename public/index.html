@@ -1,12 +1,19 @@
-function executar(){
-    const ordem = document.getElementById("ordem").value;
+<div id="login" class="tela ativa">
+  <div class="card">
+    <h2>🔐 GeoUrban - Acesso Seguro</h2>
+    <input id="chave" placeholder="Digite sua chave do soberano">
+    <button onclick="entrar()">Entrar</button>
+    <p id="mensagem"></p>
+  </div>
+</div>
 
-    fetch("/executar", {
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
-            "x-token": TOKEN
-        },
-        body: JSON.stringify({ ordem })
-    });
-}
+<div id="painel" class="tela">
+  <div class="card">
+    <h2>👑 Painel Interativo</h2>
+    <pre id="statusIA"></pre>
+    <button onclick="toggleIA('Designer')">Ativar/Desativar Designer</button>
+    <button onclick="toggleIA('Jurídica')">Ativar/Desativar Jurídica</button>
+    <button onclick="verLogs()">📜 Ver Logs</button>
+    <button onclick="abrirSalaSecreta()">🔐 Sala Secreta</button>
+  </div>
+</div>
