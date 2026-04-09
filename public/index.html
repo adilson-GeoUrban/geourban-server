@@ -3,58 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>GeoUrban</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial;
-    text-align: center;
-    color: white;
-}
-
-/* FUNDO COM IMAGEM */
-.fundo {
-    background: url("sua-imagem.jpg") no-repeat center center;
-    background-size: cover;
+    font-family: Arial, sans-serif;
     height: 100vh;
+
+    /* 🔥 FUNDO CORRETO */
+    background: url("/geo.jpg") no-repeat center center;
+    background-size: cover;
+
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 
-/* CAIXA ESCURA POR CIMA */
-.overlay {
-    background: rgba(0,0,0,0.5);
+/* 🔲 CAIXA CENTRAL */
+.container {
+    background: rgba(0,0,0,0.65);
     padding: 40px;
-    border-radius: 20px;
-    display: inline-block;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    backdrop-filter: blur(6px);
 }
 
-/* BOTÃO */
+/* 🚀 TÍTULO */
+h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+/* 📄 TEXTO */
+p {
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+/* 🟢 BOTÃO */
 button {
-    margin-top: 20px;
-    padding: 15px 30px;
-    font-size: 18px;
-    background: #00e676;
+    padding: 12px 25px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
+    background: #00c853;
+    color: white;
+    font-size: 16px;
     cursor: pointer;
+}
+
+button:hover {
+    background: #00e676;
 }
 </style>
 </head>
 
 <body>
 
-<div class="fundo">
-    <div class="overlay">
-        <h1>🚀 GEOURBAN ONLINE</h1>
-        <p>Sistema ativo e funcionando</p>
+<div class="container">
+    <h1>🚀 GEOURBAN ONLINE</h1>
+    <p>Sistema ativo e funcionando</p>
 
-        <a href="/ia.html">
-            <button>🤖 Abrir IA</button>
-        </a>
-    </div>
+    <a href="/ia.html">
+        <button>🤖 Abrir IA</button>
+    </a>
 </div>
 
 </body>
