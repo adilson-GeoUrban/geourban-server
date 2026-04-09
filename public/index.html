@@ -3,72 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>GeoUrban</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    height: 100vh;
-
-    /* ✅ FUNDO FUNCIONANDO */
-    background: url("geo.jpg") no-repeat center center;
-    background-size: cover;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ✅ CAIXA AJUSTADA (não bloqueia a imagem) */
-.container {
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(8px);
-    padding: 40px;
-    border-radius: 15px;
-    text-align: center;
+    font-family: Arial;
+    background: #0f172a;
     color: white;
 }
 
-/* ✅ TEXTO */
-h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
+.tela {
+    display: none;
+    padding: 20px;
+    text-align: center;
 }
 
-p {
-    margin-bottom: 20px;
-    opacity: 0.9;
+.ativa {
+    display: block;
 }
 
-/* ✅ BOTÃO */
+input, select, textarea {
+    width: 90%;
+    padding: 12px;
+    margin: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
 button {
-    padding: 12px 25px;
+    padding: 12px;
+    width: 90%;
+    background: #00e676;
     border: none;
     border-radius: 8px;
-    background: #00c853;
-    color: white;
-    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-button:hover {
-    background: #00e676;
+.caixa {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+h1, h2 {
+    margin-bottom: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>🚀 GEOURBAN ONLINE</h1>
-    <p>Sistema ativo e funcionando</p>
+<!-- 🔐 LOGIN -->
+<div id="login" class="tela ativa">
+    <h1>🔐 GeoUrban</h1>
+    <p>Acesso seguro</p>
 
-    <a href="/ia.html">
-        <button>🤖 Abrir IA</button>
-    </a>
+    <input id="usuario" placeholder="Usuário">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button onclick="entrar()">Entrar</button>
 </div>
+
+<!-- 🤝 RECEPÇÃO HUMANIZADA -->
+<div id="recepcao" class="tela">
+    <h1>🤝 Bem-vindo</h1>
+
+    <div class="caixa">
+        <p>
+        Olá 👋<br><br>
+        É um prazer receber você.<br><br>
+        Antes de iniciarmos, queremos garantir um atendimento confortável.
+        </p>
+
+        <h3>Você possui alguma limitação?</h3>
+
+        <select id="limitacao">
+            <option value="nenhuma">Nenhuma</option>
+            <option value="visual">Visual</option>
+            <option value="auditiva">Auditiva</option>
+            <option value="motora">Motora</option>
+        </select>
+
+        <button onclick="continuarAtendimento()">Continuar Atendimento</button>
+    </div>
+</div>
+
+<!-- 📝 CADASTRO -->
+<div id="cadastro" class="tela">
+    <h1>📝 Cadastro Inicial</h1>
+
+    <input id="nome" placeholder="Nome completo">
+    <input id="cidade" placeholder="Cidade">
+    <textarea id="descricao" placeholder="Descreva sua necessidade..."></textarea>
+
+    <button onclick="finalizarCadastro()">Iniciar Atendimento IA</button>
+</div>
+
+<!-- 🤖 REDIRECIONAMENTO -->
+<div id="final" class="tela">
+    <h1>🤖 Atendimento Iniciado</h1>
+    <p>Estamos direcionando você para a IA...</p>
+</div>
+
+<script>
+
+// 🔐 LOGIN SIMPLES (pode melhorar depois)
+function entrar() {
+    const user = document.getElementById("usuario").value;
+    const pass = document.getElementById("senha").value;
+
+    if (user && pass) {
+        trocarTela("recepcao");
+    } else {
+        alert("Preencha usuário e senha");
+    }
+}
+
+// 🔁 TROCAR TELA
+function trocarTela(id) {
+    document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
+    document.getElementById(id).classList.add("ativa");
+}
+
+// 🤝 CONTINUA ATENDIMENTO
+function continuarAtendimento() {
+    const lim = document.getElementById("limitacao").value;
+
+    // 💾 salva preferência (simples)
+    localStorage.setItem("limitacao", lim);
+
+    trocarTela("cadastro");
+}
+
+// 📝 FINALIZA CADASTRO
+function finalizarCadastro() {
+    const nome = document.getElementById("nome").value;
+    const cidade = document.getElementById("cidade").value;
+    const desc = document.getElementById("descricao").value;
+
+    if (!nome || !cidade || !desc) {
+        alert("Preencha todos os campos");
+        return;
+    }
+
+    // 💾 salvar dados
+    localStorage.setItem("usuario_nome", nome);
+    localStorage.setItem("usuario_cidade", cidade);
+    localStorage.setItem("usuario_desc", desc);
+
+    trocarTela("final");
+
+    // 🚀 redireciona pra IA
+    setTimeout(() => {
+        window.location.href = "/ia";
+    }, 2000);
+}
+
+</script>
 
 </body>
 </html>
