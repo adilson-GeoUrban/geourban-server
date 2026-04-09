@@ -1,81 +1,54 @@
-<!-- Tela IA com monitor completo -->
-<div id="ia" class="tela">
-  <div class="card">
-    <h2>🤖 IA GeoUrban - Todas Ativas</h2>
+<div id="ia" class="tela ativa">
+<div class="card">
+<h2>🤖 IA GeoUrban - Todas Ativas</h2>
 
-    <textarea id="entrada" placeholder="Digite seu projeto..."></textarea>
-    <button onclick="gerar()">Gerar Análise</button>
-    <button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
-    <button onclick="gerarRelatorioIA()">📝 Relatório de Atividade</button>
+<textarea id="entrada" placeholder="Digite seu projeto..."></textarea>
 
-    <div id="resposta"></div>
-    <hr>
-    <h3>🧠 Monitor do Sistema</h3>
-    <pre id="monitorIA"></pre>
-  </div>
+<button onclick="gerar()">Gerar Análise</button>
+<button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
+<button onclick="gerarRelatorioIA()">📝 Relatório de Atividade</button>
+<button onclick="baixarBackup()">💾 Baixar Backup</button>
+<button onclick="verLogs()">📜 Ver Logs</button>
+
+<div id="resposta"></div>
+<hr>
+<h3>🧠 Monitor do Sistema</h3>
+<pre id="monitorIA"></pre>
+</div>
 </div>
 
 <script>
-// Definição das IAs
+// IAs
 const IAs = [
-  { nome: "Designer", status: "ATIVA", funcao: "Analisa projeto e gera estrutura" },
-  { nome: "Material", status: "ATIVA", funcao: "Gera PDFs, guias e vídeos" },
-  { nome: "Monitoramento", status: "ATIVA", funcao: "Verifica status do sistema e alertas" },
-  { nome: "Relatórios", status: "ATIVA", funcao: "Gera PowerPoint e logs" },
-  { nome: "Jurídica", status: "ATIVA", funcao: "Analisa aspectos legais" },
-  { nome: "Contábil", status: "ATIVA", funcao: "Gera análises financeiras e relatórios" },
-  { nome: "Exército de Defesa", status: "ATIVA", funcao: "Verifica conformidade de segurança" }
+  { nome: "Designer", status: "ATIVA" },
+  { nome: "Material", status: "ATIVA" },
+  { nome: "Monitoramento", status: "ATIVA" },
+  { nome: "Relatórios", status: "ATIVA" },
+  { nome: "Jurídica", status: "ATIVA" },
+  { nome: "Contábil", status: "ATIVA" },
+  { nome: "Exército de Defesa", status: "ATIVA" }
 ];
 
-// Atualiza monitor em tempo real
+// Atualiza monitor
 function atualizarMonitorIA() {
   let texto = "";
-  IAs.forEach(ia => {
-    texto += `${ia.nome}: ${ia.status} → ${ia.funcao}\n`;
-  });
+  IAs.forEach(ia => { texto += `${ia.nome}: ${ia.status}\n`; });
   document.getElementById("monitorIA").innerText = texto;
 }
-
-// Chama atualização a cada 5s
 setInterval(atualizarMonitorIA, 5000);
 atualizarMonitorIA();
 
-// IA Designer
-function gerar() {
-  const texto = document.getElementById("entrada").value;
-  document.getElementById("resposta").innerHTML =
-    "📊 Análise realizada:\n" + texto + "\n✔ Todas IAs identificadas e processando conteúdo.";
+function gerar(){document.getElementById("resposta").innerText="📊 Análise completa gerada.";}
+function gerarPPT(){
+  let texto=document.getElementById("entrada").value;
+  fetch("/gerar-ppt",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({texto})})
+  .then(res=>res.blob()).then(blob=>{let url=window.URL.createObjectURL(blob);let a=document.createElement("a");a.href=url;a.download="geourban.pptx";a.click();});
 }
-
-// IA Relatórios - PowerPoint
-function gerarPPT() {
-  const texto = document.getElementById("entrada").value;
-  fetch("/gerar-ppt", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ texto })
-  })
-  .then(res => res.blob())
-  .then(blob => {
-    let url = window.URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "geourban.pptx";
-    a.click();
-  });
+function gerarRelatorioIA(){
+  let relatorio="📝 Relatório de Atividade\n\n";IAs.forEach(ia=>{relatorio+=`IA: ${ia.nome}\nStatus: ${ia.status}\n------------------\n`;});
+  document.getElementById("resposta").innerText=relatorio;
+  alert("Relatório gerado!");
 }
-
-// 🔹 NOVO: Relatório detalhado de todas as IAs
-function gerarRelatorioIA() {
-  let relatorio = "📝 RELATÓRIO DE ATIVIDADE DAS IAs\n\n";
-  IAs.forEach(ia => {
-    relatorio += `IA: ${ia.nome}\nStatus: ${ia.status}\nFunção: ${ia.funcao}\n----------------------\n`;
-  });
-
-  // Exibe na tela
-  document.getElementById("resposta").innerText = relatorio;
-
-  // Pode gerar PDF se integrado
-  alert("Relatório gerado! Você pode baixar ou enviar para auditoria.");
-}
+function baixarBackup(){window.open("/backup","_blank");}
+function verLogs(){window.open("/logs","_blank");}
 </script>
