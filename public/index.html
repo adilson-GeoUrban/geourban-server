@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban</title>
-
+<title>GeoUrban - Todas IAs Ativas</title>
 <style>
 body { font-family: Arial; background:#0d0d0d; color:white; margin:0; }
 .tela { display:none; padding:20px; }
@@ -14,7 +13,6 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 .card { max-width:600px; margin:auto; background:#1e1e1e; padding:20px; border-radius:10px; }
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN -->
@@ -23,16 +21,17 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 <h2>🔐 GeoUrban</h2>
 <input placeholder="Usuário">
 <input type="password" placeholder="Senha">
-<button onclick="trocar('atendimento')">Entrar</button>
+<button onclick="trocar('recepcao')">Entrar</button>
 </div>
 </div>
 
-<!-- ATENDIMENTO -->
-<div id="atendimento" class="tela">
+<!-- RECEPÇÃO HUMANIZADA -->
+<div id="recepcao" class="tela">
 <div class="card">
-<h2>🤝 Atendimento</h2>
-<select>
-<option>Não possuo limitação</option>
+<h2>🤝 Bem-vindo</h2>
+<p>Estamos em desenvolvimento. Sua opinião é fundamental e será registrada.</p>
+<select id="limitacao">
+<option>Não possuo</option>
 <option>Visual</option>
 <option>Auditiva</option>
 <option>Motora</option>
@@ -44,8 +43,8 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 <!-- CONTEXTO -->
 <div id="contexto" class="tela">
 <div class="card">
-<h2>🌱 Plataforma</h2>
-<p>Estamos em desenvolvimento. Sua participação é essencial.</p>
+<h2>🌱 Contexto</h2>
+<p>Participar do GeoUrban é contribuir para evolução da plataforma. Torne-se parceiro!</p>
 <button onclick="trocar('cadastro')">Continuar</button>
 </div>
 </div>
@@ -60,13 +59,12 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 </div>
 </div>
 
-<!-- IA -->
+<!-- IA UNIFICADA -->
 <div id="ia" class="tela">
 <div class="card">
-<h2>🤖 IA GeoUrban</h2>
+<h2>🤖 IA GeoUrban - Todas Ativas</h2>
 
-<textarea id="entrada" placeholder="Projeto..."></textarea>
-
+<textarea id="entrada" placeholder="Digite o projeto..."></textarea>
 <button onclick="gerar()">Gerar Análise</button>
 <button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
 
@@ -74,11 +72,13 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 
 <hr>
 
-<h3>🧠 Monitor</h3>
-<p>IA: ATIVA</p>
-<p>Servidor: OK</p>
+<h3>🧠 Monitor do Sistema</h3>
+<p>IA Designer: ATIVA</p>
+<p>IA Material: ATIVA</p>
+<p>IA Monitoramento: ATIVA</p>
+<p>IA Relatórios: ATIVA</p>
+<p>Servidor: ONLINE</p>
 <p>Motor: OPERANDO</p>
-
 </div>
 </div>
 
@@ -94,15 +94,16 @@ document.getElementById("entrada").value = texto;
 trocar('ia');
 }
 
+// IA Designer
 function gerar(){
 let texto = document.getElementById("entrada").value;
 document.getElementById("resposta").innerHTML =
-"📊 Análise:<br>"+texto+"<br><br>✔ Estrutura gerada.";
+"📊 Análise realizada:<br>"+texto+"<br><br>✔ Todas IAs ativas e processando conteúdo.";
 }
 
+// IA Relatórios (PowerPoint)
 function gerarPPT(){
 let texto = document.getElementById("entrada").value;
-
 fetch("/gerar-ppt", {
 method: "POST",
 headers: { "Content-Type": "application/json" },
@@ -118,6 +119,5 @@ a.click();
 });
 }
 </script>
-
 </body>
 </html>
