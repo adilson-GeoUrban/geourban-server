@@ -16,3 +16,45 @@ font-size:14px;
 <button onclick="alert('CLICOU')">TESTE</button>
 
 </div>
+<!-- 🔥 PAINEL FLUTUANTE REAL -->
+<div id="painel-emergencia" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#000;
+color:#0f0;
+padding:15px;
+border-radius:10px;
+z-index:999999;
+font-size:12px;
+box-shadow:0 0 10px #0f0;
+">
+
+<b>⚡ Controle Direto</b><br><br>
+
+<button onclick="ativarControle()">Ativar Controle</button><br><br>
+<button onclick="forcarLogin()">Forçar Login</button><br><br>
+<button onclick="limparSistema()">Resetar</button>
+
+<div id="status-emergencia" style="margin-top:10px;"></div>
+
+</div>
+
+<script>
+function ativarControle(){
+    localStorage.setItem("controle","ativo");
+    document.getElementById("status-emergencia").innerText = "Controle ATIVO";
+}
+
+function forcarLogin(){
+    localStorage.setItem("logado","true");
+    alert("Login forçado!");
+    location.reload();
+}
+
+function limparSistema(){
+    localStorage.clear();
+    alert("Sistema resetado!");
+    location.reload();
+}
+</script>
