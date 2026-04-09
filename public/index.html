@@ -1,9 +1,2 @@
-document.body.innerHTML = `
-<div style="background:#111;color:#0f0;height:100vh;display:flex;justify-content:center;align-items:center;font-family:Arial">
-<div>
-<h2>🧠 CONTROLE ATIVO</h2>
-<button onclick="localStorage.setItem('logado','true');location.reload()">🔐 ATIVAR ACESSO</button>
-<button onclick="localStorage.clear();location.reload()">🚪 LIMPAR</button>
-</div>
-</div>
-`;
+localStorage.clear();
+location.reload(true);
