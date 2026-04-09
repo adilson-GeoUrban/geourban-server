@@ -1,41 +1,37 @@
-// server.js - GeoUrban Unificado
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const app = express();
-const PORT = process.env.PORT || 10000;
+<!-- Caixa Flutuante de Login Desktop -->
+<div id="login-flutuante" style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: rgba(30, 30, 30, 0.95);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    z-index: 1000;
+">
+    <h2 style="text-align:center; margin-bottom: 20px;">Login Master - GeoUrban</h2>
+    
+    <label for="usuario">Usuário / E-mail:</label>
+    <input type="text" id="usuario" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
+    
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
+    
+    <button id="entrar" style="width:100%; padding:10px; margin-top:10px; background-color:#2e7d32; border:none; border-radius:5px; color:white; cursor:pointer;">Entrar</button>
+    
+    <div style="margin-top:15px; font-size:12px; text-align:center;">
+        <a href="#" style="color:#90caf9;">Esqueci minha senha</a>
+    </div>
 
-// Middleware para arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
-
-// Endpoint principal - envia ia.html novo
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "ia_novo.html"));
-});
-
-// Backup simples antes de qualquer alteração
-function criarBackup() {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const backupFile = path.join(__dirname, `BACKUP_GeoUrban_${timestamp}.tar.gz`);
-    const { execSync } = require("child_process");
-    execSync(`tar -czvf ${backupFile} ./public ./server.js`);
-    console.log(`✅ Backup criado: ${backupFile}`);
-}
-
-// Rota para forçar backup e reinício (usável com autenticação futura)
-app.get("/admin/backup-restart", (req, res) => {
-    criarBackup();
-    res.send("Backup criado com sucesso. Reinicie o servidor para aplicar alterações.");
-});
-
-// Middleware básico de log (pode evoluir para auditoria completa)
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
-
-// Servidor
-app.listen(PORT, () => {
-    console.log(`🚀 GeoUrban rodando na porta ${PORT}`);
-    console.log(`📂 Acesse: http://localhost:${PORT}/ ou https://seu-dominio.onrender.com/`);
-});
+    <!-- Dupla verificação (aparece após senha correta) -->
+    <div id="verificacao" style="display:none; margin-top:15px;">
+        <label for="codigoEmail">Código E-mail:</label>
+        <input type="text" id="codigoEmail" style="width:100%; padding:8px; margin-bottom:5px; border-radius:5px; border:none;">
+        <label for="codigoSMS">Código SMS:</label>
+        <input type="text" id="codigoSMS" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
+        <button id="confirmar" style="width:100%; padding:10px; background-color:#1565c0; border:none; border-radius:5px; color:white; cursor:pointer;">Confirmar</button>
+    </div>
+</div>
