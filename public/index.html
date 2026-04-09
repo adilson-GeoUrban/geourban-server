@@ -29,8 +29,8 @@ body {
 /* INPUT */
 input {
     width: 100%;
-    padding: 8px;
-    margin: 8px 0;
+    padding: 10px;
+    margin: 10px 0;
     border-radius: 5px;
     border: none;
 }
@@ -55,7 +55,7 @@ button {
 
 <body>
 
-<!-- TELA INICIAL -->
+<!-- INICIO -->
 <div id="inicio" class="card">
     <h2>🌍 GeoUrban</h2>
     <p>Sistema ativo e seguro</p>
@@ -66,8 +66,8 @@ button {
 <div id="login" class="card hidden">
     <h3>Login</h3>
 
-    <input type="text" id="usuario" placeholder="Usuário">
-    <input type="password" id="senha" placeholder="Senha">
+    <input id="usuario" placeholder="Usuário">
+    <input id="senha" type="password" placeholder="Senha">
 
     <button onclick="logar()">Acessar</button>
 
@@ -76,8 +76,8 @@ button {
 
 <!-- PAINEL -->
 <div id="painel" class="card hidden">
-    <h3>Bem-vindo</h3>
-    <p id="userLogado"></p>
+    <h3>Painel</h3>
+    <p id="info"></p>
 
     <button onclick="verChave()">Ver chave</button>
     <button onclick="sair()">Sair</button>
@@ -93,37 +93,31 @@ function abrirLogin(){
 
 // LOGIN
 function logar(){
-    const user = document.getElementById("usuario").value;
-    const pass = document.getElementById("senha").value;
-    const msg = document.getElementById("msg");
+    var u = document.getElementById("usuario").value;
+    var s = document.getElementById("senha").value;
 
-    if(user === "Admin" && pass === "1234"){
-
-        // 🔐 SALVA ACESSO
-        localStorage.setItem("usuario", user);
+    if(u === "Admin" && s === "1234"){
+        localStorage.setItem("usuario", u);
         localStorage.setItem("chave", "geo123");
-        localStorage.setItem("acesso", "true");
-
-        entrarSistema();
-
+        localStorage.setItem("logado", "sim");
+        entrar();
     } else {
-        msg.innerText = "❌ Dados incorretos";
-        msg.style.color = "red";
+        document.getElementById("msg").innerText = "Erro de acesso";
     }
 }
 
-// ENTRA NO SISTEMA
-function entrarSistema(){
+// ENTRAR NO SISTEMA
+function entrar(){
     document.getElementById("login").classList.add("hidden");
     document.getElementById("painel").classList.remove("hidden");
 
-    const user = localStorage.getItem("usuario");
-    document.getElementById("userLogado").innerText = "Usuário: " + user;
+    var u = localStorage.getItem("usuario");
+    document.getElementById("info").innerText = "Usuário: " + u;
 }
 
 // VER CHAVE
 function verChave(){
-    alert("Chave: " + localStorage.getItem("chave"));
+    alert(localStorage.getItem("chave"));
 }
 
 // SAIR
@@ -133,9 +127,9 @@ function sair(){
 }
 
 // AUTO LOGIN
-if(localStorage.getItem("acesso") === "true"){
+if(localStorage.getItem("logado") === "sim"){
     document.getElementById("inicio").classList.add("hidden");
-    entrarSistema();
+    entrar();
 }
 
 </script>
