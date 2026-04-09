@@ -1,35 +1,14 @@
-let CHAVE = "A9x#72!GeoUrban@Rei2026";
-let IAs = { Designer:true, Juridica:true };
+<div id="login" class="tela ativa">
+  <div class="card">
 
-function entrar(){
-  const valor = document.getElementById("chave").value;
-  if(valor === CHAVE){
-    document.getElementById("login").classList.remove("ativa");
-    document.getElementById("painel").classList.add("ativa");
-    atualizarStatus();
-    document.getElementById("mensagem").innerText = "";
-  } else {
-    document.getElementById("mensagem").innerText = "🚫 Chave incorreta!";
-  }
-}
+    <h2>🔐 GeoUrban - Acesso Seguro</h2>
 
-function atualizarStatus(){
-  let txt = "";
-  for(let ia in IAs){
-    txt += ia + ": " + (IAs[ia] ? "ATIVA" : "DESATIVADA") + "\n";
-  }
-  document.getElementById("statusIA").innerText = txt;
-}
+    <p>Escolha o tipo de acesso:</p>
 
-function toggleIA(nome){
-  IAs[nome] = !IAs[nome];
-  atualizarStatus();
-}
+    <button onclick="loginSimples()">🔑 Acesso Padrão</button>
+    <button onclick="loginCertificado()">💳 Certificado Digital (A3)</button>
 
-function verLogs(){
-  alert("Logs simulados: todas as ações monitoradas!");
-}
+    <p id="msgLogin"></p>
 
-function abrirSalaSecreta(){
-  alert("Sala secreta aberta: acesso exclusivo ao soberano");
-}
+  </div>
+</div>
