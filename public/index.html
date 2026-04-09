@@ -1,62 +1,48 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GeoUrban</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: linear-gradient(135deg, #1b5e20, #4caf50);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-
-    .box {
-      background: rgba(0,0,0,0.3);
-      padding: 30px;
-      border-radius: 12px;
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      background: #00e676;
-      color: black;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #00c853;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Modo de Emergência Seguro</title>
 </head>
+
 <body>
 
-  <div class="box">
-    <h1>🌍 GeoUrban</h1>
-    <p>Sistema ativo e seguro</p>
+<script>
+// 🔐 1. CHAVE PRINCIPAL
+const chave = prompt("Digite a chave de emergência:");
 
-    <button onclick="entrar()">Entrar</button>
-  </div>
+if (chave !== "GEOURBAN-2026") {
+    alert("Chave inválida");
+    window.location.href = "/login.html";
+} else {
 
-  <script>
-    function entrar() {
-      alert("Sistema funcionando ✅");
+    // 🔢 2. GERAR CÓDIGO
+    const codigo = Math.floor(100000 + Math.random() * 900000);
+    console.log("Código de verificação:", codigo);
+
+    alert("Código enviado (ver console F12)");
+
+    // 🔎 3. VALIDAR CÓDIGO
+    const entrada = prompt("Digite o código de verificação:");
+
+    if (entrada == codigo) {
+
+        // ✅ 4. LIBERAR ACESSO
+        localStorage.setItem("auth", "true");
+        localStorage.setItem("usuario", "admin");
+        localStorage.setItem("descricao", "acesso emergencial seguro");
+        localStorage.setItem("chave", "validado");
+
+        alert("Acesso restaurado com segurança");
+
+        window.location.href = "/sistema.html";
+
+    } else {
+        alert("Código incorreto");
+        window.location.href = "/login.html";
     }
-  </script>
+}
+</script>
 
 </body>
 </html>
