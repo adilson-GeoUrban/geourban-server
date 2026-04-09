@@ -1,108 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban IA</title>
+<!-- 🛠️ PAINEL DE EMERGÊNCIA FLUTUANTE -->
+<div id="painel-emergencia" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#000;
+color:#0f0;
+padding:15px;
+border-radius:10px;
+z-index:9999;
+font-size:12px;
+box-shadow:0 0 10px #0f0;
+">
 
-<style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#111;
-    color:#0f0;
-}
+<b>⚡ Controle Direto</b><br><br>
 
-.tela {
-    display:none;
-    height:100vh;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-}
+<button onclick="ativarControle()">Ativar Controle</button><br>
+<button onclick="forcarLogin()">Forçar Login</button><br>
+<button onclick="limparSistema()">Resetar</button>
 
-input, button {
-    padding:10px;
-    margin:5px;
-    border:none;
-    border-radius:5px;
-}
+<div id="status-emergencia" style="margin-top:10px;"></div>
 
-button {
-    background:#00c853;
-    cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
-<div id="login" class="tela">
-    <h2>🔐 GeoUrban</h2>
-    <input id="user" placeholder="Usuário">
-    <input id="pass" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-    <div id="msg"></div>
-</div>
-
-<!-- PAINEL -->
-<div id="painel" class="tela">
-    <h2>🧠 IA NO CONTROLE</h2>
-    <p id="status"></p>
-
-    <button onclick="verChave()">Ver chave</button>
-    <button onclick="logout()">Sair</button>
-
-    <div id="resposta"></div>
 </div>
 
 <script>
 
-// 🔐 LOGIN
-function entrar() {
-    const u = document.getElementById("user").value;
-    const p = document.getElementById("pass").value;
-
-    if(u === "Admin" && p === "1234") {
-        localStorage.setItem("logado", "true");
-        mostrarPainel();
-    } else {
-        document.getElementById("msg").innerText = "❌ Acesso negado";
-    }
+// ⚡ ATIVA CONTROLE
+function ativarControle(){
+    localStorage.setItem("controle", "ativo");
+    document.getElementById("status-emergencia").innerText = "Controle ATIVO";
 }
 
-// 🔁 LOGOUT
-function logout() {
-    localStorage.removeItem("logado");
-    mostrarLogin();
+// 🔐 FORÇA LOGIN
+function forcarLogin(){
+    localStorage.setItem("logado", "true");
+    location.reload();
 }
 
-// 🔑 IA RESPONDE
-function verChave() {
-    document.getElementById("resposta").innerText = "🔑 geo123";
-}
-
-// 🧠 CONTROLE DE TELA
-function mostrarLogin() {
-    document.getElementById("login").style.display = "flex";
-    document.getElementById("painel").style.display = "none";
-}
-
-function mostrarPainel() {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("painel").style.display = "flex";
-    document.getElementById("status").innerText = "Sistema ativo e controlado";
-}
-
-// 🚀 INICIALIZAÇÃO
-if(localStorage.getItem("logado") === "true") {
-    mostrarPainel();
-} else {
-    mostrarLogin();
+// 🧹 RESET
+function limparSistema(){
+    localStorage.clear();
+    location.reload();
 }
 
 </script>
-
-</body>
-</html>
