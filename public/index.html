@@ -1,11 +1,45 @@
-const CHAVE_MASTER = "geo_2026_seguro";
+<script>
+async function cadastrar() {
+    const dados = {
+        nome: document.getElementById("nome").value,
+        cpf: document.getElementById("cpf").value,
+        telefone: document.getElementById("telefone").value,
+        endereco: document.getElementById("endereco").value,
+        perfil: document.getElementById("perfil").value,
+        nivel: document.getElementById("nivel").value,
+        documento: document.getElementById("documento").value,
+        termo: document.getElementById("termo").checked
+    };
 
-app.post("/login-cert", (req, res) => {
-    const { chave } = req.body;
-
-    if (chave === CHAVE_MASTER) {
-        return res.json({ ok: true, tipo: "certificado_simulado" });
+    if (!dados.nome || !dados.cpf || !dados.telefone) {
+        alert("Preencha os campos obrigatórios ❌");
+        return;
     }
 
-    res.status(401).json({ ok: false });
-});
+    if (!dados.termo) {
+        alert("Aceite os termos ⚠️");
+        return;
+    }
+
+    try {
+        const res = await fetch("/cadastro", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+
+        const resposta = await res.json();
+
+        if (res.ok) {
+            alert("Cadastro salvo com segurança ✅");
+        } else {
+            alert(resposta.erro || "Erro no cadastro ❌");
+        }
+
+    } catch (e) {
+        alert("Erro de conexão ⚠️");
+    }
+}
+</script>
