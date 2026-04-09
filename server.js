@@ -1,25 +1,27 @@
-const fs = require("fs");
+const SESSOES = {};
 
-// caminho dos arquivos importantes
-const arquivos = [
-    "./server.js",
-    "./public/index.html",
-    "./logs.txt",
-    "./backup.json"
-];
+// 🔐 LOGIN SOBERANO
+app.post("/login", (req, res) => {
+    const { chave } = req.body;
 
-// pasta do ponto de restauração
-const ponto = "./backup_pre_chave";
+    if (chave === CHAVE_SOBERANO) {
+        const token = Math.random().toString(36).substring(2);
 
-// criar pasta se não existir
-if (!fs.existsSync(ponto)) fs.mkdirSync(ponto);
+        SESSOES[token] = true;
 
-// copiar arquivos
-arquivos.forEach(file => {
-    if (fs.existsSync(file)) {
-        const nome = file.split("/").pop();
-        fs.copyFileSync(file, `${ponto}/${nome}`);
+        return res.send({ token });
     }
+
+    return res.status(403).send("🚫 Chave inválida");
 });
 
-console.log("✅ Ponto de restauração criado com sucesso!");
+// 🔐 NOVO MIDDLEWARE (usa token)
+function autenticar(req, res, next) {
+    const token = req.headers["x-token"];
+
+    if (!SESSOES[token]) {
+        return res.status(403).send("🚫 NÃO AUTORIZADO");
+    }
+
+    next();
+}
