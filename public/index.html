@@ -1,22 +1,21 @@
 <input id="chave" placeholder="Chave do soberano">
-<textarea id="ordem" placeholder="Digite sua ordem"></textarea>
-
-<button onclick="executar()">Executar</button>
+<button onclick="login()">Entrar</button>
 
 <script>
-function executar() {
-    const chave = document.getElementById("chave").value;
-    const ordem = document.getElementById("ordem").value;
+let TOKEN = null;
 
-    fetch("/executar", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-chave": chave
-        },
-        body: JSON.stringify({ ordem })
+function login(){
+    const chave = document.getElementById("chave").value;
+
+    fetch("/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ chave })
     })
-    .then(r => r.text())
-    .then(t => console.log(t));
+    .then(r=>r.json())
+    .then(d=>{
+        TOKEN = d.token;
+        alert("👑 Acesso liberado");
+    });
 }
 </script>
