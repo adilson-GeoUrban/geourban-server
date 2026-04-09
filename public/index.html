@@ -1,123 +1,81 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban - Todas IAs Ativas</title>
-<style>
-body { font-family: Arial; background:#0d0d0d; color:white; margin:0; }
-.tela { display:none; padding:20px; }
-.ativa { display:block; }
-button { width:100%; padding:12px; margin-top:10px; background:#00c853; border:none; }
-input, textarea, select { width:100%; padding:10px; margin-top:10px; }
-.card { max-width:600px; margin:auto; background:#1e1e1e; padding:20px; border-radius:10px; }
-</style>
-</head>
-<body>
-
-<!-- LOGIN -->
-<div id="login" class="tela ativa">
-<div class="card">
-<h2>🔐 GeoUrban</h2>
-<input placeholder="Usuário">
-<input type="password" placeholder="Senha">
-<button onclick="trocar('recepcao')">Entrar</button>
-</div>
-</div>
-
-<!-- RECEPÇÃO HUMANIZADA -->
-<div id="recepcao" class="tela">
-<div class="card">
-<h2>🤝 Bem-vindo</h2>
-<p>Estamos em desenvolvimento. Sua opinião é fundamental e será registrada.</p>
-<select id="limitacao">
-<option>Não possuo</option>
-<option>Visual</option>
-<option>Auditiva</option>
-<option>Motora</option>
-</select>
-<button onclick="trocar('contexto')">Continuar</button>
-</div>
-</div>
-
-<!-- CONTEXTO -->
-<div id="contexto" class="tela">
-<div class="card">
-<h2>🌱 Contexto</h2>
-<p>Participar do GeoUrban é contribuir para evolução da plataforma. Torne-se parceiro!</p>
-<button onclick="trocar('cadastro')">Continuar</button>
-</div>
-</div>
-
-<!-- CADASTRO -->
-<div id="cadastro" class="tela">
-<div class="card">
-<h2>📝 Cadastro</h2>
-<input id="nome" placeholder="Nome">
-<textarea id="texto" placeholder="Descreva seu projeto"></textarea>
-<button onclick="iniciarIA()">Finalizar</button>
-</div>
-</div>
-
-<!-- IA UNIFICADA -->
+<!-- Tela IA com monitor completo -->
 <div id="ia" class="tela">
-<div class="card">
-<h2>🤖 IA GeoUrban - Todas Ativas</h2>
+  <div class="card">
+    <h2>🤖 IA GeoUrban - Todas Ativas</h2>
 
-<textarea id="entrada" placeholder="Digite o projeto..."></textarea>
-<button onclick="gerar()">Gerar Análise</button>
-<button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
+    <textarea id="entrada" placeholder="Digite seu projeto..."></textarea>
+    <button onclick="gerar()">Gerar Análise</button>
+    <button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
+    <button onclick="gerarRelatorioIA()">📝 Relatório de Atividade</button>
 
-<div id="resposta"></div>
-
-<hr>
-
-<h3>🧠 Monitor do Sistema</h3>
-<p>IA Designer: ATIVA</p>
-<p>IA Material: ATIVA</p>
-<p>IA Monitoramento: ATIVA</p>
-<p>IA Relatórios: ATIVA</p>
-<p>Servidor: ONLINE</p>
-<p>Motor: OPERANDO</p>
-</div>
+    <div id="resposta"></div>
+    <hr>
+    <h3>🧠 Monitor do Sistema</h3>
+    <pre id="monitorIA"></pre>
+  </div>
 </div>
 
 <script>
-function trocar(id){
-document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
-document.getElementById(id).classList.add('ativa');
+// Definição das IAs
+const IAs = [
+  { nome: "Designer", status: "ATIVA", funcao: "Analisa projeto e gera estrutura" },
+  { nome: "Material", status: "ATIVA", funcao: "Gera PDFs, guias e vídeos" },
+  { nome: "Monitoramento", status: "ATIVA", funcao: "Verifica status do sistema e alertas" },
+  { nome: "Relatórios", status: "ATIVA", funcao: "Gera PowerPoint e logs" },
+  { nome: "Jurídica", status: "ATIVA", funcao: "Analisa aspectos legais" },
+  { nome: "Contábil", status: "ATIVA", funcao: "Gera análises financeiras e relatórios" },
+  { nome: "Exército de Defesa", status: "ATIVA", funcao: "Verifica conformidade de segurança" }
+];
+
+// Atualiza monitor em tempo real
+function atualizarMonitorIA() {
+  let texto = "";
+  IAs.forEach(ia => {
+    texto += `${ia.nome}: ${ia.status} → ${ia.funcao}\n`;
+  });
+  document.getElementById("monitorIA").innerText = texto;
 }
 
-function iniciarIA(){
-let texto = document.getElementById("texto").value;
-document.getElementById("entrada").value = texto;
-trocar('ia');
-}
+// Chama atualização a cada 5s
+setInterval(atualizarMonitorIA, 5000);
+atualizarMonitorIA();
 
 // IA Designer
-function gerar(){
-let texto = document.getElementById("entrada").value;
-document.getElementById("resposta").innerHTML =
-"📊 Análise realizada:<br>"+texto+"<br><br>✔ Todas IAs ativas e processando conteúdo.";
+function gerar() {
+  const texto = document.getElementById("entrada").value;
+  document.getElementById("resposta").innerHTML =
+    "📊 Análise realizada:\n" + texto + "\n✔ Todas IAs identificadas e processando conteúdo.";
 }
 
-// IA Relatórios (PowerPoint)
-function gerarPPT(){
-let texto = document.getElementById("entrada").value;
-fetch("/gerar-ppt", {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ texto })
-})
-.then(res => res.blob())
-.then(blob => {
-let url = window.URL.createObjectURL(blob);
-let a = document.createElement("a");
-a.href = url;
-a.download = "geourban.pptx";
-a.click();
-});
+// IA Relatórios - PowerPoint
+function gerarPPT() {
+  const texto = document.getElementById("entrada").value;
+  fetch("/gerar-ppt", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texto })
+  })
+  .then(res => res.blob())
+  .then(blob => {
+    let url = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "geourban.pptx";
+    a.click();
+  });
+}
+
+// 🔹 NOVO: Relatório detalhado de todas as IAs
+function gerarRelatorioIA() {
+  let relatorio = "📝 RELATÓRIO DE ATIVIDADE DAS IAs\n\n";
+  IAs.forEach(ia => {
+    relatorio += `IA: ${ia.nome}\nStatus: ${ia.status}\nFunção: ${ia.funcao}\n----------------------\n`;
+  });
+
+  // Exibe na tela
+  document.getElementById("resposta").innerText = relatorio;
+
+  // Pode gerar PDF se integrado
+  alert("Relatório gerado! Você pode baixar ou enviar para auditoria.");
 }
 </script>
-</body>
-</html>
