@@ -1,3 +1,4 @@
+/public/index.html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,7 +18,7 @@ body {
     height: 100vh;
 }
 
-/* CARD */
+/* TELA INICIAL */
 .card {
     background: rgba(0,0,0,0.3);
     padding: 30px;
@@ -52,6 +53,7 @@ button {
     display: block;
     margin: 5px 0;
     padding: 8px;
+    width: 200px;
 }
 
 /* PAINEL */
@@ -64,15 +66,6 @@ button {
     color: #0f0;
     padding: 15px;
     border-radius: 10px;
-    z-index: 9999;
-}
-
-#painel button {
-    display: block;
-    width: 100%;
-    margin-top: 5px;
-    background: #222;
-    color: #0f0;
 }
 </style>
 </head>
@@ -81,69 +74,43 @@ button {
 
 <div class="card">
     <h1>🌍 GeoUrban</h1>
-    <p>Sistema ativo e seguro</p>
+    <p>Sistema limpo e reconstruído</p>
     <button onclick="abrirLogin()">Entrar</button>
 </div>
 
 <!-- LOGIN -->
 <div id="login">
     <h3>Login</h3>
-    <input id="user" placeholder="Usuário">
-    <input id="pass" type="password" placeholder="Senha">
-    <button onclick="logar()">Entrar</button>
+    <input id="usuario" placeholder="Usuário">
+    <input id="senha" type="password" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
 </div>
 
 <!-- PAINEL -->
 <div id="painel">
-    <b>CONTROLE</b>
-    <button onclick="ativarControle()">Ativar</button>
-    <button onclick="resetar()">Resetar</button>
+    <b>CONTROLE ATIVO</b>
 </div>
 
 <script>
 
-// ABRIR LOGIN
+// abrir login
 function abrirLogin() {
     document.getElementById("login").style.display = "block";
 }
 
-// LOGIN
-function logar() {
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
+// login simples
+function entrar() {
+    const u = document.getElementById("usuario").value;
+    const p = document.getElementById("senha").value;
 
     if (u === "admin" && p === "123") {
         alert("Login OK 🚀");
-        localStorage.setItem("logado", "true");
         document.getElementById("login").style.display = "none";
         document.getElementById("painel").style.display = "block";
     } else {
         alert("Erro ❌");
     }
 }
-
-// CONTROLE
-function ativarControle() {
-    alert("Controle ativo 🔥");
-}
-
-// RESET
-function resetar() {
-    localStorage.clear();
-    location.reload();
-}
-
-// AUTO LOGIN
-if (localStorage.getItem("logado") === "true") {
-    document.getElementById("painel").style.display = "block";
-}
-
-// ATALHO
-document.addEventListener("keydown", function(e) {
-    if (e.ctrlKey && e.key === "9") {
-        document.getElementById("painel").style.display = "block";
-    }
-});
 
 </script>
 
