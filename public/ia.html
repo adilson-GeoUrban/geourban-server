@@ -112,3 +112,30 @@ setInterval(verificarSistema, 5000);
 // 🚀 inicia ao abrir
 verificarSistema();
 </script>
+function verificarSistema() {
+    let status = "";
+
+    // 🤖 IA
+    status += "🤖 IA Designer: ATIVA\n";
+
+    // 📡 Internet
+    if (navigator.onLine) {
+        status += "📡 Conexão: ONLINE\n";
+    } else {
+        status += "📡 Conexão: OFFLINE\n";
+    }
+
+    // 🌐 Servidor (teste real)
+    fetch("/")
+        .then(() => {
+            status += "🌐 Servidor: OK\n";
+            atualizar(status);
+        })
+        .catch(() => {
+            status += "🌐 Servidor: ERRO\n";
+            atualizar(status);
+        });
+
+    // 🧠 Sistema
+    status += "⚙️ Motor IA: OPERANDO\n";
+}
