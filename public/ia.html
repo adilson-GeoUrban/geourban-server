@@ -1,37 +1,28 @@
-<!-- Caixa Flutuante de Login Desktop -->
-<div id="login-flutuante" style="
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    background-color: rgba(30, 30, 30, 0.95);
-    color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    z-index: 1000;
-">
-    <h2 style="text-align:center; margin-bottom: 20px;">Login Master - GeoUrban</h2>
-    
-    <label for="usuario">Usuário / E-mail:</label>
-    <input type="text" id="usuario" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
-    
-    <label for="senha">Senha:</label>
-    <input type="password" id="senha" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
-    
-    <button id="entrar" style="width:100%; padding:10px; margin-top:10px; background-color:#2e7d32; border:none; border-radius:5px; color:white; cursor:pointer;">Entrar</button>
-    
-    <div style="margin-top:15px; font-size:12px; text-align:center;">
-        <a href="#" style="color:#90caf9;">Esqueci minha senha</a>
-    </div>
+<script>
+document.getElementById("entrar").addEventListener("click", function() {
+    const usuario = document.getElementById("usuario").value;
+    const senha = document.getElementById("senha").value;
 
-    <!-- Dupla verificação (aparece após senha correta) -->
-    <div id="verificacao" style="display:none; margin-top:15px;">
-        <label for="codigoEmail">Código E-mail:</label>
-        <input type="text" id="codigoEmail" style="width:100%; padding:8px; margin-bottom:5px; border-radius:5px; border:none;">
-        <label for="codigoSMS">Código SMS:</label>
-        <input type="text" id="codigoSMS" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:none;">
-        <button id="confirmar" style="width:100%; padding:10px; background-color:#1565c0; border:none; border-radius:5px; color:white; cursor:pointer;">Confirmar</button>
-    </div>
-</div>
+    // Login dummy temporário
+    if(usuario === "admin" && senha === "1234") {
+        alert("Senha correta! Agora confirme o código de email/SMS.");
+        document.getElementById("verificacao").style.display = "block";
+    } else {
+        alert("Usuário ou senha incorretos!");
+    }
+});
+
+document.getElementById("confirmar").addEventListener("click", function() {
+    const codigoEmail = document.getElementById("codigoEmail").value;
+    const codigoSMS = document.getElementById("codigoSMS").value;
+
+    // Verificação dummy temporária
+    if(codigoEmail === "1111" && codigoSMS === "2222") {
+        alert("Login master confirmado! Bem-vindo ao GeoUrban.");
+        // Aqui você pode redirecionar ou ativar Calcenter/IA
+        document.getElementById("login-flutuante").style.display = "none";
+    } else {
+        alert("Códigos incorretos! Tente novamente.");
+    }
+});
+</script>
