@@ -1,10 +1,22 @@
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// ================================
+// 🌐 SERVIR FRONT (PRIORIDADE)
+// ================================
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // ================================
 // 🧠 IA MONITOR + AUTO CORREÇÃO
 // ================================
-
-const fs = require("fs");
-
-// 📁 Garantir arquivo de histórico
 const HIST_PATH = "./historico.json";
 
 function registrarEvento(tipo, descricao) {
@@ -78,4 +90,11 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (err) => {
     registrarEvento("erro_async", err);
     console.error("Erro async:", err);
+});
+
+// ================================
+// 🚀 START SERVIDOR
+// ================================
+app.listen(PORT, () => {
+    console.log("Servidor rodando na porta " + PORT);
 });
