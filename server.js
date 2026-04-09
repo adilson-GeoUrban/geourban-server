@@ -1,100 +1,54 @@
-const express = require("express");
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const DB_PATH = path.join(__dirname, "usuarios.json");
 
-// ================================
-// 🌐 SERVIR FRONT (PRIORIDADE)
-// ================================
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// ================================
-// 🧠 IA MONITOR + AUTO CORREÇÃO
-// ================================
-const HIST_PATH = "./historico.json";
-
-function registrarEvento(tipo, descricao) {
-    const evento = {
-        data: new Date().toISOString(),
-        tipo,
-        descricao
-    };
-
-    let historico = [];
-
-    try {
-        if (fs.existsSync(HIST_PATH)) {
-            historico = JSON.parse(fs.readFileSync(HIST_PATH));
-        }
-    } catch (erro) {
-        console.error("Erro ao ler histórico:", erro.message);
-    }
-
-    historico.push(evento);
-
-    try {
-        fs.writeFileSync(HIST_PATH, JSON.stringify(historico, null, 2));
-    } catch (erro) {
-        console.error("Erro ao salvar histórico:", erro.message);
-    }
+// garantir arquivo
+if (!fs.existsSync(DB_PATH)) {
+    fs.writeFileSync(DB_PATH, JSON.stringify([]));
 }
 
-// ================================
-// 🔍 ROTA DE STATUS
-// ================================
-app.get('/ia/status', (req, res) => {
-    registrarEvento("ok", "Status verificado");
+// salvar cadastro
+app.post("/cadastro", (req, res) => {
+    const dados = req.body;
 
-    res.json({
-        status: "online",
-        servidor: "ativo",
-        hora: new Date()
-    });
-});
-
-// ================================
-// 📜 ROTA DE HISTÓRICO
-// ================================
-app.get('/ia/historico', (req, res) => {
-    try {
-        if (!fs.existsSync(HIST_PATH)) {
-            return res.json([]);
-        }
-
-        const dados = JSON.parse(fs.readFileSync(HIST_PATH));
-        res.json(dados);
-
-    } catch (erro) {
-        registrarEvento("erro", "Falha ao ler histórico");
-
-        res.status(500).json({
-            erro: "Falha ao carregar histórico"
-        });
+    if (!dados.nome || !dados.cpf || !dados.telefone) {
+        return res.status(400).json({ erro: "Dados incompletos" });
     }
-});
 
-// ================================
-// 🚨 CAPTURA GLOBAL DE ERROS
-// ================================
-process.on('uncaughtException', (err) => {
-    registrarEvento("erro_critico", err.message);
-    console.error("Erro crítico:", err);
-});
+    let banco = [];
 
-process.on('unhandledRejection', (err) => {
-    registrarEvento("erro_async", err);
-    console.error("Erro async:", err);
-});
+    try {
+        banco = JSON.parse(fs.readFileSync(DB_PATH));
+    } catch (e) {
+        return res.status(500).json({ erro: "Falha ao ler banco" });
+    }
 
-// ================================
-// 🚀 START SERVIDOR
-// ================================
-app.listen(PORT, () => {
-    console.log("Servidor rodando na porta " + PORT);
+    // evitar duplicado
+    const existe = banco.find(u => u.cpf === dados.cpf);
+    if (existe) {
+        return res.status(400).json({ erro: "Usuário já cadastrado" });
+    }
+
+    const novo = {
+        id: Date.now(),
+        nome: dados.nome,
+        cpf: dados.cpf,
+        telefone: dados.telefone,
+        endereco: dados.endereco,
+        perfil: dados.perfil,
+        nivel: dados.nivel,
+        documento: dados.documento || null,
+        data: new Date()
+    };
+
+    banco.push(novo);
+
+    try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(banco, null, 2));
+    } catch (e) {
+        return res.status(500).json({ erro: "Falha ao salvar" });
+    }
+
+    res.json({ ok: true });
 });
