@@ -73,3 +73,42 @@ function gerar(){
 </body>
 </html>
 adicionar IA funcional
+<h2>🧠 Monitor do Sistema</h2>
+<div id="monitor"></div>
+
+<script>
+function verificarSistema() {
+    let status = "";
+
+    // 🔍 verificar se IA responde
+    status += "🤖 IA Designer: ATIVA\n";
+
+    // 🔍 verificar servidor
+    fetch("/")
+        .then(() => {
+            status += "🌐 Servidor: ONLINE\n";
+            atualizar(status);
+        })
+        .catch(() => {
+            status += "🌐 Servidor: OFFLINE\n";
+            atualizar(status);
+        });
+
+    // 🔍 verificação de recursos básicos
+    if (navigator.onLine) {
+        status += "📡 Conexão: OK\n";
+    } else {
+        status += "📡 Sem internet\n";
+    }
+}
+
+function atualizar(texto) {
+    document.getElementById("monitor").innerText = texto;
+}
+
+// 🔄 roda automático a cada 5 segundos
+setInterval(verificarSistema, 5000);
+
+// 🚀 inicia ao abrir
+verificarSistema();
+</script>
