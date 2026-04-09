@@ -1,143 +1,27 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #2e7d32;
-    color: white;
-}
-
-/* telas */
-.tela {
-    display: none;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ativa tela */
-.ativa {
-    display: flex;
-}
-
-/* caixa central */
-.box {
-    background: rgba(0,0,0,0.7);
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
-    width: 300px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: none;
-}
-
-button {
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    background: #00c853;
-    color: white;
-    cursor: pointer;
-}
-</style>
-</head>
-
-<body>
-
-<!-- TELA 1: INICIAL -->
-<div id="inicio" class="tela ativa">
-    <div class="box">
-        <h2>🌎 GeoUrban</h2>
-        <p>Sistema ativo e seguro</p>
-        <button onclick="abrirLogin()">Entrar</button>
-    </div>
-</div>
-
-<!-- TELA 2: LOGIN -->
-<div id="login" class="tela">
-    <div class="box">
-        <h3>Login</h3>
-        <input id="usuario" placeholder="Usuário">
-        <input id="senha" type="password" placeholder="Senha">
-        <button onclick="logar()">Acessar</button>
-        <p id="msg"></p>
-    </div>
-</div>
-
-<!-- TELA 3: PAINEL -->
-<div id="painel" class="tela">
-    <div class="box">
-        <h3>✅ Painel</h3>
-        <p id="userInfo"></p>
-        <button onclick="verChave()">Ver chave</button>
-        <button onclick="sair()">Sair</button>
-    </div>
-</div>
-
 <script>
+document.getElementById("entrar").addEventListener("click", function() {
+    const usuario = document.getElementById("usuario").value;
+    const senha = document.getElementById("senha").value;
+    const mensagem = document.getElementById("mensagem");
 
-// trocar tela
-function mostrar(id){
-    document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
-    document.getElementById(id).classList.add("ativa");
-}
+    if(usuario === "Admin" && senha === "1234") {
 
-// abrir login
-function abrirLogin(){
-    mostrar("login");
-}
-
-// login
-function logar(){
-    const user = document.getElementById("usuario").value;
-    const pass = document.getElementById("senha").value;
-    const msg = document.getElementById("msg");
-
-    if(user === "Admin" && pass === "1234"){
-        localStorage.setItem("usuario", user);
+        // ✅ SALVA ACESSO
+        localStorage.setItem("usuario", usuario);
+        localStorage.setItem("acesso_emergencia", "true");
         localStorage.setItem("chave", "geo123");
 
-        document.getElementById("userInfo").innerText = "Usuário: " + user;
-        mostrar("painel");
+        mensagem.style.color = "#00ff00";
+        mensagem.innerText = "✅ Acesso liberado! Redirecionando...";
+
+        // 🚀 REDIRECIONA PARA SISTEMA
+        setTimeout(() => {
+            window.location.href = "/";
+        }, 1000);
+
     } else {
-        msg.innerText = "❌ Login incorreto";
+        mensagem.style.color = "#ff5555";
+        mensagem.innerText = "❌ Usuário ou senha incorretos!";
     }
-}
-
-// ver chave
-function verChave(){
-    alert("Chave: " + localStorage.getItem("chave"));
-}
-
-// sair
-function sair(){
-    localStorage.clear();
-    mostrar("inicio");
-}
-
-// auto login (se já entrou)
-window.onload = () => {
-    const user = localStorage.getItem("usuario");
-    if(user){
-        document.getElementById("userInfo").innerText = "Usuário: " + user;
-        mostrar("painel");
-    }
-}
-
+});
 </script>
-
-</body>
-</html>
