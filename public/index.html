@@ -12,8 +12,8 @@ body {
     font-family: Arial, sans-serif;
     height: 100vh;
 
-    /* 🔥 FUNDO CORRETO */
-    background: url("/geo.jpg") no-repeat center center;
+    /* ✅ FUNDO FUNCIONANDO */
+    background: url("geo.jpg") no-repeat center center;
     background-size: cover;
 
     display: flex;
@@ -21,29 +21,28 @@ body {
     justify-content: center;
 }
 
-/* 🔲 CAIXA CENTRAL */
+/* ✅ CAIXA AJUSTADA (não bloqueia a imagem) */
 .container {
-    background: rgba(0,0,0,0.65);
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(8px);
     padding: 40px;
     border-radius: 15px;
     text-align: center;
     color: white;
-    backdrop-filter: blur(6px);
 }
 
-/* 🚀 TÍTULO */
+/* ✅ TEXTO */
 h1 {
     font-size: 32px;
     margin-bottom: 10px;
 }
 
-/* 📄 TEXTO */
 p {
     margin-bottom: 20px;
     opacity: 0.9;
 }
 
-/* 🟢 BOTÃO */
+/* ✅ BOTÃO */
 button {
     padding: 12px 25px;
     border: none;
