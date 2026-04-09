@@ -1,22 +1,31 @@
 const express = require("express");
 const path = require("path");
-const helmet = require("helmet");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🔐 segurança básica
-app.use(helmet());
-
-// 📁 servir arquivos da pasta public
+// 🔥 SERVE ARQUIVOS
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🌐 rota principal
+// 🔥 ROTA PRINCIPAL
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 🚀 iniciar servidor
+// 🔥 ROTA IA
+app.get("/ia", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "ia.html"));
+});
+
+// 🔥 PROTEÇÃO DE ERRO
+process.on("uncaughtException", (err) => {
+  console.error("Erro capturado:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("Erro promessa:", err);
+});
+
 app.listen(PORT, () => {
-  console.log("GeoUrban rodando na porta " + PORT);
+  console.log("Servidor rodando na porta " + PORT);
 });
