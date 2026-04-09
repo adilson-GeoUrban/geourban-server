@@ -1,1 +1,41 @@
-res.sendFile(path.join(__dirname, "public", "ia_novo.html"));
+// server.js - GeoUrban Unificado
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// Middleware para arquivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
+
+// Endpoint principal - envia ia.html novo
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "ia_novo.html"));
+});
+
+// Backup simples antes de qualquer alteração
+function criarBackup() {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const backupFile = path.join(__dirname, `BACKUP_GeoUrban_${timestamp}.tar.gz`);
+    const { execSync } = require("child_process");
+    execSync(`tar -czvf ${backupFile} ./public ./server.js`);
+    console.log(`✅ Backup criado: ${backupFile}`);
+}
+
+// Rota para forçar backup e reinício (usável com autenticação futura)
+app.get("/admin/backup-restart", (req, res) => {
+    criarBackup();
+    res.send("Backup criado com sucesso. Reinicie o servidor para aplicar alterações.");
+});
+
+// Middleware básico de log (pode evoluir para auditoria completa)
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
+// Servidor
+app.listen(PORT, () => {
+    console.log(`🚀 GeoUrban rodando na porta ${PORT}`);
+    console.log(`📂 Acesse: http://localhost:${PORT}/ ou https://seu-dominio.onrender.com/`);
+});
