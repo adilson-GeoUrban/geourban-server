@@ -1,136 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0d0d0d;
-    color: white;
-}
-
-.tela { display: none; padding: 30px; }
-.ativa { display: block; }
-
-button {
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background: #00c853;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-.card {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 600px;
-    margin: auto;
-}
-</style>
-</head>
-
-<body>
-
-<!-- 🔐 LOGIN -->
-<div id="login" class="tela ativa">
-  <div class="card">
-    <h2>🔒 GeoUrban</h2>
-    <p>Sua segurança é prioridade.</p>
-    <input placeholder="Usuário">
-    <input type="password" placeholder="Senha">
-    <button onclick="trocarTela('atendimento')">Entrar</button>
-  </div>
-</div>
-
-<!-- 🤝 ATENDIMENTO -->
-<div id="atendimento" class="tela">
-  <div class="card">
-    <h2>🤝 Atendimento</h2>
-    <p>Você possui alguma limitação?</p>
-    <select id="limitacao">
-      <option>Não possuo</option>
-      <option>Visual</option>
-      <option>Auditiva</option>
-      <option>Motora</option>
-    </select>
-    <button onclick="trocarTela('contexto')">Continuar</button>
-  </div>
-</div>
-
-<!-- 🌱 CONTEXTO -->
-<div id="contexto" class="tela">
-  <div class="card">
-    <h2>🌱 Sobre</h2>
-    <p>Plataforma em desenvolvimento. Sua opinião é essencial.</p>
-    <button onclick="trocarTela('cadastro')">Continuar</button>
-  </div>
-</div>
-
-<!-- 📝 CADASTRO -->
-<div id="cadastro" class="tela">
-  <div class="card">
-    <h2>📝 Cadastro</h2>
-    <input placeholder="Nome">
-    <input placeholder="Email">
-    <button onclick="iniciarIA()">Finalizar</button>
-  </div>
-</div>
-
-<!-- 🤖 IA GEOURBAN -->
-<div id="ia" class="tela">
-  <div class="card">
-
-    <h2>🤖 IA GeoUrban</h2>
-
-    <textarea id="entrada" placeholder="Descreva seu projeto..."></textarea>
-
-    <button onclick="gerar()">Gerar Conteúdo</button>
-
-    <div id="resposta" style="margin-top:15px;"></div>
-
-    <hr>
-
-    <h3>🧠 Monitor do Sistema</h3>
-    <p>IA: ATIVA</p>
-    <p>Servidor: OK</p>
-    <p>Motor: OPERANDO</p>
-
-  </div>
-</div>
-
-<script>
-function trocarTela(id) {
-    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-    document.getElementById(id).classList.add('ativa');
-}
-
-function iniciarIA() {
-    trocarTela('ia');
-}
-
 function gerar() {
-    const texto = document.getElementById("entrada").value;
+    const texto = document.getElementById("entrada").value.toLowerCase();
 
-    document.getElementById("resposta").innerHTML =
-        "📊 Projeto recebido:<br><br>" +
-        texto +
-        "<br><br>✅ Análise inicial gerada com sucesso.";
+    let resposta = "";
+
+    // 🧠 IA DESIGNER - ANÁLISE
+    if (texto.includes("regularizar") || texto.includes("terreno")) {
+        resposta = `
+        📊 ANÁLISE URBANA:
+
+        ✔ Identificado: processo de regularização
+        ✔ Ação recomendada:
+        - Levantamento documental
+        - Verificação zoneamento
+        - Consulta prefeitura
+
+        ⚠️ Risco:
+        - área irregular ou restrição legal
+
+        💡 Sugestão:
+        iniciar diagnóstico técnico completo.
+        `;
+    }
+
+    else if (texto.includes("empresa") || texto.includes("negócio")) {
+        resposta = `
+        📊 ANÁLISE EMPRESARIAL:
+
+        ✔ Estrutura de negócio identificada
+        ✔ Recomendado:
+        - Plano financeiro
+        - Regularização fiscal
+        - Estratégia de crescimento
+
+        💡 IA recomenda iniciar planejamento estratégico.
+        `;
+    }
+
+    else {
+        resposta = `
+        🤖 IA GeoUrban ativa:
+
+        ✔ Projeto recebido
+        ✔ Iniciando análise inteligente
+
+        💡 Sugestão:
+        forneça mais detalhes para análise avançada.
+        `;
+    }
+
+    document.getElementById("resposta").innerHTML = resposta;
 }
-</script>
-
-</body>
-</html>
