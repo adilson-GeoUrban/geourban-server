@@ -1,19 +1,35 @@
-<div id="login" class="tela ativa">
-  <div class="card">
-    <h2>🔐 GeoUrban - Acesso Seguro</h2>
-    <input id="chave" placeholder="Digite sua chave do soberano">
-    <button onclick="entrar()">Entrar</button>
-    <p id="mensagem"></p>
-  </div>
-</div>
+let CHAVE = "A9x#72!GeoUrban@Rei2026";
+let IAs = { Designer:true, Juridica:true };
 
-<div id="painel" class="tela">
-  <div class="card">
-    <h2>👑 Painel Interativo</h2>
-    <pre id="statusIA"></pre>
-    <button onclick="toggleIA('Designer')">Ativar/Desativar Designer</button>
-    <button onclick="toggleIA('Jurídica')">Ativar/Desativar Jurídica</button>
-    <button onclick="verLogs()">📜 Ver Logs</button>
-    <button onclick="abrirSalaSecreta()">🔐 Sala Secreta</button>
-  </div>
-</div>
+function entrar(){
+  const valor = document.getElementById("chave").value;
+  if(valor === CHAVE){
+    document.getElementById("login").classList.remove("ativa");
+    document.getElementById("painel").classList.add("ativa");
+    atualizarStatus();
+    document.getElementById("mensagem").innerText = "";
+  } else {
+    document.getElementById("mensagem").innerText = "🚫 Chave incorreta!";
+  }
+}
+
+function atualizarStatus(){
+  let txt = "";
+  for(let ia in IAs){
+    txt += ia + ": " + (IAs[ia] ? "ATIVA" : "DESATIVADA") + "\n";
+  }
+  document.getElementById("statusIA").innerText = txt;
+}
+
+function toggleIA(nome){
+  IAs[nome] = !IAs[nome];
+  atualizarStatus();
+}
+
+function verLogs(){
+  alert("Logs simulados: todas as ações monitoradas!");
+}
+
+function abrirSalaSecreta(){
+  alert("Sala secreta aberta: acesso exclusivo ao soberano");
+}
