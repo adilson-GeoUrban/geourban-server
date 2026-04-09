@@ -1,11 +1,62 @@
-1. Mensagem do commit:
-🔒 correção tela branca + ajuste index (seguro)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoUrban</title>
 
-2. Marcar opção:
-✔ Criar uma nova ramificação para este commit e iniciar um pull request
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg, #1b5e20, #4caf50);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
 
-3. Nome da branch:
-correcao-tela-branca
+    .box {
+      background: rgba(0,0,0,0.3);
+      padding: 30px;
+      border-radius: 12px;
+    }
 
-4. Clicar:
-👉 Propor alterações
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #00e676;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00c853;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>🌍 GeoUrban</h1>
+    <p>Sistema ativo e seguro</p>
+
+    <button onclick="entrar()">Entrar</button>
+  </div>
+
+  <script>
+    function entrar() {
+      alert("Sistema funcionando ✅");
+    }
+  </script>
+
+</body>
+</html>
