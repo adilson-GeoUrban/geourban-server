@@ -1,28 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #1b5e20, #4caf50);
+    color: white;
+}
+
+/* TELAS */
+.tela {
+    display: none;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.ativa {
+    display: flex;
+}
+
+/* CARD */
+.card {
+    background: rgba(0,0,0,0.7);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 300px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+/* BOTÃO */
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #00c853;
+    color: white;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TELA INICIAL -->
 <div id="inicio" class="tela ativa">
-    <div class="box">
+    <div class="card">
         <h2>🌎 GeoUrban</h2>
-        <p>Sistema ativo</p>
-
-        <button onclick="acaoRapida()">🔐 Ativar Acesso</button>
-        <button onclick="verStatus()">📊 Ver Status</button>
-
-        <p id="resposta"></p>
+        <p>Sistema ativo e seguro</p>
+        <button onclick="abrirLogin()">Entrar</button>
     </div>
 </div>
-function acaoRapida(){
-    // ativa sistema direto
-    localStorage.setItem("usuario", "Admin");
-    localStorage.setItem("chave", "geo123");
 
-    document.getElementById("resposta").innerText = "✅ Acesso ativado";
+<!-- LOGIN -->
+<div id="login" class="tela">
+    <div class="card">
+        <h3>Login</h3>
+        <input type="text" id="usuario" placeholder="Admin">
+        <input type="password" id="senha" placeholder="1234">
+        <button onclick="logar()">Acessar</button>
+        <p id="msg"></p>
+    </div>
+</div>
+
+<!-- PAINEL -->
+<div id="painel" class="tela">
+    <div class="card">
+        <h2>✅ Painel</h2>
+        <p id="user"></p>
+        <button onclick="logout()">Sair</button>
+    </div>
+</div>
+
+<script>
+
+// 🔓 ABRIR LOGIN
+function abrirLogin() {
+    document.getElementById("inicio").classList.remove("ativa");
+    document.getElementById("login").classList.add("ativa");
 }
 
-function verStatus(){
-    const user = localStorage.getItem("usuario");
+// 🔐 LOGIN
+function logar() {
+    const u = document.getElementById("usuario").value;
+    const s = document.getElementById("senha").value;
 
-    if(user){
-        document.getElementById("resposta").innerText = "👤 Logado: " + user;
+    if (u === "Admin" && s === "1234") {
+
+        // salva sessão
+        localStorage.setItem("logado", "true");
+        localStorage.setItem("usuario", u);
+
+        abrirPainel();
+
     } else {
-        document.getElementById("resposta").innerText = "❌ Sem acesso";
+        document.getElementById("msg").innerText = "❌ Dados incorretos";
     }
 }
+
+// 📊 PAINEL
+function abrirPainel() {
+    document.getElementById("login").classList.remove("ativa");
+    document.getElementById("painel").classList.add("ativa");
+
+    document.getElementById("user").innerText =
+        "Bem-vindo: " + localStorage.getItem("usuario");
+}
+
+// 🚪 LOGOUT
+function logout() {
+    localStorage.clear();
+    location.reload();
+}
+
+// 🔁 AUTO LOGIN (se já entrou antes)
+if (localStorage.getItem("logado") === "true") {
+    document.getElementById("inicio").classList.remove("ativa");
+    abrirPainel();
+}
+
+</script>
+
+</body>
+</html>
