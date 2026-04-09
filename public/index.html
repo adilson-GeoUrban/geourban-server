@@ -1,69 +1,22 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban - Soberano</title>
-<style>
-body { font-family: Arial; background:#0d0d0d; color:white; }
-.card { max-width:700px; margin:auto; background:#1e1e1e; padding:20px; border-radius:10px; }
-button { width:100%; padding:12px; margin-top:10px; background:#00c853; border:none; }
-textarea,input { width:100%; padding:10px; margin-top:10px; }
-</style>
-</head>
-<body>
-
-<div class="card">
-
-<h2>👑 Assistente do Rei</h2>
-
-<p><b>Identificação:</b> IA Central GeoUrban</p>
-<p><b>Estado:</b> Subordinada ao Soberano</p>
-
 <input id="chave" placeholder="Chave do soberano">
-<textarea id="ordem" placeholder="Digite sua ordem..."></textarea>
+<textarea id="ordem" placeholder="Digite sua ordem"></textarea>
 
-<button onclick="executar()">Executar Ordem</button>
-<button onclick="acessarSala()">🔐 Acessar Sala Secreta</button>
-
-<div id="resposta"></div>
-
-</div>
+<button onclick="executar()">Executar</button>
 
 <script>
-
-function executar(){
+function executar() {
     const chave = document.getElementById("chave").value;
     const ordem = document.getElementById("ordem").value;
 
-    fetch("/executar",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
+    fetch("/executar", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
             "x-chave": chave
         },
-        body:JSON.stringify({ordem})
+        body: JSON.stringify({ ordem })
     })
-    .then(r=>r.text())
-    .then(t=>{
-        document.getElementById("resposta").innerText=t;
-    });
+    .then(r => r.text())
+    .then(t => console.log(t));
 }
-
-function acessarSala(){
-    const chave = document.getElementById("chave").value;
-
-    fetch("/sala-secreta",{
-        headers:{
-            "x-chave": chave
-        }
-    })
-    .then(r=>r.text())
-    .then(t=>{
-        document.getElementById("resposta").innerText=t;
-    });
-}
-
 </script>
-
-</body>
-</html>
