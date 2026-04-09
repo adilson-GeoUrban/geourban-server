@@ -2,127 +2,114 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IA GeoUrban</title>
+<title>GeoUrban</title>
 
 <style>
 body {
-    background: #0f0f0f;
-    color: white;
-    font-family: Arial;
-    text-align: center;
-    padding: 20px;
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  text-align:center;
 }
 
-textarea {
-    width: 90%;
-    height: 120px;
-    padding: 10px;
-    border-radius: 10px;
+.card {
+  background:#1e293b;
+  padding:20px;
+  margin:20px auto;
+  width:300px;
+  border-radius:10px;
 }
 
 button {
-    margin-top: 15px;
-    padding: 15px;
-    width: 90%;
-    background: #00e676;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.resultado {
-    margin-top: 20px;
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left;
-    white-space: pre-line;
+  margin:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:5px;
+  background:#22c55e;
+  color:white;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🤖 IA GeoUrban</h1>
+<div id="login" class="card">
+<h2>🔐 GeoUrban</h2>
 
-<textarea id="entrada" placeholder="Descreva seu projeto..."></textarea>
+<button onclick="loginPadrao()">Entrar</button>
 
-<button onclick="gerar()">Gerar Conteúdo</button>
+<input id="chave" placeholder="Chave soberana">
+<button onclick="loginSoberano()">👑 Soberano</button>
 
-<div id="saida" class="resultado"></div>
+<p id="msg"></p>
+</div>
 
-<h2>🧠 Monitor do Sistema</h2>
-<div id="monitor" class="resultado"></div>
+<div id="painel" class="card" style="display:none;">
+<h2>🏢 Painel</h2>
+
+<textarea id="ordem" placeholder="Digite ordem"></textarea>
+
+<button onclick="executar()">Executar</button>
+<button onclick="sala()">Sala Secreta</button>
+
+<p id="resposta"></p>
+</div>
 
 <script>
+let TOKEN = null;
 
-// 🔥 IA DESIGNER
-function gerar() {
-    const texto = document.getElementById("entrada").value.toLowerCase();
-    let resposta = "";
-
-    if (texto.includes("pdf")) {
-        resposta = "📄 GERADOR DE PDF\n\n- Capa\n- Conteúdo\n- Conclusão";
-    }
-    else if (texto.includes("guia")) {
-        resposta = "📘 GUIA\n\n1. Planejar\n2. Executar\n3. Validar";
-    }
-    else if (texto.includes("video")) {
-        resposta = "🎥 ROTEIRO\n\n- Abertura\n- Conteúdo\n- Final";
-    }
-    else {
-        resposta = "🤖 IA ativa\nSugestão: use PDF, guia ou vídeo";
-    }
-
-    document.getElementById("saida").innerText = resposta;
+function loginPadrao(){
+  fetch("/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ tipo:"padrao" })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    TOKEN = d.token;
+    document.getElementById("login").style.display="none";
+    document.getElementById("painel").style.display="block";
+  });
 }
 
-// 🔔 ALERTA
-function alertaSistema(status) {
-    if (status.includes("ERRO") || status.includes("OFFLINE")) {
-        alert("⚠️ Sistema com problema!");
-    }
+function loginSoberano(){
+  const chave = document.getElementById("chave").value;
+
+  fetch("/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ tipo:"soberano", chave })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    TOKEN = d.token;
+    document.getElementById("login").style.display="none";
+    document.getElementById("painel").style.display="block";
+  });
 }
 
-// 🔄 ATUALIZA MONITOR
-function atualizar(texto) {
-    document.getElementById("monitor").innerText = texto;
-    alertaSistema(texto);
+function executar(){
+  fetch("/executar",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-token": TOKEN
+    },
+    body: JSON.stringify({ ordem: document.getElementById("ordem").value })
+  })
+  .then(r=>r.text())
+  .then(t=>document.getElementById("resposta").innerText=t);
 }
 
-// 🔍 VERIFICA SISTEMA
-function verificarSistema() {
-    let status = "";
-
-    status += "🤖 IA: ATIVA\n";
-
-    if (navigator.onLine) {
-        status += "📡 Internet: ONLINE\n";
-    } else {
-        status += "📡 Internet: OFFLINE\n";
-    }
-
-    fetch("/")
-        .then(() => {
-            status += "🌐 Servidor: OK\n";
-            status += "⚙️ Motor: OPERANDO\n";
-            atualizar(status);
-        })
-        .catch(() => {
-            status += "🌐 Servidor: ERRO\n";
-            status += "⚙️ Motor: PARADO\n";
-            atualizar(status);
-        });
+function sala(){
+  fetch("/sala-secreta",{
+    headers:{ "x-token": TOKEN }
+  })
+  .then(r=>r.text())
+  .then(t=>document.getElementById("resposta").innerText=t);
 }
-
-// 🔁 LOOP AUTOMÁTICO
-setInterval(verificarSistema, 5000);
-
-// 🚀 INICIAR
-verificarSistema();
-
 </script>
 
 </body>
