@@ -7,40 +7,38 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: #121212;
+    background: #0f0f0f;
     color: white;
+    font-family: Arial;
+    text-align: center;
     padding: 20px;
 }
 
-h1 {
-    text-align: center;
-}
-
 textarea {
-    width: 100%;
+    width: 90%;
     height: 120px;
-    border-radius: 8px;
     padding: 10px;
-    font-size: 16px;
+    border-radius: 10px;
 }
 
 button {
-    margin-top: 10px;
-    padding: 12px;
-    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    width: 90%;
     background: #00e676;
     border: none;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 10px;
+    font-size: 16px;
     cursor: pointer;
 }
 
 .resultado {
     margin-top: 20px;
     background: #1e1e1e;
-    padding: 15px;
+    padding: 20px;
     border-radius: 10px;
+    text-align: left;
+    white-space: pre-line;
 }
 </style>
 </head>
@@ -51,96 +49,81 @@ button {
 
 <textarea id="entrada" placeholder="Descreva seu projeto..."></textarea>
 
-<button onclick="gerar()">Gerar Projeto</button>
+<button onclick="gerar()">Gerar Conteúdo</button>
 
-<div class="resultado" id="saida">
-Aguardando comando...
-</div>
+<div id="saida" class="resultado"></div>
 
-<script>
-function gerar(){
-    let texto = document.getElementById("entrada").value;
-
-    document.getElementById("saida").innerHTML =
-    "✔️ Projeto analisado<br><br>" +
-    "📌 Descrição: " + texto + "<br><br>" +
-    "🏗️ Estrutura sugerida:<br>" +
-    "- Frontend<br>- Backend<br>- Banco de dados<br><br>" +
-    "🚀 Pronto para desenvolvimento";
-}
-</script>
-
-</body>
-</html>
-adicionar IA funcional
 <h2>🧠 Monitor do Sistema</h2>
-<div id="monitor"></div>
+<div id="monitor" class="resultado"></div>
 
 <script>
-function verificarSistema() {
-    let status = "";
 
-    // 🔍 verificar se IA responde
-    status += "🤖 IA Designer: ATIVA\n";
+// 🔥 IA DESIGNER
+function gerar() {
+    const texto = document.getElementById("entrada").value.toLowerCase();
+    let resposta = "";
 
-    // 🔍 verificar servidor
-    fetch("/")
-        .then(() => {
-            status += "🌐 Servidor: ONLINE\n";
-            atualizar(status);
-        })
-        .catch(() => {
-            status += "🌐 Servidor: OFFLINE\n";
-            atualizar(status);
-        });
+    if (texto.includes("pdf")) {
+        resposta = "📄 GERADOR DE PDF\n\n- Capa\n- Conteúdo\n- Conclusão";
+    }
+    else if (texto.includes("guia")) {
+        resposta = "📘 GUIA\n\n1. Planejar\n2. Executar\n3. Validar";
+    }
+    else if (texto.includes("video")) {
+        resposta = "🎥 ROTEIRO\n\n- Abertura\n- Conteúdo\n- Final";
+    }
+    else {
+        resposta = "🤖 IA ativa\nSugestão: use PDF, guia ou vídeo";
+    }
 
-    // 🔍 verificação de recursos básicos
-    if (navigator.onLine) {
-        status += "📡 Conexão: OK\n";
-    } else {
-        status += "📡 Sem internet\n";
+    document.getElementById("saida").innerText = resposta;
+}
+
+// 🔔 ALERTA
+function alertaSistema(status) {
+    if (status.includes("ERRO") || status.includes("OFFLINE")) {
+        alert("⚠️ Sistema com problema!");
     }
 }
 
+// 🔄 ATUALIZA MONITOR
 function atualizar(texto) {
     document.getElementById("monitor").innerText = texto;
+    alertaSistema(texto);
 }
 
-// 🔄 roda automático a cada 5 segundos
-setInterval(verificarSistema, 5000);
-
-// 🚀 inicia ao abrir
-verificarSistema();
-</script>
+// 🔍 VERIFICA SISTEMA
 function verificarSistema() {
     let status = "";
 
-    // 🤖 IA
-    status += "🤖 IA Designer: ATIVA\n";
+    status += "🤖 IA: ATIVA\n";
 
-    // 📡 Internet
     if (navigator.onLine) {
-        status += "📡 Conexão: ONLINE\n";
+        status += "📡 Internet: ONLINE\n";
     } else {
-        status += "📡 Conexão: OFFLINE\n";
+        status += "📡 Internet: OFFLINE\n";
     }
 
-    // 🌐 Servidor (teste real)
     fetch("/")
         .then(() => {
             status += "🌐 Servidor: OK\n";
+            status += "⚙️ Motor: OPERANDO\n";
             atualizar(status);
         })
         .catch(() => {
             status += "🌐 Servidor: ERRO\n";
+            status += "⚙️ Motor: PARADO\n";
             atualizar(status);
         });
+}
 
-    // 🧠 Sistema
-    status += "⚙️ Motor IA: OPERANDO\n";
-}
-function alertaSistema(status) {
-    if (status.includes("ERRO") || status.includes("OFFLINE")) {
-        alert("⚠️ Atenção: Sistema com problema!");
-    }
-}
+// 🔁 LOOP AUTOMÁTICO
+setInterval(verificarSistema, 5000);
+
+// 🚀 INICIAR
+verificarSistema();
+
+</script>
+
+</body>
+</html>
