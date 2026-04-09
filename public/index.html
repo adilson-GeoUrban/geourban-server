@@ -2,70 +2,141 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Painel GeoUrban</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
 
 <style>
 body {
+    margin: 0;
     font-family: Arial;
-    background: #111;
-    color: #0f0;
-    padding: 20px;
+    background: linear-gradient(135deg, #1b5e20, #4caf50);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.box {
-    background: #000;
-    padding: 15px;
-    margin: 10px 0;
-    border: 1px solid #0f0;
+/* CARD */
+.card {
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 300px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+/* BOTÃO */
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #00c853;
+    color: white;
+    cursor: pointer;
+}
+
+/* ESCONDER */
+.hidden {
+    display: none;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🧠 IA DESIGNER — PAINEL ATIVO</h2>
-
-<div class="box">
-    👤 Usuário: <span id="user"></span>
+<!-- TELA INICIAL -->
+<div id="inicio" class="card">
+    <h2>🌍 GeoUrban</h2>
+    <p>Sistema ativo e seguro</p>
+    <button onclick="abrirLogin()">Entrar</button>
 </div>
 
-<div class="box">
-    📡 Status do sistema: <span id="status">carregando...</span>
+<!-- LOGIN -->
+<div id="login" class="card hidden">
+    <h3>Login</h3>
+
+    <input type="text" id="usuario" placeholder="Usuário">
+    <input type="password" id="senha" placeholder="Senha">
+
+    <button onclick="logar()">Acessar</button>
+
+    <p id="msg"></p>
 </div>
 
-<div class="box">
-    📜 Histórico IA:
-    <pre id="historico"></pre>
+<!-- PAINEL -->
+<div id="painel" class="card hidden">
+    <h3>Bem-vindo</h3>
+    <p id="userLogado"></p>
+
+    <button onclick="verChave()">Ver chave</button>
+    <button onclick="sair()">Sair</button>
 </div>
 
 <script>
 
-// 🔐 PROTEÇÃO
-if(localStorage.getItem("logado") !== "true") {
-    window.location.href = "/";
+// ABRIR LOGIN
+function abrirLogin(){
+    document.getElementById("inicio").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
 }
 
-// 👤 MOSTRA USUÁRIO
-document.getElementById("user").innerText = localStorage.getItem("usuario");
+// LOGIN
+function logar(){
+    const user = document.getElementById("usuario").value;
+    const pass = document.getElementById("senha").value;
+    const msg = document.getElementById("msg");
 
-// 🔁 IA DESIGNER (VISÍVEL)
-async function atualizar() {
+    if(user === "Admin" && pass === "1234"){
 
-    try {
-        const status = await fetch("/ia/status").then(r => r.json());
-        document.getElementById("status").innerText = status.status;
+        // 🔐 SALVA ACESSO
+        localStorage.setItem("usuario", user);
+        localStorage.setItem("chave", "geo123");
+        localStorage.setItem("acesso", "true");
 
-        const hist = await fetch("/ia/historico").then(r => r.json());
-        document.getElementById("historico").innerText = JSON.stringify(hist, null, 2);
+        entrarSistema();
 
-    } catch (e) {
-        document.getElementById("status").innerText = "erro";
+    } else {
+        msg.innerText = "❌ Dados incorretos";
+        msg.style.color = "red";
     }
-
 }
 
-// 🔄 LOOP CONTROLADO (IA EM AÇÃO)
-setInterval(atualizar, 3000);
+// ENTRA NO SISTEMA
+function entrarSistema(){
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("painel").classList.remove("hidden");
+
+    const user = localStorage.getItem("usuario");
+    document.getElementById("userLogado").innerText = "Usuário: " + user;
+}
+
+// VER CHAVE
+function verChave(){
+    alert("Chave: " + localStorage.getItem("chave"));
+}
+
+// SAIR
+function sair(){
+    localStorage.clear();
+    location.reload();
+}
+
+// AUTO LOGIN
+if(localStorage.getItem("acesso") === "true"){
+    document.getElementById("inicio").classList.add("hidden");
+    entrarSistema();
+}
 
 </script>
 
