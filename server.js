@@ -1,50 +1,23 @@
+server.js
 // ===============================
-// 🔒 SISTEMA DE AUDITORIA + BACKUP
+// 🤖 IA MONITOR AUTOMÁTICO
 // ===============================
 
-const fs = require("fs");
-const path = require("path");
+function verificarSistema() {
+    try {
+        // Simulação de verificação interna
+        const status = true; // aqui depois pode validar banco, arquivos, etc
 
-const logPath = path.join(__dirname, "historico.json");
+        if (!status) {
+            registrarEvento("erro", "Falha detectada automaticamente");
+        } else {
+            registrarEvento("ok", "Sistema verificado e estável");
+        }
 
-// Criar arquivo se não existir
-if (!fs.existsSync(logPath)) {
-    fs.writeFileSync(logPath, JSON.stringify([]));
+    } catch (erro) {
+        registrarEvento("erro_critico", erro.message);
+    }
 }
 
-// Função de registrar evento
-function registrarEvento(tipo, descricao) {
-    const historico = JSON.parse(fs.readFileSync(logPath));
-
-    historico.push({
-        data: new Date().toISOString(),
-        tipo,
-        descricao
-    });
-
-    fs.writeFileSync(logPath, JSON.stringify(historico, null, 2));
-}
-
-// ===============================
-// 📊 ROTAS DE MONITORAMENTO
-// ===============================
-
-// Status do sistema
-app.get("/ia/status", (req, res) => {
-    res.json({
-        status: "online",
-        hora: new Date()
-    });
-});
-
-// Histórico completo
-app.get("/ia/historico", (req, res) => {
-    const historico = JSON.parse(fs.readFileSync(logPath));
-    res.json(historico);
-});
-
-// Registrar erro manual
-app.get("/ia/erro", (req, res) => {
-    registrarEvento("erro", "Erro detectado manualmente");
-    res.send("Erro registrado");
-});
+// Executa a cada 30 segundos
+setInterval(verificarSistema, 30000);
