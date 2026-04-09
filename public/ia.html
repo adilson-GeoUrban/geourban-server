@@ -139,3 +139,8 @@ function verificarSistema() {
     // 🧠 Sistema
     status += "⚙️ Motor IA: OPERANDO\n";
 }
+function alertaSistema(status) {
+    if (status.includes("ERRO") || status.includes("OFFLINE")) {
+        alert("⚠️ Atenção: Sistema com problema!");
+    }
+}
