@@ -1,1 +1,91 @@
-alert("Sistema
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #2e7d32;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.box {
+    background: rgba(0,0,0,0.8);
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #00c853;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>🌎 GeoUrban</h2>
+
+    <input id="usuario" placeholder="Admin">
+    <input id="senha" type="password" placeholder="1234">
+
+    <button id="btn">ENTRAR</button>
+
+    <p id="msg"></p>
+
+</div>
+
+<script>
+
+// CLIQUE DIRETO (SEM BUG)
+document.getElementById("btn").onclick = function(){
+
+    var u = document.getElementById("usuario").value;
+    var s = document.getElementById("senha").value;
+
+    if(u === "Admin" && s === "1234"){
+
+        // SALVA ACESSO
+        localStorage.setItem("logado", "true");
+
+        document.getElementById("msg").innerText = "✅ Entrando...";
+
+        // REDIRECIONA
+        setTimeout(function(){
+            window.location.href = "/";
+        }, 500);
+
+    } else {
+        document.getElementById("msg").innerText = "❌ Erro";
+    }
+
+};
+</script>
+
+</body>
+</html>
