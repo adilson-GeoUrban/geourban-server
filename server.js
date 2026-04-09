@@ -1,4 +1,3 @@
-
 const express = require("express");
 const path = require("path");
 
@@ -7,12 +6,26 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// SERVIR PUBLIC
+// servir pasta public
 app.use(express.static(path.join(__dirname, "public")));
 
-// ROTA PRINCIPAL
+// rota principal -> abre ia.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
+  res.sendFile(path.join(__dirname, "public", "ia.html"));
+});
+
+// rotas básicas
+app.post("/login", (req, res) => {
+  res.json({ token: "ok" });
+});
+
+app.post("/executar", (req, res) => {
+  const ordem = req.body?.ordem || "";
+  res.send("Executado: " + ordem);
+});
+
+app.get("/sala-secreta", (req, res) => {
+  res.send("👑 Acesso autorizado");
 });
 
 app.listen(PORT, () => {
