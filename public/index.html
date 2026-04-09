@@ -1,20 +1,54 @@
-geourban-server/
- ├── server.js
- └── public/
-      └── index.html  ← ESSE AQUI (seu código)
-      const express = require("express");
-const path = require("path");
+<script>
+function entrar() {
+    // cria tela de login dinamicamente
+    const tela = document.createElement("div");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+    tela.innerHTML = `
+    <div style="
+        position: fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background: rgba(0,0,0,0.9);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        z-index:99999;
+    ">
+        <div style="
+            background:#111;
+            padding:30px;
+            border-radius:10px;
+            text-align:center;
+            width:300px;
+        ">
+            <h2>Login</h2>
+            <input id="user" placeholder="Usuário" style="width:100%;padding:8px;margin:5px 0;"><br>
+            <input id="pass" type="password" placeholder="Senha" style="width:100%;padding:8px;margin:5px 0;"><br>
+            <button onclick="validarLogin()">Entrar</button>
+            <p id="erro" style="color:red;"></p>
+        </div>
+    </div>
+    `;
 
-// 🔥 SERVE HTML DA PASTA PUBLIC
-app.use(express.static(path.join(__dirname, "public")));
+    document.body.appendChild(tela);
+}
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+// valida login
+function validarLogin() {
+    const u = document.getElementById("user").value;
+    const p = document.getElementById("pass").value;
 
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
-});
+    if (u === "Admin" && p === "1234") {
+        localStorage.setItem("usuario", "admin");
+
+        document.body.innerHTML = `
+        <div style="padding:20px">
+            <h1>Painel Administrativo</h1>
+            <p>Controle total do sistema liberado ✅</p>
+        </div>
+        `;
+    } else {
+        document.getElementById("erro").innerText = "Dados incorretos";
+    }
+}
+</script>
