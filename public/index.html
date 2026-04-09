@@ -9,47 +9,39 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: #0f172a;
+    background: #0d0d0d;
     color: white;
 }
 
-.tela {
-    display: none;
-    padding: 20px;
-    text-align: center;
-}
+/* TELAS */
+.tela { display: none; padding: 30px; }
+.ativa { display: block; }
 
-.ativa {
-    display: block;
-}
-
-input, select, textarea {
-    width: 90%;
-    padding: 12px;
-    margin: 10px;
-    border-radius: 8px;
-    border: none;
-}
-
+/* BOTÕES */
 button {
-    padding: 12px;
-    width: 90%;
-    background: #00e676;
+    padding: 12px 20px;
     border: none;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 6px;
+    background: #00c853;
+    color: white;
     cursor: pointer;
+    margin-top: 15px;
 }
 
-.caixa {
-    background: #1e293b;
+/* INPUT */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+/* CARD */
+.card {
+    background: #1e1e1e;
     padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-}
-
-h1, h2 {
-    margin-bottom: 10px;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: auto;
 }
 </style>
 </head>
@@ -58,110 +50,110 @@ h1, h2 {
 
 <!-- 🔐 LOGIN -->
 <div id="login" class="tela ativa">
-    <h1>🔐 GeoUrban</h1>
-    <p>Acesso seguro</p>
+  <div class="card">
+    <h2>🔒 GeoUrban</h2>
 
-    <input id="usuario" placeholder="Usuário">
-    <input id="senha" type="password" placeholder="Senha">
+    <p>
+      Sua segurança é nossa prioridade.<br>
+      Seus dados são protegidos com padrão avançado.
+    </p>
+
+    <input placeholder="Usuário">
+    <input type="password" placeholder="Senha">
 
     <button onclick="entrar()">Entrar</button>
+  </div>
 </div>
 
-<!-- 🤝 RECEPÇÃO HUMANIZADA -->
-<div id="recepcao" class="tela">
-    <h1>🤝 Bem-vindo</h1>
+<!-- 🤝 ATENDIMENTO -->
+<div id="atendimento" class="tela">
+  <div class="card">
 
-    <div class="caixa">
-        <p>
-        Olá 👋<br><br>
-        É um prazer receber você.<br><br>
-        Antes de iniciarmos, queremos garantir um atendimento confortável.
-        </p>
+    <h2>🤝 Atendimento GeoUrban</h2>
 
-        <h3>Você possui alguma limitação?</h3>
+    <p>
+      Olá, seja muito bem-vindo 👋<br><br>
 
-        <select id="limitacao">
-            <option value="nenhuma">Nenhuma</option>
-            <option value="visual">Visual</option>
-            <option value="auditiva">Auditiva</option>
-            <option value="motora">Motora</option>
-        </select>
+      É um prazer ter você conosco.<br><br>
 
-        <button onclick="continuarAtendimento()">Continuar Atendimento</button>
-    </div>
+      👉 Você possui alguma limitação que devemos considerar?
+    </p>
+
+    <select id="limitacao">
+      <option value="">Selecione</option>
+      <option>Visual</option>
+      <option>Auditiva</option>
+      <option>Motora</option>
+      <option>Outra</option>
+      <option>Não possuo</option>
+    </select>
+
+    <button onclick="continuar()">Continuar</button>
+  </div>
+</div>
+
+<!-- 🌱 CONTEXTO -->
+<div id="contexto" class="tela">
+  <div class="card">
+
+    <h2>🌱 Sobre a Plataforma</h2>
+
+    <p>
+      A GeoUrban está em constante desenvolvimento.<br><br>
+
+      Sua participação é extremamente importante para nós.<br>
+      Suas sugestões ajudam diretamente na evolução da plataforma.<br><br>
+
+      🤝 Ficaremos honrados em ter você como um membro parceiro deste projeto.
+    </p>
+
+    <button onclick="irCadastro()">Continuar</button>
+  </div>
 </div>
 
 <!-- 📝 CADASTRO -->
 <div id="cadastro" class="tela">
-    <h1>📝 Cadastro Inicial</h1>
+  <div class="card">
 
-    <input id="nome" placeholder="Nome completo">
-    <input id="cidade" placeholder="Cidade">
-    <textarea id="descricao" placeholder="Descreva sua necessidade..."></textarea>
+    <h2>📝 Cadastro</h2>
 
-    <button onclick="finalizarCadastro()">Iniciar Atendimento IA</button>
-</div>
+    <p>Vamos iniciar seu atendimento.</p>
 
-<!-- 🤖 REDIRECIONAMENTO -->
-<div id="final" class="tela">
-    <h1>🤖 Atendimento Iniciado</h1>
-    <p>Estamos direcionando você para a IA...</p>
+    <input placeholder="Nome completo">
+    <input placeholder="Email">
+
+    <button onclick="finalizar()">Finalizar Cadastro</button>
+  </div>
 </div>
 
 <script>
-
-// 🔐 LOGIN SIMPLES (pode melhorar depois)
-function entrar() {
-    const user = document.getElementById("usuario").value;
-    const pass = document.getElementById("senha").value;
-
-    if (user && pass) {
-        trocarTela("recepcao");
-    } else {
-        alert("Preencha usuário e senha");
-    }
-}
-
-// 🔁 TROCAR TELA
 function trocarTela(id) {
-    document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
-    document.getElementById(id).classList.add("ativa");
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.getElementById(id).classList.add('ativa');
 }
 
-// 🤝 CONTINUA ATENDIMENTO
-function continuarAtendimento() {
+function entrar() {
+    trocarTela('atendimento');
+}
+
+function continuar() {
     const lim = document.getElementById("limitacao").value;
 
-    // 💾 salva preferência (simples)
-    localStorage.setItem("limitacao", lim);
-
-    trocarTela("cadastro");
-}
-
-// 📝 FINALIZA CADASTRO
-function finalizarCadastro() {
-    const nome = document.getElementById("nome").value;
-    const cidade = document.getElementById("cidade").value;
-    const desc = document.getElementById("descricao").value;
-
-    if (!nome || !cidade || !desc) {
-        alert("Preencha todos os campos");
-        return;
+    // 🧠 adaptação básica
+    if (lim === "Visual") {
+        document.body.style.fontSize = "20px";
     }
 
-    // 💾 salvar dados
-    localStorage.setItem("usuario_nome", nome);
-    localStorage.setItem("usuario_cidade", cidade);
-    localStorage.setItem("usuario_desc", desc);
-
-    trocarTela("final");
-
-    // 🚀 redireciona pra IA
-    setTimeout(() => {
-        window.location.href = "/ia";
-    }, 2000);
+    trocarTela('contexto');
 }
 
+function irCadastro() {
+    trocarTela('cadastro');
+}
+
+function finalizar() {
+    alert("Cadastro realizado com sucesso!");
+}
 </script>
 
 </body>
