@@ -9,4 +9,3 @@ app.post("/login-cert", (req, res) => {
 
     res.status(401).json({ ok: false });
 });
-fetch("/login-cert"
