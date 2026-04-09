@@ -1,119 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban IA</title>
+geourban-server/
+ ├── server.js
+ └── public/
+      └── index.html  ← ESSE AQUI (seu código)
+      const express = require("express");
+const path = require("path");
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: linear-gradient(135deg, #1b5e20, #4caf50);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-/* CARD CENTRAL */
-.card {
-    background: rgba(0,0,0,0.3);
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-}
+// 🔥 SERVE HTML DA PASTA PUBLIC
+app.use(express.static(path.join(__dirname, "public")));
 
-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #00e676;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* PAINEL FLUTUANTE */
-#painel {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #000;
-    color: #0f0;
-    padding: 15px;
-    border-radius: 10px;
-    z-index: 9999;
-    display: none;
-}
-
-#painel button {
-    display: block;
-    width: 100%;
-    margin-top: 5px;
-    background: #222;
-    color: #0f0;
-}
-</style>
-</head>
-
-<body>
-
-<div class="card">
-    <h1>🌍 GeoUrban</h1>
-    <p>Sistema ativo e seguro</p>
-    <button onclick="entrar()">Entrar</button>
-</div>
-
-<!-- 🔥 PAINEL DE CONTROLE -->
-<div id="painel">
-    <b>CONTROLE DO SISTEMA</b>
-    <button onclick="ativarControle()">Ativar Controle</button>
-    <button onclick="forcarLogin()">Forçar Login</button>
-    <button onclick="resetar()">Resetar</button>
-</div>
-
-<script>
-// 🔓 DETECÇÃO DE CONTROLE
-let controle = localStorage.getItem("controle");
-
-// MOSTRAR PAINEL SE JÁ ATIVO
-if (controle === "true") {
-    document.getElementById("painel").style.display = "block";
-}
-
-// BOTÃO ENTRAR
-function entrar() {
-    alert("Sistema funcionando ✅");
-}
-
-// ATIVAR CONTROLE
-function ativarControle() {
-    localStorage.setItem("controle", "true");
-    document.getElementById("painel").style.display = "block";
-    alert("Controle ativado 🔥");
-}
-
-// FORÇAR LOGIN (BYPASS)
-function forcarLogin() {
-    localStorage.setItem("usuario", "admin");
-    alert("Login forçado realizado 🚀");
-}
-
-// RESETAR
-function resetar() {
-    localStorage.clear();
-    location.reload();
-}
-
-// 🔥 ATALHO SECRETO (ativa painel)
-document.addEventListener("keydown", function(e) {
-    if (e.ctrlKey && e.key === "9") {
-        document.getElementById("painel").style.display = "block";
-        alert("Painel liberado ⚡");
-    }
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-</script>
 
-</body>
-</html>
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
