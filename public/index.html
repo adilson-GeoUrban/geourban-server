@@ -1,14 +1,78 @@
-<div id="login" class="tela ativa">
-  <div class="card">
+<div class="card">
 
-    <h2>🔐 GeoUrban - Acesso Seguro</h2>
+<h2>🔐 GeoUrban</h2>
 
-    <p>Escolha o tipo de acesso:</p>
+<button onclick="loginPadrao()">Entrar (Padrão)</button>
 
-    <button onclick="loginSimples()">🔑 Acesso Padrão</button>
-    <button onclick="loginCertificado()">💳 Certificado Digital (A3)</button>
+<input id="chave" placeholder="Chave soberana">
+<button onclick="loginSoberano()">👑 Entrar como Soberano</button>
 
-    <p id="msgLogin"></p>
+<hr>
 
-  </div>
+<textarea id="ordem" placeholder="Digite ordem"></textarea>
+<button onclick="executar()">Executar</button>
+
+<button onclick="sala()">🔐 Sala Secreta</button>
+
+<div id="resposta"></div>
+
 </div>
+
+<script>
+
+let TOKEN = null;
+
+// LOGIN PADRÃO
+function loginPadrao(){
+  fetch("/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ tipo:"padrao" })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    TOKEN = d.token;
+    document.getElementById("resposta").innerText="✔ Logado como usuário";
+  });
+}
+
+// LOGIN SOBERANO
+function loginSoberano(){
+  const chave = document.getElementById("chave").value;
+
+  fetch("/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ tipo:"soberano", chave })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    TOKEN = d.token;
+    document.getElementById("resposta").innerText="👑 Logado como soberano";
+  });
+}
+
+// EXECUTAR
+function executar(){
+  fetch("/executar",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-token": TOKEN
+    },
+    body: JSON.stringify({ ordem: document.getElementById("ordem").value })
+  })
+  .then(r=>r.text())
+  .then(t=>document.getElementById("resposta").innerText=t);
+}
+
+// SALA SECRETA
+function sala(){
+  fetch("/sala-secreta",{
+    headers:{ "x-token": TOKEN }
+  })
+  .then(r=>r.text())
+  .then(t=>document.getElementById("resposta").innerText=t);
+}
+
+</script>
