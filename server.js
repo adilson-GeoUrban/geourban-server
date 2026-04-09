@@ -1,122 +1,50 @@
-const express = require("express");
+// ===============================
+// 🔒 SISTEMA DE AUDITORIA + BACKUP
+// ===============================
+
+const fs = require("fs");
 const path = require("path");
 
-const app = express();
-const PORT = process.env.PORT || 10000;
+const logPath = path.join(__dirname, "historico.json");
 
-app.use(express.json());
-
-// 🔒 SEGURANÇA BÁSICA
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  next();
-});
-
-// 📂 ARQUIVOS ESTÁTICOS
-app.use(express.static(path.join(__dirname, "public")));
-
-// ===============================
-// 🧠 IA MONITOR DE ERROS
-// ===============================
-let logsErros = [];
-
-function registrarErro(erro) {
-  const registro = {
-    data: new Date().toISOString(),
-    erro: erro.toString()
-  };
-
-  logsErros.push(registro);
-  console.error("🚨 ERRO DETECTADO:", registro);
+// Criar arquivo se não existir
+if (!fs.existsSync(logPath)) {
+    fs.writeFileSync(logPath, JSON.stringify([]));
 }
 
-// Captura erros globais
-process.on("uncaughtException", (err) => {
-  registrarErro(err);
-});
+// Função de registrar evento
+function registrarEvento(tipo, descricao) {
+    const historico = JSON.parse(fs.readFileSync(logPath));
 
-process.on("unhandledRejection", (err) => {
-  registrarErro(err);
-});
+    historico.push({
+        data: new Date().toISOString(),
+        tipo,
+        descricao
+    });
+
+    fs.writeFileSync(logPath, JSON.stringify(historico, null, 2));
+}
 
 // ===============================
-// 🧠 IA - STATUS
+// 📊 ROTAS DE MONITORAMENTO
 // ===============================
+
+// Status do sistema
 app.get("/ia/status", (req, res) => {
-  const status = logsErros.length === 0
-    ? "Sistema saudável"
-    : "Erros detectados";
-
-  res.json({
-    status,
-    totalErros: logsErros.length
-  });
+    res.json({
+        status: "online",
+        hora: new Date()
+    });
 });
 
-// ===============================
-// 📊 IA - LISTAR ERROS
-// ===============================
-app.get("/ia/erros", (req, res) => {
-  res.json({
-    total: logsErros.length,
-    erros: logsErros.slice(-10)
-  });
+// Histórico completo
+app.get("/ia/historico", (req, res) => {
+    const historico = JSON.parse(fs.readFileSync(logPath));
+    res.json(historico);
 });
 
-// ===============================
-// 🤖 IA COMANDO CONTROLADO
-// ===============================
-app.post("/ia/comando", (req, res) => {
-  const comando = req.body?.comando;
-
-  const comandosPermitidos = [
-    "iniciar_sistema",
-    "verificar_status",
-    "modo_auditoria"
-  ];
-
-  if (!comando || !comandosPermitidos.includes(comando)) {
-    return res.status(403).json({ erro: "Comando não autorizado" });
-  }
-
-  let resposta = "";
-
-  switch (comando) {
-    case "iniciar_sistema":
-      resposta = "Sistema inicializado com sucesso";
-      break;
-
-    case "verificar_status":
-      resposta = "Sistema operacional";
-      break;
-
-    case "modo_auditoria":
-      resposta = "Auditoria ativada";
-      break;
-  }
-
-  res.json({ sucesso: true, resposta });
-});
-
-// ===============================
-// 🌐 ROTA PRINCIPAL
-// ===============================
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// ===============================
-// 🔁 FALLBACK (ANTI NOT FOUND)
-// ===============================
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// ===============================
-// 🚀 START SERVIDOR
-// ===============================
-app.listen(PORT, () => {
-  console.log("🚀 Servidor rodando na porta", PORT);
+// Registrar erro manual
+app.get("/ia/erro", (req, res) => {
+    registrarEvento("erro", "Erro detectado manualmente");
+    res.send("Erro registrado");
 });
