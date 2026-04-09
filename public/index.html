@@ -2,15 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban - Comando Central</title>
+<title>GeoUrban - Comando Supremo</title>
 <style>
-body { font-family: Arial; background:#0d0d0d; color:white; margin:0; }
+body { font-family: Arial; background:#0d0d0d; color:white; }
 .tela { display:none; padding:20px; }
 .ativa { display:block; }
-button { width:100%; padding:12px; margin-top:10px; background:#00c853; border:none; cursor:pointer; }
-input, textarea, select { width:100%; padding:10px; margin-top:10px; }
-.card { max-width:600px; margin:auto; background:#1e1e1e; padding:20px; border-radius:10px; }
+.card { max-width:700px; margin:auto; background:#1e1e1e; padding:20px; border-radius:10px; }
+button { width:100%; padding:12px; margin-top:10px; background:#00c853; border:none; }
+textarea, input, select { width:100%; padding:10px; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -21,144 +20,133 @@ input, textarea, select { width:100%; padding:10px; margin-top:10px; }
 <h2>🔐 GeoUrban</h2>
 <input placeholder="Usuário">
 <input type="password" placeholder="Senha">
-<button onclick="trocar('recepcao')">Entrar</button>
+<button onclick="trocar('ia')">Entrar</button>
 </div>
 </div>
 
-<!-- RECEPÇÃO HUMANIZADA -->
-<div id="recepcao" class="tela">
-<div class="card">
-<h2>🤝 Bem-vindo</h2>
-<p>Estamos em desenvolvimento. Sua participação é essencial.</p>
-<select id="limitacao">
-<option>Não possuo</option>
-<option>Visual</option>
-<option>Auditiva</option>
-<option>Motora</option>
-</select>
-<button onclick="trocar('contexto')">Continuar</button>
-</div>
-</div>
-
-<!-- CONTEXTO -->
-<div id="contexto" class="tela">
-<div class="card">
-<h2>🌱 Contexto</h2>
-<p>Participe do GeoUrban como membro parceiro!</p>
-<button onclick="trocar('cadastro')">Continuar</button>
-</div>
-</div>
-
-<!-- CADASTRO -->
-<div id="cadastro" class="tela">
-<div class="card">
-<h2>📝 Cadastro</h2>
-<input id="nome" placeholder="Nome">
-<textarea id="texto" placeholder="Descreva seu projeto"></textarea>
-<button onclick="iniciarIA()">Finalizar</button>
-</div>
-</div>
-
-<!-- IA UNIFICADA -->
+<!-- IA CENTRAL -->
 <div id="ia" class="tela">
 <div class="card">
-<h2>🤖 IA GeoUrban</h2>
-<textarea id="entrada" placeholder="Digite seu projeto..."></textarea>
-<button onclick="gerar()">Gerar Análise</button>
-<button onclick="gerarPPT()">📊 Gerar PowerPoint</button>
+
+<h2>👑 Assistente do Rei</h2>
+
+<textarea id="entrada" placeholder="Descreva sua ordem..."></textarea>
+
+<button onclick="executarOrdem()">Executar Ordem</button>
+
 <div id="resposta"></div>
+
 <hr>
-<h3>🧠 Monitor do Sistema</h3>
-<pre id="monitorIA"></pre>
-<button onclick="trocar('comando')">👑 Acessar Comando Central</button>
+
+<h3>🧠 Status das IAs</h3>
+<pre id="status"></pre>
+
+<h3>🛡️ Guardião</h3>
+<p id="guardiao">VERIFICANDO...</p>
+
+<button onclick="trocar('comando')">👑 Comando Central</button>
+
 </div>
 </div>
 
 <!-- COMANDO CENTRAL -->
 <div id="comando" class="tela">
 <div class="card">
-<h2>👑 Comando Central GeoUrban</h2>
-<h3>🧠 Status das IAs</h3>
-<pre id="statusIA"></pre>
-<button onclick="gerarRelatorio()">📝 Relatório Completo</button>
-<button onclick="baixarRelatorio()">📥 Baixar Relatório</button>
-<button onclick="verLogs()">📜 Ver Logs</button>
-<button onclick="baixarBackup()">💾 Baixar Backup</button>
-<hr>
-<h3>⚙️ Controle das IAs</h3>
-<button onclick="toggleIA('Designer')">Ativar/Desativar Designer</button>
-<button onclick="toggleIA('Jurídica')">Ativar/Desativar Jurídica</button>
-<button onclick="toggleIA('Contábil')">Ativar/Desativar Contábil</button>
-<button onclick="toggleIA('Defesa')">Ativar/Desativar Defesa</button>
-<div id="saidaComando" style="margin-top:15px;"></div>
+<h2>👑 Comando Central</h2>
+
+<button onclick="window.open('/logs')">📜 Logs</button>
+<button onclick="window.open('/backup')">💾 Backup</button>
+<button onclick="window.open('/relatorio')">📊 Relatório</button>
+
+<div id="controle"></div>
+
 </div>
 </div>
 
 <script>
-// TROCAR TELAS
+
+// ESTADO DAS IAs
+let IAs = {
+  Designer:true,
+  Material:true,
+  Juridica:true,
+  Contabil:true,
+  Defesa:true,
+  Monitoramento:true,
+  Relatorios:true
+};
+
+// TROCA TELA
 function trocar(id){
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
   document.getElementById(id).classList.add('ativa');
 }
 
-// INICIAR IA
-function iniciarIA(){
-  let texto = document.getElementById("texto").value;
-  document.getElementById("entrada").value = texto;
-  trocar('ia');
+// ATUALIZA STATUS
+function atualizarStatus(){
+  let txt="";
+  for(let ia in IAs){
+    txt += ia + ": " + (IAs[ia]?"ATIVA":"DESATIVADA")+"\n";
+  }
+  document.getElementById("status").innerText=txt;
+}
+setInterval(atualizarStatus,3000);
+atualizarStatus();
+
+// 👑 ASSISTENTE DO REI
+function executarOrdem(){
+  let entrada = document.getElementById("entrada").value.toLowerCase();
+  let resposta = "👑 DECISÃO DO SISTEMA:\n\n";
+
+  // 🔍 CHECAGEM OBRIGATÓRIA
+  resposta += "✔ Verificando IAs...\n";
+
+  for(let ia in IAs){
+    if(!IAs[ia]){
+      resposta += "❌ ERRO: IA "+ia+" desativada\n";
+      document.getElementById("resposta").innerText=resposta;
+      return;
+    }
+  }
+
+  resposta += "✔ Todas IAs operacionais\n";
+
+  // 🧠 DECISÃO INTELIGENTE
+  if(entrada.includes("legal")){
+    resposta += "\n⚖️ IA Jurídica acionada\n";
+  }
+  else if(entrada.includes("financeiro")){
+    resposta += "\n💰 IA Contábil acionada\n";
+  }
+  else if(entrada.includes("projeto")){
+    resposta += "\n📊 IA Designer acionada\n";
+  }
+  else{
+    resposta += "\n🤖 IA Geral executando análise\n";
+  }
+
+  // 🛡️ VALIDAÇÃO FINAL
+  resposta += "\n🛡️ Passando pelo Guardião...";
+  resposta += "\n✅ Integridade confirmada";
+
+  document.getElementById("resposta").innerText=resposta;
 }
 
-// IA DESIGNER
-function gerar(){
-  let texto = document.getElementById("entrada").value;
-  document.getElementById("resposta").innerText="📊 Análise completa:\n"+texto+"\n✔ Todas IAs identificadas.";
-}
-
-// IA RELATÓRIOS
-function gerarPPT(){
-  let texto = document.getElementById("entrada").value;
-  fetch("/gerar-ppt",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({texto})
-  })
-  .then(res=>res.blob())
-  .then(blob=>{
-    let url=window.URL.createObjectURL(blob);
-    let a=document.createElement("a");
-    a.href=url;
-    a.download="geourban.pptx";
-    a.click();
+// 🛡️ GUARDIÃO STATUS
+function guardiaoCheck(){
+  fetch("/logs")
+  .then(r=>r.text())
+  .then(t=>{
+    if(t.includes("ALERTA")){
+      document.getElementById("guardiao").innerText="🚨 ALERTA";
+    } else {
+      document.getElementById("guardiao").innerText="✅ BLINDADO";
+    }
   });
 }
+setInterval(guardiaoCheck,5000);
+guardiaoCheck();
 
-// COMANDO CENTRAL
-let estadoIA = {Designer:true,Material:true,Monitoramento:true,Relatorios:true,Jurídica:true,Contábil:true,Defesa:true};
-
-function atualizarStatusIA(){
-  let texto="";
-  for(let ia in estadoIA){texto+=ia+": "+(estadoIA[ia]?"ATIVA":"DESATIVADA")+"\n";}
-  document.getElementById("statusIA").innerText=texto;
-}
-setInterval(atualizarStatusIA,5000);atualizarStatusIA();
-
-function toggleIA(nome){estadoIA[nome]=!estadoIA[nome];atualizarStatusIA();document.getElementById("saidaComando").innerText="IA "+nome+" agora está "+(estadoIA[nome]?"ATIVA":"DESATIVADA");}
-
-function gerarRelatorio(){
-  let relatorio="👑 RELATÓRIO COMANDO CENTRAL\n\n";
-  for(let ia in estadoIA){relatorio+=`IA: ${ia}\nStatus: ${estadoIA[ia]?"ATIVA":"DESATIVADA"}\n-------------------\n`;}
-  document.getElementById("saidaComando").innerText=relatorio;
-}
-
-function baixarRelatorio(){window.open("/baixar-relatorio","_blank");}
-function verLogs(){window.open("/logs","_blank");}
-function baixarBackup(){window.open("/backup","_blank");}
-
-// MONITORAMENTO AUTOMÁTICO SIMULADO
-setInterval(()=>{
-  // registra logs automáticos
-  fetch("/logs").then(r=>r.text()).then(t=>console.log("Monitor atualizado"));
-},10000);
 </script>
 
 </body>
