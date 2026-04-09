@@ -1,39 +1,43 @@
-const fs = require("fs");
-const path = require("path");
+const bcrypt = require("bcrypt");
 
-const DB_PATH = path.join(__dirname, "usuarios.json");
-
-// garantir arquivo
-if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify([]));
-}
-
-// salvar cadastro
-app.post("/cadastro", (req, res) => {
+app.post("/cadastro", async (req, res) => {
     const dados = req.body;
 
+    // validação básica
     if (!dados.nome || !dados.cpf || !dados.telefone) {
         return res.status(400).json({ erro: "Dados incompletos" });
     }
 
     let banco = [];
 
+    // carregar banco
     try {
         banco = JSON.parse(fs.readFileSync(DB_PATH));
     } catch (e) {
         return res.status(500).json({ erro: "Falha ao ler banco" });
     }
 
-    // evitar duplicado
-    const existe = banco.find(u => u.cpf === dados.cpf);
-    if (existe) {
-        return res.status(400).json({ erro: "Usuário já cadastrado" });
+    // 🔐 VERIFICAR CPF DUPLICADO (AGORA CORRETO)
+    for (let u of banco) {
+        const igual = await bcrypt.compare(dados.cpf, u.cpf);
+        if (igual) {
+            return res.status(400).json({ erro: "CPF já cadastrado" });
+        }
     }
 
+    // 🔐 CRIPTOGRAFAR CPF
+    let cpfHash;
+    try {
+        cpfHash = await bcrypt.hash(dados.cpf, 10);
+    } catch (e) {
+        return res.status(500).json({ erro: "Erro ao proteger CPF" });
+    }
+
+    // criar usuário
     const novo = {
         id: Date.now(),
         nome: dados.nome,
-        cpf: dados.cpf,
+        cpf: cpfHash,
         telefone: dados.telefone,
         endereco: dados.endereco,
         perfil: dados.perfil,
@@ -44,6 +48,7 @@ app.post("/cadastro", (req, res) => {
 
     banco.push(novo);
 
+    // salvar banco
     try {
         fs.writeFileSync(DB_PATH, JSON.stringify(banco, null, 2));
     } catch (e) {
