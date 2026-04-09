@@ -1,60 +1,119 @@
-<div id="painel-emergencia" style="
-position:fixed;
-top:10px;
-left:10px;
-background:red;
-color:white;
-padding:15px;
-z-index:999999;
-font-size:14px;
-">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban IA</title>
 
-⚠️ PAINEL ATIVO
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #1b5e20, #4caf50);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-<br><br>
+/* CARD CENTRAL */
+.card {
+    background: rgba(0,0,0,0.3);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+}
 
-<button onclick="alert('CLICOU')">TESTE</button>
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #00e676;
+    cursor: pointer;
+    font-weight: bold;
+}
 
+/* PAINEL FLUTUANTE */
+#painel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #000;
+    color: #0f0;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 9999;
+    display: none;
+}
+
+#painel button {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    background: #222;
+    color: #0f0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>🌍 GeoUrban</h1>
+    <p>Sistema ativo e seguro</p>
+    <button onclick="entrar()">Entrar</button>
 </div>
-<!-- 🔥 PAINEL FLUTUANTE REAL -->
-<div id="painel-emergencia" style="
-position:fixed;
-bottom:20px;
-right:20px;
-background:#000;
-color:#0f0;
-padding:15px;
-border-radius:10px;
-z-index:999999;
-font-size:12px;
-box-shadow:0 0 10px #0f0;
-">
 
-<b>⚡ Controle Direto</b><br><br>
-
-<button onclick="ativarControle()">Ativar Controle</button><br><br>
-<button onclick="forcarLogin()">Forçar Login</button><br><br>
-<button onclick="limparSistema()">Resetar</button>
-
-<div id="status-emergencia" style="margin-top:10px;"></div>
-
+<!-- 🔥 PAINEL DE CONTROLE -->
+<div id="painel">
+    <b>CONTROLE DO SISTEMA</b>
+    <button onclick="ativarControle()">Ativar Controle</button>
+    <button onclick="forcarLogin()">Forçar Login</button>
+    <button onclick="resetar()">Resetar</button>
 </div>
 
 <script>
-function ativarControle(){
-    localStorage.setItem("controle","ativo");
-    document.getElementById("status-emergencia").innerText = "Controle ATIVO";
+// 🔓 DETECÇÃO DE CONTROLE
+let controle = localStorage.getItem("controle");
+
+// MOSTRAR PAINEL SE JÁ ATIVO
+if (controle === "true") {
+    document.getElementById("painel").style.display = "block";
 }
 
-function forcarLogin(){
-    localStorage.setItem("logado","true");
-    alert("Login forçado!");
-    location.reload();
+// BOTÃO ENTRAR
+function entrar() {
+    alert("Sistema funcionando ✅");
 }
 
-function limparSistema(){
+// ATIVAR CONTROLE
+function ativarControle() {
+    localStorage.setItem("controle", "true");
+    document.getElementById("painel").style.display = "block";
+    alert("Controle ativado 🔥");
+}
+
+// FORÇAR LOGIN (BYPASS)
+function forcarLogin() {
+    localStorage.setItem("usuario", "admin");
+    alert("Login forçado realizado 🚀");
+}
+
+// RESETAR
+function resetar() {
     localStorage.clear();
-    alert("Sistema resetado!");
     location.reload();
 }
+
+// 🔥 ATALHO SECRETO (ativa painel)
+document.addEventListener("keydown", function(e) {
+    if (e.ctrlKey && e.key === "9") {
+        document.getElementById("painel").style.display = "block";
+        alert("Painel liberado ⚡");
+    }
+});
 </script>
+
+</body>
+</html>
