@@ -9,127 +9,132 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(135deg, #1b5e20, #4caf50);
+    background: #2e7d32;
     color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
-/* CARD */
-.card {
-    background: rgba(0,0,0,0.6);
+/* telas */
+.tela {
+    display: none;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ativa tela */
+.ativa {
+    display: flex;
+}
+
+/* caixa central */
+.box {
+    background: rgba(0,0,0,0.7);
     padding: 30px;
-    border-radius: 15px;
+    border-radius: 12px;
     text-align: center;
     width: 300px;
 }
 
-/* INPUT */
 input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 8px;
+    margin: 8px 0;
     border-radius: 5px;
     border: none;
 }
 
-/* BOTÃO */
 button {
-    width: 100%;
     padding: 10px;
+    width: 100%;
     border: none;
     border-radius: 5px;
     background: #00c853;
     color: white;
     cursor: pointer;
 }
-
-/* ESCONDER */
-.hidden {
-    display: none;
-}
 </style>
 </head>
 
 <body>
 
-<!-- INICIO -->
-<div id="inicio" class="card">
-    <h2>🌍 GeoUrban</h2>
-    <p>Sistema ativo e seguro</p>
-    <button onclick="abrirLogin()">Entrar</button>
+<!-- TELA 1: INICIAL -->
+<div id="inicio" class="tela ativa">
+    <div class="box">
+        <h2>🌎 GeoUrban</h2>
+        <p>Sistema ativo e seguro</p>
+        <button onclick="abrirLogin()">Entrar</button>
+    </div>
 </div>
 
-<!-- LOGIN -->
-<div id="login" class="card hidden">
-    <h3>Login</h3>
-
-    <input id="usuario" placeholder="Usuário">
-    <input id="senha" type="password" placeholder="Senha">
-
-    <button onclick="logar()">Acessar</button>
-
-    <p id="msg"></p>
+<!-- TELA 2: LOGIN -->
+<div id="login" class="tela">
+    <div class="box">
+        <h3>Login</h3>
+        <input id="usuario" placeholder="Usuário">
+        <input id="senha" type="password" placeholder="Senha">
+        <button onclick="logar()">Acessar</button>
+        <p id="msg"></p>
+    </div>
 </div>
 
-<!-- PAINEL -->
-<div id="painel" class="card hidden">
-    <h3>Painel</h3>
-    <p id="info"></p>
-
-    <button onclick="verChave()">Ver chave</button>
-    <button onclick="sair()">Sair</button>
+<!-- TELA 3: PAINEL -->
+<div id="painel" class="tela">
+    <div class="box">
+        <h3>✅ Painel</h3>
+        <p id="userInfo"></p>
+        <button onclick="verChave()">Ver chave</button>
+        <button onclick="sair()">Sair</button>
+    </div>
 </div>
 
 <script>
 
-// ABRIR LOGIN
-function abrirLogin(){
-    document.getElementById("inicio").classList.add("hidden");
-    document.getElementById("login").classList.remove("hidden");
+// trocar tela
+function mostrar(id){
+    document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
+    document.getElementById(id).classList.add("ativa");
 }
 
-// LOGIN
-function logar(){
-    var u = document.getElementById("usuario").value;
-    var s = document.getElementById("senha").value;
+// abrir login
+function abrirLogin(){
+    mostrar("login");
+}
 
-    if(u === "Admin" && s === "1234"){
-        localStorage.setItem("usuario", u);
+// login
+function logar(){
+    const user = document.getElementById("usuario").value;
+    const pass = document.getElementById("senha").value;
+    const msg = document.getElementById("msg");
+
+    if(user === "Admin" && pass === "1234"){
+        localStorage.setItem("usuario", user);
         localStorage.setItem("chave", "geo123");
-        localStorage.setItem("logado", "sim");
-        entrar();
+
+        document.getElementById("userInfo").innerText = "Usuário: " + user;
+        mostrar("painel");
     } else {
-        document.getElementById("msg").innerText = "Erro de acesso";
+        msg.innerText = "❌ Login incorreto";
     }
 }
 
-// ENTRAR NO SISTEMA
-function entrar(){
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("painel").classList.remove("hidden");
-
-    var u = localStorage.getItem("usuario");
-    document.getElementById("info").innerText = "Usuário: " + u;
-}
-
-// VER CHAVE
+// ver chave
 function verChave(){
-    alert(localStorage.getItem("chave"));
+    alert("Chave: " + localStorage.getItem("chave"));
 }
 
-// SAIR
+// sair
 function sair(){
     localStorage.clear();
-    location.reload();
+    mostrar("inicio");
 }
 
-// AUTO LOGIN
-if(localStorage.getItem("logado") === "sim"){
-    document.getElementById("inicio").classList.add("hidden");
-    entrar();
+// auto login (se já entrou)
+window.onload = () => {
+    const user = localStorage.getItem("usuario");
+    if(user){
+        document.getElementById("userInfo").innerText = "Usuário: " + user;
+        mostrar("painel");
+    }
 }
 
 </script>
