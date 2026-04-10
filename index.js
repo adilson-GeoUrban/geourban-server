@@ -5,18 +5,20 @@ const CryptoJS = require("crypto-js");
 const fs = require("fs");
 const helmet = require("helmet");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ================= 🔐 SECRET SEGURA =================
+// ================= 🔐 SECRET =================
 const SECRET = process.env.SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!SECRET) {
-  console.error("❌ SECRET não definida!");
+if (!SECRET || !JWT_SECRET) {
+  console.error("❌ SECRET ou JWT_SECRET não definida!");
   process.exit(1);
 }
 
-// ================= SEGURANÇA HTTP =================
+// ================= SEGURANÇA =================
 app.use(helmet());
 
 app.use(cors({
@@ -27,17 +29,42 @@ app.use(cors({
 
 app.use(express.json({ limit: "10kb" }));
 
-// ================= AUTH SIMPLES =================
-const TOKEN_FIXO = process.env.TOKEN || "geo_token_local";
+// ================= 🔐 LOGIN =================
+app.post("/login", (req, res) => {
+  const { usuario, senha } = req.body;
 
-function proteger(req, res, next) {
-  const token = req.headers["authorization"];
+  // 🔒 TEMPORÁRIO
+  if (usuario === "admin" && senha === "123") {
 
-  if (!token || token !== TOKEN_FIXO) {
-    return res.status(401).json({ erro: "Não autorizado" });
+    const token = jwt.sign(
+      { usuario },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.json({ token });
   }
 
-  next();
+  return res.status(401).json({ erro: "Credenciais inválidas" });
+});
+
+// ================= 🔐 PROTEGER =================
+function proteger(req, res, next) {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader) {
+    return res.status(401).json({ erro: "Token ausente" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.usuario = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ erro: "Token inválido" });
+  }
 }
 
 // ================= RATE LIMIT =================
