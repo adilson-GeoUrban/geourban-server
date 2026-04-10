@@ -133,3 +133,5 @@ app.post("/cadastro",
 
   }
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_nome_unico 
+ON cadastros(nome);
