@@ -1,17 +1,150 @@
-<div id="chat" style="position:fixed;bottom:10px;right:10px;width:320px;background:white;color:black;border-radius:10px;padding:10px;box-shadow:0 0 10px rgba(0,0,0,0.5);">
+<script>
+// ================= ESTADO =================
+let etapa = 0;
+let dados = {};
+let liberado = false;
 
-    <!-- 👤 LUIZA (TOPO) -->
-    <div style="background:#2e7d32;color:white;padding:8px;border-radius:8px 8px 0 0;font-weight:bold;">
-        🤖 Luiza • Atendimento Inteligente
-    </div>
 
-    <!-- 💬 MENSAGENS -->
-    <div id="mensagens" style="height:200px;overflow:auto;font-size:14px;margin-top:5px;"></div>
+// ================= INICIO =================
+function iniciarSistema(){
+ liberado = true;
+ document.getElementById("intro").style.display="none";
 
-    <!-- ⌨️ INPUT -->
-    <div style="margin-top:5px;">
-        <input id="input" placeholder="Digite..." style="width:70%">
-        <button onclick="enviar()">OK</button>
-    </div>
+ mostrar("Luiza: Iniciando cadastro obrigatório.");
+ mostrar("Luiza: Informe seu nome completo.");
+}
 
-</div>
+
+// ================= CHAT =================
+function enviar(){
+ if(!liberado){
+  mostrar("Luiza: Aceite a LGPD.");
+  return;
+ }
+
+ const input = document.getElementById("input");
+ const msg = input.value;
+
+ mostrar("Você: "+msg);
+
+ // ================= FLUXO CADASTRO =================
+
+ if(etapa === 0){
+  dados.nome = msg;
+  mostrar("Luiza: Qual seu nível de escolaridade?");
+  etapa++;
+ }
+
+ else if(etapa === 1){
+  dados.escolaridade = msg.toLowerCase();
+  mostrar("Luiza: Qual sua profissão?");
+  etapa++;
+ }
+
+ else if(etapa === 2){
+  dados.profissao = msg.toLowerCase();
+
+  // 🔴 REGRA PROFISSIONAL
+  if(dados.escolaridade.includes("tecnico") || dados.escolaridade.includes("superior")){
+    mostrar("Luiza: Informe seu registro profissional (ART, TRT ou RRT).");
+    etapa = 3;
+  } else {
+    etapa = 4;
+    mostrar("Luiza: Você possui alguma limitação (visual, auditiva ou motora)?");
+  }
+ }
+
+ else if(etapa === 3){
+  dados.registro = msg;
+  mostrar("Luiza: Você possui alguma limitação (visual, auditiva ou motora)?");
+  etapa = 4;
+ }
+
+ else if(etapa === 4){
+  dados.limitacoes = msg;
+  mostrar("Luiza: Confirma que todas as informações são verdadeiras? (SIM/NÃO)");
+  etapa = 5;
+ }
+
+ else if(etapa === 5){
+
+  if(msg.toLowerCase() !== "sim"){
+    mostrar("Luiza: Cadastro cancelado. Reinicie o processo.");
+    etapa = 0;
+    return;
+  }
+
+  registrar("Cadastro completo: "+JSON.stringify(dados));
+
+  salvarCadastro();
+
+  mostrar("Luiza: Cadastro concluído.");
+
+  // 🔥 DESATIVA LUIZA
+  document.getElementById("chat").style.display = "none";
+
+  // 🔐 ABRE LOGIN
+  abrirLogin();
+ }
+
+ input.value="";
+}
+
+
+// ================= BACKEND =================
+function salvarCadastro(){
+ fetch("/cadastro",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(dados)
+ });
+}
+
+
+// ================= LOGIN LIMPO =================
+function abrirLogin(){
+
+ const tela = document.createElement("div");
+
+ tela.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:#111;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;";
+
+ tela.innerHTML = `
+   <h2>Login</h2>
+   <input id="user" placeholder="Usuário"><br><br>
+   <input id="pass" type="password" placeholder="Senha"><br><br>
+   <button onclick="logar()">Entrar</button>
+ `;
+
+ document.body.appendChild(tela);
+}
+
+
+function logar(){
+ fetch("/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    usuario: document.getElementById("user").value,
+    senha: document.getElementById("pass").value
+  })
+ }).then(()=> alert("Login realizado"));
+}
+
+
+// ================= AUDITORIA =================
+function registrar(evento){
+ fetch("/log",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({evento})
+ });
+}
+
+
+// ================= UI =================
+function mostrar(txt){
+ const d=document.getElementById("mensagens");
+ d.innerHTML+="<p>"+txt+"</p>";
+ d.scrollTop=d.scrollHeight;
+}
+</script>
