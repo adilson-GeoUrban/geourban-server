@@ -183,3 +183,68 @@ function mostrar(txt){
 
 </body>
 </html>
+<script>
+// ================= CONTROLE DE INATIVIDADE =================
+
+let tempoInatividade;
+let avisoEnviado = false;
+
+// ⏱️ tempo (ajuste se quiser)
+const LIMITE = 60000;       // 60s sem interação
+const AVISO = 45000;        // aviso aos 45s
+
+function resetarInatividade(){
+    clearTimeout(tempoInatividade);
+    avisoEnviado = false;
+
+    tempoInatividade = setTimeout(() => {
+        encerrarSessao();
+    }, LIMITE);
+
+    // aviso antes de encerrar
+    setTimeout(() => {
+        if(!avisoEnviado){
+            mostrar("Luiza: Sem interação. Atendimento será encerrado em breve.");
+            registrar("Aviso de inatividade");
+            avisoEnviado = true;
+        }
+    }, AVISO);
+}
+
+
+// ================= ENCERRAMENTO =================
+function encerrarSessao(){
+
+    registrar("Sessão encerrada por inatividade");
+
+    mostrar("Luiza: Atendimento encerrado por falta de interação.");
+
+    // bloqueia sistema
+    liberado = false;
+
+    // desativa chat
+    const chat = document.getElementById("chat");
+    if(chat){
+        chat.style.opacity = "0.5";
+    }
+
+    // limpa input
+    const input = document.getElementById("input");
+    if(input){
+        input.disabled = true;
+    }
+}
+
+
+// ================= MONITORA INTERAÇÃO =================
+document.addEventListener("click", resetarInatividade);
+document.addEventListener("keypress", resetarInatividade);
+
+// inicia contagem ao liberar sistema
+const oldIniciar = iniciarSistema;
+iniciarSistema = function(){
+    oldIniciar();
+    resetarInatividade();
+};
+
+</script>
