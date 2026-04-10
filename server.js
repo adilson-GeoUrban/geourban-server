@@ -1,134 +1,155 @@
 // ================= CADASTRO =================
-app.post("/cadastro", proteger, (req, res, next) => {
-  try {
+app.post("/cadastro",
+  proteger,
+  autorizar(["admin", "tecnico"]),
+  (req, res, next) => {
 
-    let {
-      nome,
-      escolaridade,
-      profissao,
-      limitacoes,
-      registro,
-      declaracao
-    } = req.body;
+    try {
 
-    // ================= NORMALIZAÇÃO =================
-    nome = typeof nome === "string" ? nome.trim() : "";
-    escolaridade = typeof escolaridade === "string" ? escolaridade.trim() : "";
-    profissao = typeof profissao === "string" ? profissao.trim() : "";
-    limitacoes = typeof limitacoes === "string" ? limitacoes.trim() : "";
-    registro = typeof registro === "string" ? registro.trim() : "";
+      let {
+        nome,
+        escolaridade,
+        profissao,
+        limitacoes,
+        registro,
+        declaracao
+      } = req.body;
 
-    // ================= VALIDAÇÃO =================
-    if (!nome || !escolaridade || !profissao || !limitacoes) {
-      return res.status(400).json({ erro: "Dados obrigatórios incompletos" });
-    }
+      // ================= USUÁRIO LOGADO =================
+      const usuario = req.usuario;
 
-    // 🔒 LIMITE DE TAMANHO
-    if (
-      nome.length > 100 ||
-      profissao.length > 100 ||
-      limitacoes.length > 300 ||
-      registro.length > 100
-    ) {
-      return res.status(400).json({ erro: "Dados excedem limite permitido" });
-    }
+      // ================= NORMALIZAÇÃO =================
+      nome = typeof nome === "string" ? nome.trim() : "";
+      escolaridade = typeof escolaridade === "string" ? escolaridade.trim() : "";
+      profissao = typeof profissao === "string" ? profissao.trim() : "";
+      limitacoes = typeof limitacoes === "string" ? limitacoes.trim() : "";
+      registro = typeof registro === "string" ? registro.trim() : "";
 
-    // 🔒 SANITIZAÇÃO
-    const padraoSeguro = /^[a-zA-ZÀ-ÿ0-9\s.,\-_/()]+$/;
+      // ================= VALIDAÇÃO =================
+      if (!nome || !escolaridade || !profissao || !limitacoes) {
+        return res.status(400).json({ erro: "Dados obrigatórios incompletos" });
+      }
 
-    if (
-      !padraoSeguro.test(nome) ||
-      !padraoSeguro.test(profissao) ||
-      !padraoSeguro.test(limitacoes)
-    ) {
-      return res.status(400).json({ erro: "Caracteres inválidos detectados" });
-    }
+      // 🔒 LIMITE DE TAMANHO
+      if (
+        nome.length > 100 ||
+        profissao.length > 100 ||
+        limitacoes.length > 300 ||
+        registro.length > 100
+      ) {
+        return res.status(400).json({
+          erro: "Dados excedem limite permitido"
+        });
+      }
 
-    // 🔒 REGRA PROFISSIONAL
-    const esc = escolaridade.toLowerCase();
+      // 🔒 SANITIZAÇÃO
+      const padraoSeguro = /^[a-zA-ZÀ-ÿ0-9\s.,\-_/()]+$/;
 
-    if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
-      return res.status(400).json({
-        erro: "Registro profissional obrigatório (ART/TRT/RRT)"
-      });
-    }
+      if (
+        !padraoSeguro.test(nome) ||
+        !padraoSeguro.test(profissao) ||
+        !padraoSeguro.test(limitacoes)
+      ) {
+        return res.status(400).json({
+          erro: "Caracteres inválidos detectados"
+        });
+      }
 
-    // 🔒 VALIDAÇÃO EXTRA DO REGISTRO
-    if (registro && registro.length < 5) {
-      return res.status(400).json({
-        erro: "Registro inválido"
-      });
-    }
+      // 🔒 REGRA PROFISSIONAL
+      const esc = escolaridade.toLowerCase();
 
-    // 🔒 DECLARAÇÃO
-    if (declaracao !== true) {
-      return res.status(400).json({
-        erro: "Declaração obrigatória não confirmada"
-      });
-    }
+      if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
+        return res.status(400).json({
+          erro: "Registro profissional obrigatório (ART/TRT/RRT)"
+        });
+      }
 
-    // ================= CRIPTOGRAFIA =================
-    const nomeCripto = CryptoJS.AES.encrypt(nome, SECRET).toString();
+      // 🔒 VALIDAÇÃO EXTRA
+      if (registro && registro.length < 5) {
+        return res.status(400).json({
+          erro: "Registro inválido"
+        });
+      }
 
-    // ================= ANTI DUPLICIDADE =================
-    db.get(
-      "SELECT id FROM cadastros WHERE nome = ?",
-      [nomeCripto],
-      (err, row) => {
+      // 🔒 DECLARAÇÃO
+      if (declaracao !== true) {
+        return res.status(400).json({
+          erro: "Declaração obrigatória não confirmada"
+        });
+      }
 
-        if (err) {
-          log("ERRO_DB", { erro: err.message });
-          return next(err);
-        }
+      // ================= CRIPTOGRAFIA =================
+      const nomeCripto = CryptoJS.AES.encrypt(nome, SECRET).toString();
 
-        if (row) {
-          return res.status(409).json({
-            erro: "Cadastro já existente"
-          });
-        }
+      // ================= ANTI DUPLICIDADE =================
+      db.get(
+        "SELECT id FROM cadastros WHERE nome = ?",
+        [nomeCripto],
+        (err, row) => {
 
-        // 🔐 CRIPTO RESTANTE
-        const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
-        const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
-        const regCripto = registro
-          ? CryptoJS.AES.encrypt(registro, SECRET).toString()
-          : null;
+          if (err) {
+            log("ERRO_DB", { erro: err.message });
+            return next(err);
+          }
 
-        // ================= SALVAR =================
-        db.run(
-          `INSERT INTO cadastros 
-          (nome, escolaridade, profissao, limitacoes, registro, data)
-          VALUES (?, ?, ?, ?, ?, ?)`,
-          [
-            nomeCripto,
-            escolaridade,
-            profCripto,
-            limCripto,
-            regCripto,
-            new Date().toISOString()
-          ],
-          (err) => {
-            if (err) {
-              log("ERRO_DB", { erro: err.message });
-              return next(err);
-            }
-
-            log("CADASTRO", {
-              status: "ok",
-              nivel: escolaridade
+          if (row) {
+            log("CADASTRO_DUPLICADO", {
+              usuario: usuario.id
             });
 
-            res.status(201).json({
-              ok: true,
-              mensagem: "Cadastro realizado com sucesso"
+            return res.status(409).json({
+              erro: "Cadastro já existente"
             });
           }
-        );
 
-      }
-    );
+          // 🔐 CRIPTO RESTANTE
+          const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
+          const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
+          const regCripto = registro
+            ? CryptoJS.AES.encrypt(registro, SECRET).toString()
+            : null;
 
-  } catch (erro) {
-    next(erro);
+          // ================= SALVAR =================
+          db.run(
+            `INSERT INTO cadastros 
+            (nome, escolaridade, profissao, limitacoes, registro, data)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              nomeCripto,
+              escolaridade,
+              profCripto,
+              limCripto,
+              regCripto,
+              new Date().toISOString()
+            ],
+            (err) => {
+
+              if (err) {
+                log("ERRO_DB", { erro: err.message });
+                return next(err);
+              }
+
+              // ================= AUDITORIA =================
+              log("CADASTRO", {
+                status: "ok",
+                usuario: usuario.id,
+                perfil: usuario.nivel,
+                nivelCadastro: escolaridade
+              });
+
+              res.status(201).json({
+                ok: true,
+                mensagem: "Cadastro realizado com sucesso"
+              });
+            }
+          );
+
+        }
+      );
+
+    } catch (erro) {
+      next(erro);
+    }
+
   }
-});
+);
