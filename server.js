@@ -17,7 +17,6 @@ app.post("/cadastro", async (req, res) => {
       return res.status(400).json({ erro: "Dados obrigatórios incompletos" });
     }
 
-    // 🔴 REGRA PROFISSIONAL
     const esc = escolaridade.toLowerCase();
 
     if (esc.includes("tecnico") || esc.includes("superior")) {
@@ -26,7 +25,6 @@ app.post("/cadastro", async (req, res) => {
       }
     }
 
-    // 🔴 DECLARAÇÃO
     if (declaracao !== true) {
       return res.status(400).json({ erro: "Declaração obrigatória não confirmada" });
     }
@@ -66,7 +64,6 @@ app.post("/cadastro", async (req, res) => {
 
     fs.writeFileSync("log.json", JSON.stringify(logs, null, 2));
 
-    // ✅ RESPOSTA FINAL
     res.json({ ok: true, mensagem: "Cadastro realizado com sucesso" });
 
   } catch (erro) {
