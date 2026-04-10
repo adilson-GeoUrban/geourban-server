@@ -15,7 +15,7 @@ app.use(cors({
     // 📱 SEM ORIGIN (mobile, backend, curl)
     if (!origin) {
       log("CORS_INFO", { tipo: "sem_origin_controlado" });
-      return callback(null, true); // protegido pelo JWT depois
+      return callback(null, true); // JWT protege depois
     }
 
     let originNormalizado;
@@ -32,7 +32,7 @@ app.use(cors({
       return callback(null, true);
     }
 
-    // ✅ subdomínios
+    // ✅ subdomínios seguros
     if (regexDominio.test(originNormalizado)) {
       return callback(null, true);
     }
