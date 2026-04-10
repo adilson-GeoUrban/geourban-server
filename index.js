@@ -1,3 +1,4 @@
+// ================= IMPORTS =================
 const express = require("express");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
@@ -9,7 +10,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-// ================= 🔐 SECRET =================
+// ================= 🔐 ENV =================
 const SECRET = process.env.SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -18,56 +19,27 @@ if (!SECRET || !JWT_SECRET) {
   process.exit(1);
 }
 
-// ================= SEGURANÇA =================
+// ================= 🛡 SEGURANÇA HTTP =================
 app.use(helmet());
 
+// 🔒 CORS CONTROLADO (AJUSTAR DOMÍNIO)
 app.use(cors({
-  origin: "*",
+  origin: ["http://localhost:3000"], // ALTERAR EM PRODUÇÃO
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json({ limit: "10kb" }));
 
-// ================= 🔐 LOGIN =================
-app.post("/login", (req, res) => {
-  const { usuario, senha } = req.body;
-
-  // 🔒 TEMPORÁRIO
-  if (usuario === "admin" && senha === "123") {
-
-    const token = jwt.sign(
-      { usuario },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    return res.json({ token });
-  }
-
-  return res.status(401).json({ erro: "Credenciais inválidas" });
+// ================= ⏱ TIMEOUT =================
+app.use((req, res, next) => {
+  res.setTimeout(5000, () => {
+    res.status(408).json({ erro: "Tempo esgotado" });
+  });
+  next();
 });
 
-// ================= 🔐 PROTEGER =================
-function proteger(req, res, next) {
-  const authHeader = req.headers["authorization"];
-
-  if (!authHeader) {
-    return res.status(401).json({ erro: "Token ausente" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.usuario = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ erro: "Token inválido" });
-  }
-}
-
-// ================= RATE LIMIT =================
+// ================= 🚦 RATE LIMIT (DEV) =================
 let requisicoes = {};
 
 app.use((req, res, next) => {
@@ -90,7 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ================= LOG =================
+// ================= 📊 LOG =================
 function log(tipo, dados) {
   const registro = {
     tipo,
@@ -99,14 +71,22 @@ function log(tipo, dados) {
   };
 
   console.log(JSON.stringify(registro));
-  fs.appendFileSync("logs.txt", JSON.stringify(registro) + "\n");
 }
 
-// ================= BANCO =================
+// ================= 🗄 BANCO =================
 const db = new sqlite3.Database("./banco.db");
 
 db.serialize(() => {
+
   db.run("PRAGMA journal_mode = WAL;");
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario TEXT,
+      senha TEXT
+    )
+  `);
 
   db.run(`
     CREATE TABLE IF NOT EXISTS operacoes (
@@ -129,14 +109,61 @@ db.serialize(() => {
   `);
 });
 
-// ================= FRONT =================
+// ================= 🌐 FRONT =================
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// ================= IA MÓDULOS =================
+// ================= 🔐 LOGIN =================
+app.post("/login", (req, res) => {
+  const { usuario, senha } = req.body;
+
+  db.get(
+    "SELECT * FROM usuarios WHERE usuario = ?",
+    [usuario],
+    (err, user) => {
+
+      if (err || !user) {
+        return res.status(401).json({ erro: "Usuário inválido" });
+      }
+
+      if (user.senha !== senha) {
+        return res.status(401).json({ erro: "Senha inválida" });
+      }
+
+      const token = jwt.sign(
+        { usuario: user.usuario },
+        JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      res.json({ token });
+    }
+  );
+});
+
+// ================= 🔐 MIDDLEWARE AUTH =================
+function proteger(req, res, next) {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader) {
+    return res.status(401).json({ erro: "Token ausente" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.usuario = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ erro: "Token inválido" });
+  }
+}
+
+// ================= 🤖 IA MÓDULOS =================
 function iaJuridica(msg) {
   if (msg.includes("lei") || msg.includes("contrato")) {
     return "⚖️ IA Jurídica: verificar legislação.";
@@ -161,9 +188,10 @@ function iaTecnica(msg) {
   return null;
 }
 
-// ================= IA GLOBAL =================
+// ================= 🧠 IA GLOBAL =================
 app.post("/ia", proteger, (req, res, next) => {
   try {
+
     const mensagemOriginal = req.body.mensagem || "";
 
     if (!mensagemOriginal) {
@@ -193,12 +221,10 @@ app.post("/ia", proteger, (req, res, next) => {
       "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
       [criptografado, new Date().toISOString()],
       (err) => {
-        if (err) {
-          log("ERRO_DB", { erro: err.message });
-          return next(err);
-        }
+        if (err) return next(err);
 
-        log("IA", { entrada: mensagemOriginal, resposta });
+        log("IA", { entrada: mensagemOriginal });
+
         res.json({ resposta });
       }
     );
@@ -208,9 +234,10 @@ app.post("/ia", proteger, (req, res, next) => {
   }
 });
 
-// ================= CADASTRO =================
+// ================= 👤 CADASTRO =================
 app.post("/cadastro", (req, res, next) => {
   try {
+
     const {
       nome,
       escolaridade,
@@ -254,12 +281,10 @@ app.post("/cadastro", (req, res, next) => {
         new Date().toISOString()
       ],
       (err) => {
-        if (err) {
-          log("ERRO_DB", { erro: err.message });
-          return next(err);
-        }
+        if (err) return next(err);
 
         log("CADASTRO", { nome });
+
         res.json({ ok: true });
       }
     );
@@ -269,7 +294,7 @@ app.post("/cadastro", (req, res, next) => {
   }
 });
 
-// ================= LISTAR =================
+// ================= 📄 LISTAR =================
 app.get("/operacoes", proteger, (req, res) => {
   db.all("SELECT * FROM operacoes ORDER BY id DESC", [], (err, rows) => {
     if (err) return res.json([]);
@@ -283,7 +308,7 @@ app.get("/operacoes", proteger, (req, res) => {
   });
 });
 
-// ================= ERRO GLOBAL =================
+// ================= ❌ ERRO GLOBAL =================
 app.use((err, req, res, next) => {
   log("ERRO_GLOBAL", {
     rota: req.url,
@@ -295,7 +320,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ================= START =================
+// ================= 🚀 START =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
