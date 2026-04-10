@@ -1,4 +1,5 @@
-// ================= 🔒 CORS PROFISSIONAL FINAL (BLINDADO) =================
+// ================= 🔒 CORS PROFISSIONAL FINAL (SEGURO E ESTÁVEL) =================
+
 const ORIGENS_PERMITIDAS = [
   "http://localhost:3000",
   "https://seudominio.com",
@@ -9,24 +10,17 @@ const ORIGENS_PERMITIDAS = [
 const regexDominio = /^https:\/\/([a-z0-9-]+\.)?seudominio\.com$/i;
 
 app.use(cors({
+
   origin: function (origin, callback) {
 
-    const originNormalizado = origin ? origin.toLowerCase() : null;
-
-    // ================= 📱 MOBILE / SEM ORIGIN =================
-    if (!originNormalizado) {
-
-      // 🔒 exige autenticação para liberar
-      const auth = this?.req?.headers?.authorization;
-
-      if (!auth) {
-        log("CORS_BLOQUEADO", { motivo: "sem_origin_sem_token" });
-        return callback(new Error("CORS_BLOCK"));
-      }
-
-      log("CORS_INFO", { tipo: "mobile_autenticado" });
+    // ================= 📱 SEM ORIGIN (apps / backend / curl) =================
+    if (!origin) {
+      // 🔐 NÃO confiar aqui — validação será feita pelo JWT depois
+      log("CORS_INFO", { tipo: "sem_origin_permitido" });
       return callback(null, true);
     }
+
+    const originNormalizado = origin.toLowerCase();
 
     // ================= ✅ WHITELIST =================
     if (ORIGENS_PERMITIDAS.includes(originNormalizado)) {
@@ -45,6 +39,12 @@ app.use(cors({
   },
 
   methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization"
+  ],
+
   credentials: true
+
 }));
