@@ -8,7 +8,6 @@
 <style>
 body { margin:0; font-family:Arial; background:#111; color:white; }
 
-/* INTRO */
 #intro {
  position:fixed; top:0; left:0; width:100%; height:100%;
  background:black; display:flex; flex-direction:column;
@@ -16,7 +15,6 @@ body { margin:0; font-family:Arial; background:#111; color:white; }
  z-index:9999; text-align:center;
 }
 
-/* CHAT */
 #chat {
  position:fixed; bottom:10px; right:10px;
  width:320px; background:white; color:black;
@@ -80,27 +78,30 @@ function iniciarSistema(){
  liberado = true;
 
  document.getElementById("intro").style.display="none";
-
  document.getElementById("audio").play().catch(()=>{});
 
  mostrar("Luiza: Sistema iniciado.");
  mostrar("Luiza: Você possui limitação visual, auditiva ou motora?");
+
+ resetarInatividade();
 }
 
 
 // ================= CHAT =================
 function enviar(){
+
  if(!liberado){
   mostrar("Luiza: Aceite a LGPD.");
   return;
  }
+
+ resetarInatividade();
 
  const input = document.getElementById("input");
  const msg = input.value.toLowerCase();
 
  mostrar("Você: "+msg);
 
- // FLUXO PERFIL
  if(etapa===0){
   registrar("Limitacoes: "+msg);
   mostrar("Luiza: Qual seu nível de escolaridade?");
@@ -179,75 +180,61 @@ function mostrar(txt){
  d.innerHTML+="<p>"+txt+"</p>";
  d.scrollTop=d.scrollHeight;
 }
+
+
+// ================= INATIVIDADE =================
+let tempoInatividade;
+let avisoEnviado = false;
+
+const LIMITE = 120000; // 2 minutos
+const AVISO = 90000;   // 1:30 aviso
+
+function resetarInatividade(){
+ clearTimeout(tempoInatividade);
+ avisoEnviado = false;
+
+ tempoInatividade = setTimeout(encerrarSessao, LIMITE);
+
+ setTimeout(()=>{
+  if(!avisoEnviado){
+   mostrar("Luiza: Sem interação. Atendimento será encerrado.");
+   registrar("Aviso de inatividade");
+   avisoEnviado = true;
+  }
+ }, AVISO);
+}
+
+
+// ================= ENCERRAR =================
+function encerrarSessao(){
+
+ registrar("Sessão encerrada por inatividade");
+
+ mostrar("Luiza: Atendimento encerrado.");
+
+ setTimeout(()=>{
+  reiniciarSistema();
+ },2000);
+}
+
+
+// ================= RESET =================
+function reiniciarSistema(){
+
+ etapa = 0;
+ liberado = false;
+
+ document.getElementById("mensagens").innerHTML = "";
+ document.getElementById("input").disabled = false;
+
+ document.getElementById("intro").style.display = "flex";
+
+ const audio = document.getElementById("audio");
+ audio.pause();
+ audio.currentTime = 0;
+}
+
 </script>
 
 </body>
 </html>
-<script>
-// ================= CONTROLE DE INATIVIDADE =================
-
-let tempoInatividade;
-let avisoEnviado = false;
-
-// ⏱️ tempo (ajuste se quiser)
-const LIMITE = 60000;       // 60s sem interação
-const AVISO = 45000;        // aviso aos 45s
-
-function resetarInatividade(){
-    clearTimeout(tempoInatividade);
-    avisoEnviado = false;
-
-    tempoInatividade = setTimeout(() => {
-        encerrarSessao();
-    }, LIMITE);
-
-    // aviso antes de encerrar
-    setTimeout(() => {
-        if(!avisoEnviado){
-            mostrar("Luiza: Sem interação. Atendimento será encerrado em breve.");
-            registrar("Aviso de inatividade");
-            avisoEnviado = true;
-        }
-    }, AVISO);
-}
-
-
-// ================= ENCERRAMENTO =================
-function encerrarSessao(){
-
-    registrar("Sessão encerrada por inatividade");
-
-    mostrar("Luiza: Atendimento encerrado por falta de interação.");
-
-    // bloqueia sistema
-    liberado = false;
-
-    // desativa chat
-    const chat = document.getElementById("chat");
-    if(chat){
-        chat.style.opacity = "0.5";
-    }
-
-    // limpa input
-    const input = document.getElementById("input");
-    if(input){
-        input.disabled = true;
-    }
-}
-
-
-// ================= MONITORA INTERAÇÃO =================
-document.addEventListener("click", resetarInatividade);
-document.addEventListener("keypress", resetarInatividade);
-
-// inicia contagem ao liberar sistema
-const oldIniciar = iniciarSistema;
-iniciarSistema = function(){
-    oldIniciar();
-    resetarInatividade();
-};
-const LIMITE = 120000; // 2 minutos
-const AVISO = 90000;   // aviso aos 1:30
-</script>
-const LIMITE = 120000; // 2 minutos
-const AVISO = 90000;   // aviso aos 1:30
