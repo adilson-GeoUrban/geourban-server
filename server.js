@@ -6,23 +6,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// 🔥 GARANTIR CAMINHO ABSOLUTO
-const publicPath = path.resolve(__dirname, "public");
+// SERVE A PASTA PUBLIC
+app.use(express.static(path.join(__dirname, "public")));
 
-// 🔍 LOG PRA DEBUG
-console.log("Pasta pública:", publicPath);
-
-// 🔥 SERVIR ARQUIVOS
-app.use(express.static(publicPath));
-
-// 🔥 ROTA RAIZ GARANTIDA
+// ROTA PRINCIPAL
 app.get("/", (req, res) => {
-    res.sendFile(path.join(publicPath, "index.html"));
-});
-
-// 🔥 TESTE DIRETO (FORÇADO)
-app.get("/teste", (req, res) => {
-    res.send("<h1>TESTE OK</h1>");
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, () => {
