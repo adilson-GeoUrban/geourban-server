@@ -54,13 +54,11 @@ app.use((req, res, next) => {
     requisicoes[ip].count++;
   }
 
-  // limite: 20 requisições em 10s
   if (requisicoes[ip].count > 20 && (Date.now() - requisicoes[ip].tempo < 10000)) {
     log("RATE_LIMIT", { ip });
     return res.status(429).json({ erro: "Muitas requisições. Aguarde." });
   }
 
-  // reset
   if (Date.now() - requisicoes[ip].tempo > 10000) {
     requisicoes[ip] = { count: 1, tempo: Date.now() };
   }
@@ -69,10 +67,11 @@ app.use((req, res, next) => {
 });
 
 // ================= BANCO =================
-const db = new sqlite3.Database("./banco.db");
+const db = new sqlite3.Database("./banco.db", sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE);
 
 db.serialize(() => {
   db.run("PRAGMA journal_mode = WAL;");
+  db.run("PRAGMA busy_timeout = 5000;");
   db.run(`
     CREATE TABLE IF NOT EXISTS operacoes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,6 +80,30 @@ db.serialize(() => {
     )
   `);
 });
+
+// ================= FILA (CONCORRÊNCIA REAL) =================
+let fila = [];
+let processando = false;
+
+function processarFila() {
+  if (processando || fila.length === 0) return;
+
+  processando = true;
+
+  const { mensagem, callback } = fila.shift();
+
+  const criptografado = CryptoJS.AES.encrypt(mensagem, SECRET).toString();
+
+  db.run(
+    "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
+    [criptografado, new Date().toISOString()],
+    (err) => {
+      processando = false;
+      callback(err);
+      processarFila();
+    }
+  );
+}
 
 // ================= STATIC =================
 app.use(express.static(path.join(__dirname, "public")));
@@ -100,7 +123,6 @@ app.post("/ia", (req, res, next) => {
 
     const mensagem = mensagemOriginal.toLowerCase();
 
-    // BLOQUEIO LEGAL
     const proibidos = ["ilegal", "fraude", "sonegar", "burlar"];
 
     for (let p of proibidos) {
@@ -128,12 +150,10 @@ app.post("/ia", (req, res, next) => {
       resposta = "🎨 IA Designer: ajustar layout.";
     }
 
-    const criptografado = CryptoJS.AES.encrypt(mensagemOriginal, SECRET).toString();
-
-    db.run(
-      "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
-      [criptografado, new Date().toISOString()],
-      (err) => {
+    // 🔥 FILA (AO INVÉS DE DB DIRETO)
+    fila.push({
+      mensagem: mensagemOriginal,
+      callback: (err) => {
         if (err) {
           log("ERRO_DB", { erro: err.message });
           return next(err);
@@ -142,7 +162,9 @@ app.post("/ia", (req, res, next) => {
         log("IA", { mensagem: mensagemOriginal });
         res.json({ resposta });
       }
-    );
+    });
+
+    processarFila();
 
   } catch (erro) {
     next(erro);
