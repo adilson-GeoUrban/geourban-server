@@ -26,14 +26,28 @@ app.post("/cadastro", proteger, (req, res, next) => {
     }
 
     // 🔒 LIMITE DE TAMANHO
-    if (nome.length > 100 || profissao.length > 100) {
+    if (
+      nome.length > 100 ||
+      profissao.length > 100 ||
+      limitacoes.length > 300
+    ) {
       return res.status(400).json({
-        erro: "Dados muito longos"
+        erro: "Dados excedem limite permitido"
+      });
+    }
+
+    // 🔒 SANITIZAÇÃO BÁSICA (anti-injeção)
+    const padraoSeguro = /^[a-zA-ZÀ-ÿ0-9\s.,\-_/()]+$/;
+
+    if (!padraoSeguro.test(nome) || !padraoSeguro.test(profissao)) {
+      return res.status(400).json({
+        erro: "Caracteres inválidos detectados"
       });
     }
 
     const esc = escolaridade.toLowerCase();
 
+    // 🔒 REGRA PROFISSIONAL
     if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
       return res.status(400).json({
         erro: "Registro profissional obrigatório (ART/TRT/RRT)"
@@ -73,7 +87,11 @@ app.post("/cadastro", proteger, (req, res, next) => {
           return next(err);
         }
 
-        log("CADASTRO", { status: "ok" });
+        // 🔒 LOG SEM DADOS SENSÍVEIS
+        log("CADASTRO", {
+          status: "ok",
+          nivel: escolaridade
+        });
 
         res.json({
           ok: true,
