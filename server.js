@@ -1,7 +1,6 @@
 // ================= CADASTRO =================
-app.post("/cadastro", async (req, res) => {
+app.post("/cadastro", (req, res, next) => {
   try {
-    const fs = require("fs");
 
     const {
       nome,
@@ -19,55 +18,59 @@ app.post("/cadastro", async (req, res) => {
 
     const esc = escolaridade.toLowerCase();
 
-    if (esc.includes("tecnico") || esc.includes("superior")) {
-      if (!registro) {
-        return res.status(400).json({ erro: "Registro profissional obrigatório (ART/TRT/RRT)" });
-      }
+    if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
+      return res.status(400).json({
+        erro: "Registro profissional obrigatório (ART/TRT/RRT)"
+      });
     }
 
     if (declaracao !== true) {
-      return res.status(400).json({ erro: "Declaração obrigatória não confirmada" });
+      return res.status(400).json({
+        erro: "Declaração obrigatória não confirmada"
+      });
     }
 
-    // ================= BANCO =================
-    let db = [];
+    // 🔐 CRIPTOGRAFIA
+    const nomeCripto = CryptoJS.AES.encrypt(nome, SECRET).toString();
+    const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
+    const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
+    const regCripto = registro
+      ? CryptoJS.AES.encrypt(registro, SECRET).toString()
+      : null;
 
-    if (fs.existsSync("db.json")) {
-      db = JSON.parse(fs.readFileSync("db.json", "utf-8"));
-    }
+    // 💾 SALVAR NO SQLITE
+    db.run(
+      `INSERT INTO cadastros 
+      (nome, escolaridade, profissao, limitacoes, registro, data)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        nomeCripto,
+        escolaridade,
+        profCripto,
+        limCripto,
+        regCripto,
+        new Date().toISOString()
+      ],
+      (err) => {
+        if (err) {
+          log("ERRO_DB", { erro: err.message });
+          return next(err);
+        }
 
-    const novoCadastro = {
-      nome,
-      escolaridade,
-      profissao,
-      limitacoes,
-      registro: registro || null,
-      data: new Date().toISOString()
-    };
+        // 🔒 LOG SEGURO (SEM DADOS SENSÍVEIS)
+        log("CADASTRO", {
+          status: "ok",
+          tipo: escolaridade
+        });
 
-    db.push(novoCadastro);
-
-    fs.writeFileSync("db.json", JSON.stringify(db, null, 2));
-
-    // ================= LOG =================
-    let logs = [];
-
-    if (fs.existsSync("log.json")) {
-      logs = JSON.parse(fs.readFileSync("log.json", "utf-8"));
-    }
-
-    logs.push({
-      evento: "Cadastro validado",
-      usuario: nome,
-      data: new Date().toISOString()
-    });
-
-    fs.writeFileSync("log.json", JSON.stringify(logs, null, 2));
-
-    res.json({ ok: true, mensagem: "Cadastro realizado com sucesso" });
+        res.json({
+          ok: true,
+          mensagem: "Cadastro realizado com sucesso"
+        });
+      }
+    );
 
   } catch (erro) {
-    console.error("Erro cadastro:", erro);
-    res.status(500).json({ erro: "Erro interno no cadastro" });
+    next(erro);
   }
 });
