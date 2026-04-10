@@ -1,23 +1,48 @@
-<script>
-function iniciarSistema(){
- liberado = true;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban v2</title>
 
- const intro = document.getElementById("intro");
-
- // 🔥 REMOVE COMPLETAMENTE (não só esconder)
- intro.style.display = "none";
- intro.style.visibility = "hidden";
- intro.style.opacity = "0";
-
- document.getElementById("audio").play().catch(()=>{});
-
- mostrar("Luiza: Sistema iniciado.");
- mostrar("Luiza: Você possui limitação visual, auditiva ou motora?");
-
- resetarInatividade();
+<style>
+body {
+ margin:0;
+ font-family:Arial;
+ color:white;
 }
-</script>
-z-index:10000;
+
+/* INTRO COM IMAGEM */
+#intro {
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+
+ background: url("bg.jpg") no-repeat center center;
+ background-size: cover;
+
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+
+ z-index:9999;
+ text-align:center;
+}
+
+/* camada escura */
+#intro::before {
+ content:"";
+ position:absolute;
+ width:100%;
+ height:100%;
+ background:rgba(0,0,0,0.6);
+ z-index:-1;
+}
+
+/* CHAT CENTRAL */
 #chat {
  position:fixed;
  top:50%;
@@ -32,7 +57,251 @@ z-index:10000;
  cursor:move;
  z-index:10000;
 }
+
+#mensagens {
+ height:200px;
+ overflow:auto;
+ font-size:14px;
+}
+
+button {
+ padding:8px;
+ margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+ <div id="slide"></div>
+
+ <audio id="audio" loop>
+  <source src="audio.mp3" type="audio/mpeg">
+ </audio>
+
+ <div style="margin-top:20px;">
+  ⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.<br><br>
+  <button onclick="iniciarSistema()">Aceito e continuar</button>
+ </div>
+</div>
+
+<!-- CHAT -->
+<div id="chat">
+ <div id="mensagens"></div>
+ <input id="input" placeholder="Digite..." style="width:70%">
+ <button onclick="enviar()">OK</button>
+</div>
+
+<script>
+
+// ================= SLIDES =================
+const slides = [
+"🌍 GeoUrban",
+"🚀 Gestão Inteligente",
+"🔐 Segurança Total",
+"🤖 IA Luiza",
+"📊 Controle Completo"
+];
+
+let i = 0;
+setInterval(()=>{
+ document.getElementById("slide").innerText = slides[i];
+ i = (i + 1) % slides.length;
+}, 2000);
+
+// ================= ESTADO =================
+let liberado = false;
+let etapa = 0;
+
+// ================= INICIAR =================
+function iniciarSistema(){
+
+ liberado = true;
+
+ const intro = document.getElementById("intro");
+ intro.style.display = "none";
+
+ const chat = document.getElementById("chat");
+ chat.style.top = "50%";
+ chat.style.left = "50%";
+ chat.style.transform = "translate(-50%, -50%)";
+
+ document.getElementById("audio").play().catch(()=>{});
+
+ mostrar("Luiza: Sistema iniciado.");
+ mostrar("Luiza: Você possui limitação visual, auditiva ou motora?");
+
+ resetarInatividade();
+}
+
+// ================= CHAT =================
+function enviar(){
+
+ if(!liberado){
+  mostrar("Luiza: Aceite a LGPD.");
+  return;
+ }
+
+ resetarInatividade();
+
+ const input = document.getElementById("input");
+ const msg = input.value.toLowerCase();
+
+ mostrar("Você: " + msg);
+
+ if(etapa === 0){
+  registrar("Limitacoes: " + msg);
+  mostrar("Luiza: Qual seu nível de escolaridade?");
+  etapa++;
+ }
+ else if(etapa === 1){
+  registrar("Escolaridade: " + msg);
+  mostrar("Luiza: Qual sua profissão?");
+  etapa++;
+ }
+ else if(etapa === 2){
+  registrar("Profissao: " + msg);
+  mostrar("Luiza: Perfil registrado.");
+  mostrar("Luiza: Digite LOGIN ou CADASTRO.");
+  etapa++;
+ }
+ else{
+  if(msg.includes("login")){
+   registrar("Login solicitado");
+   login();
+  }
+  else if(msg.includes("cadastro")){
+   registrar("Cadastro solicitado");
+   cadastro();
+  }
+  else{
+   mostrar("Luiza: Digite LOGIN ou CADASTRO.");
+  }
+ }
+
+ input.value = "";
+}
+
+// ================= BACKEND =================
+function login(){
+ fetch("/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({usuario:"admin",senha:"123"})
+ })
+ .then(r=>r.json())
+ .then(()=>{
+  mostrar("Luiza: Login executado.");
+  registrar("Login executado");
+ });
+}
+
+function cadastro(){
+ fetch("/cadastro",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({usuario:"admin",senha:"123"})
+ })
+ .then(r=>r.json())
+ .then(()=>{
+  mostrar("Luiza: Cadastro executado.");
+  registrar("Cadastro executado");
+ });
+}
+
+// ================= AUDITORIA =================
+function registrar(evento){
+ fetch("/log",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({evento})
+ });
+}
+
+// ================= UI =================
+function mostrar(txt){
+ const d = document.getElementById("mensagens");
+ d.innerHTML += "<p>" + txt + "</p>";
+ d.scrollTop = d.scrollHeight;
+}
+
+// ================= INATIVIDADE =================
+let tempoInatividade;
+let avisoEnviado = false;
+
+const LIMITE = 120000;
+const AVISO = 90000;
+
+function resetarInatividade(){
+
+ clearTimeout(tempoInatividade);
+ avisoEnviado = false;
+
+ tempoInatividade = setTimeout(encerrarSessao, LIMITE);
+
+ setTimeout(()=>{
+  if(!avisoEnviado){
+   mostrar("Luiza: Sem interação. Atendimento será encerrado.");
+   registrar("Aviso de inatividade");
+   avisoEnviado = true;
+  }
+ }, AVISO);
+}
+
+// ================= ENCERRAR =================
+function encerrarSessao(){
+
+ registrar("Sessão encerrada");
+
+ mostrar("Luiza: Atendimento encerrado.");
+
+ setTimeout(()=>{
+  reiniciarSistema();
+ }, 2000);
+}
+
+// ================= RESET =================
+function reiniciarSistema(){
+
+ etapa = 0;
+ liberado = false;
+
+ document.getElementById("mensagens").innerHTML = "";
+ document.getElementById("input").disabled = false;
+
+ document.getElementById("intro").style.display = "flex";
+
+ const audio = document.getElementById("audio");
+ audio.pause();
+ audio.currentTime = 0;
+}
+
+// ================= ARRASTAR =================
 const chat = document.getElementById("chat");
-chat.style.top = "50%";
-chat.style.left = "50%";
-chat.style.transform = "translate(-50%, -50%)";
+
+let segurando = false, offsetX, offsetY;
+
+chat.addEventListener("mousedown", (e)=>{
+ segurando = true;
+ offsetX = e.offsetX;
+ offsetY = e.offsetY;
+});
+
+document.addEventListener("mousemove", (e)=>{
+ if(!segurando) return;
+
+ chat.style.left = (e.clientX - offsetX) + "px";
+ chat.style.top = (e.clientY - offsetY) + "px";
+ chat.style.transform = "none";
+});
+
+document.addEventListener("mouseup", ()=>{
+ segurando = false;
+});
+
+</script>
+
+</body>
+</html>
