@@ -1,170 +1,91 @@
-<script>
-// ================= ESTADO =================
-let etapa = 0;
-let dados = {};
-let liberado = false;
+app.post("/ia", (req, res) => {
 
+  const mensagem = (req.body.mensagem || "").toLowerCase();
 
-// ================= INICIO =================
-function iniciarSistema(){
- liberado = true;
- document.getElementById("intro").style.display="none";
+  // ================= BLOQUEIO LEGAL =================
+  const proibidos = ["ilegal", "fraude", "sonegar", "burlar"];
 
- mostrar("Luiza: Iniciando cadastro obrigatório.");
- mostrar("Luiza: Informe seu nome completo.");
-}
-
-
-// ================= CHAT =================
-function enviar(){
- if(!liberado){
-  mostrar("Luiza: Aceite a LGPD.");
-  return;
- }
-
- const input = document.getElementById("input");
- const msg = input.value;
-
- mostrar("Você: "+msg);
-
- // ================= FLUXO CADASTRO =================
-
- if(etapa === 0){
-  dados.nome = msg;
-  mostrar("Luiza: Qual seu nível de escolaridade?");
-  etapa++;
- }
-
- else if(etapa === 1){
-  dados.escolaridade = msg.toLowerCase();
-  mostrar("Luiza: Qual sua profissão?");
-  etapa++;
- }
-
- else if(etapa === 2){
-  dados.profissao = msg.toLowerCase();
-
-  // 🔴 REGRA PROFISSIONAL
-  if(dados.escolaridade.includes("tecnico") || dados.escolaridade.includes("superior")){
-    mostrar("Luiza: Informe seu registro profissional (ART, TRT ou RRT).");
-    etapa = 3;
-  } else {
-    etapa = 4;
-    mostrar("Luiza: Você possui alguma limitação (visual, auditiva ou motora)?");
-  }
- }
-
- else if(etapa === 3){
-  dados.registro = msg;
-  mostrar("Luiza: Você possui alguma limitação (visual, auditiva ou motora)?");
-  etapa = 4;
- }
-
- else if(etapa === 4){
-  dados.limitacoes = msg;
-  mostrar("Luiza: Confirma que todas as informações são verdadeiras? (SIM/NÃO)");
-  etapa = 5;
- }
-
- else if(etapa === 5){
-
-  if(msg.toLowerCase() !== "sim"){
-    mostrar("Luiza: Cadastro cancelado. Reinicie o processo.");
-    etapa = 0;
-    return;
+  for (let p of proibidos) {
+    if (mensagem.includes(p)) {
+      return res.json({
+        resposta: "🚫 IA Jurídica: operação bloqueada por possível ilegalidade."
+      });
+    }
   }
 
-  registrar("Cadastro completo: "+JSON.stringify(dados));
+  let resposta = "🤖 IA GeoUrban ativa.\n";
 
-  salvarCadastro();
+  // ================= IA JURÍDICA =================
+  if (
+    mensagem.includes("lei") ||
+    mensagem.includes("direito") ||
+    mensagem.includes("contrato") ||
+    mensagem.includes("processo")
+  ) {
+    resposta = `
+⚖️ IA Jurídica Ativa
 
-  mostrar("Luiza: Cadastro concluído.");
+- Verificar legislação aplicável
+- Validar documentação
+- Consultar profissional habilitado
 
-  // 🔥 DESATIVA LUIZA
-  document.getElementById("chat").style.display = "none";
+⚠️ Uso orientativo
+`;
+  }
 
-  // 🔐 ABRE LOGIN
-  abrirLogin();
- }
+  // ================= INTERNACIONAL =================
+  else if (
+    mensagem.includes("importar") ||
+    mensagem.includes("exportar")
+  ) {
+    resposta = `
+🌍 Operação Internacional
 
- input.value="";
-}
+- NCM obrigatório
+- Impostos (II + ICMS)
+- Licenciamento possível
 
+⚖️ Seguir legislação vigente
+`;
+  }
 
-// ================= BACKEND =================
-function salvarCadastro(){
- fetch("/cadastro",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify(dados)
- });
-}
+  // ================= CONTÁBIL =================
+  else if (mensagem.includes("imposto")) {
+    resposta = `
+📊 IA Contábil
 
+- Avaliar regime tributário
+- Simples / Presumido
 
-// ================= LOGIN LIMPO =================
-function abrirLogin(){
+⚠️ Consultar contador
+`;
+  }
 
- const tela = document.createElement("div");
+  // ================= TÉCNICO =================
+  else if (
+    mensagem.includes("erro") ||
+    mensagem.includes("bug")
+  ) {
+    resposta = "🛠 IA Técnica: verificar backend, rotas e arquivos.";
+  }
 
- tela.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:#111;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;";
+  // ================= DESIGN =================
+  else if (mensagem.includes("tela")) {
+    resposta = "🎨 IA Designer: ajustar layout e centralização.";
+  }
 
- tela.innerHTML = `
-   <h2>Login</h2>
-   <input id="user" placeholder="Usuário"><br><br>
-   <input id="pass" type="password" placeholder="Senha"><br><br>
-   <button onclick="logar()">Entrar</button>
- `;
+  // ================= PADRÃO =================
+  else {
+    resposta = "🤖 IA GeoUrban pronta. Informe sua necessidade.";
+  }
 
- document.body.appendChild(tela);
-}
+  // ================= AUDITORIA =================
+  operacoes.push({
+    mensagem,
+    resposta,
+    data: new Date()
+  });
 
+  res.json({ resposta });
 
-function logar(){
- fetch("/login",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    usuario: document.getElementById("user").value,
-    senha: document.getElementById("pass").value
-  })
- }).then(()=> alert("Login realizado"));
-}
-
-
-// ================= AUDITORIA =================
-function registrar(evento){
- fetch("/log",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({evento})
- });
-}
-
-
-// ================= UI =================
-function mostrar(txt){
- const d=document.getElementById("mensagens");
- d.innerHTML+="<p>"+txt+"</p>";
- d.scrollTop=d.scrollHeight;
-}
-</script>
-<script>
-const chat = document.getElementById("chat");
-
-let isDown = false, offsetX, offsetY;
-
-chat.onmousedown = (e) => {
- isDown = true;
- offsetX = e.offsetX;
- offsetY = e.offsetY;
-};
-
-document.onmousemove = (e) => {
- if (!isDown) return;
- chat.style.left = (e.clientX - offsetX) + "px";
- chat.style.top = (e.clientY - offsetY) + "px";
- chat.style.bottom = "auto";
-};
-
-document.onmouseup = () => isDown = false;
-</script>
+});
