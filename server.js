@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// SERVE FRONTEND
+// SERVE ARQUIVOS
 app.use(express.static(path.join(__dirname, "public")));
 
 // ROTA PRINCIPAL
@@ -17,3 +17,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log("Servidor rodando na porta " + PORT);
 });
+<h1>FUNCIONANDO</h1>
