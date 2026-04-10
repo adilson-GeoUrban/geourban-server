@@ -1,5 +1,5 @@
 // ================= CADASTRO =================
-app.post("/cadastro", (req, res, next) => {
+app.post("/cadastro", proteger, (req, res, next) => {
   try {
 
     let {
@@ -25,7 +25,7 @@ app.post("/cadastro", (req, res, next) => {
       });
     }
 
-    // 🔒 LIMITE DE TAMANHO (ANTI ATAQUE)
+    // 🔒 LIMITE DE TAMANHO
     if (nome.length > 100 || profissao.length > 100) {
       return res.status(400).json({
         erro: "Dados muito longos"
@@ -73,10 +73,7 @@ app.post("/cadastro", (req, res, next) => {
           return next(err);
         }
 
-        // 🔒 LOG SEGURO
-        log("CADASTRO", {
-          status: "ok"
-        });
+        log("CADASTRO", { status: "ok" });
 
         res.json({
           ok: true,
@@ -88,4 +85,4 @@ app.post("/cadastro", (req, res, next) => {
   } catch (erro) {
     next(erro);
   }
-app.post("/cadastro", proteger, (req, res, next) => {
+});
