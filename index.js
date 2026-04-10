@@ -7,8 +7,16 @@ const fs = require("fs");
 const app = express();
 app.use(express.json({ limit: "10kb" }));
 
-// 🔐 CHAVE (ajustada)
+// 🔐 CHAVE
 const SECRET = process.env.SECRET || "geo_urban_local";
+
+// ================= TIMEOUT =================
+app.use((req, res, next) => {
+  res.setTimeout(5000, () => {
+    res.status(408).json({ erro: "Tempo de requisição esgotado" });
+  });
+  next();
+});
 
 // ================= LOG =================
 function log(tipo, dados) {
@@ -29,6 +37,32 @@ app.use((req, res, next) => {
   if (!userAgent) {
     log("SEGURANCA", { motivo: "sem user-agent" });
     return res.status(403).json({ erro: "Acesso negado" });
+  }
+
+  next();
+});
+
+// ================= CONTROLE DE REQUISIÇÕES =================
+let requisicoes = {};
+
+app.use((req, res, next) => {
+  const ip = req.ip;
+
+  if (!requisicoes[ip]) {
+    requisicoes[ip] = { count: 1, tempo: Date.now() };
+  } else {
+    requisicoes[ip].count++;
+  }
+
+  // limite: 20 requisições em 10s
+  if (requisicoes[ip].count > 20 && (Date.now() - requisicoes[ip].tempo < 10000)) {
+    log("RATE_LIMIT", { ip });
+    return res.status(429).json({ erro: "Muitas requisições. Aguarde." });
+  }
+
+  // reset
+  if (Date.now() - requisicoes[ip].tempo > 10000) {
+    requisicoes[ip] = { count: 1, tempo: Date.now() };
   }
 
   next();
@@ -66,16 +100,13 @@ app.post("/ia", (req, res, next) => {
 
     const mensagem = mensagemOriginal.toLowerCase();
 
-    // BLOQUEIO
+    // BLOQUEIO LEGAL
     const proibidos = ["ilegal", "fraude", "sonegar", "burlar"];
 
     for (let p of proibidos) {
       if (mensagem.includes(p)) {
         log("BLOQUEIO", { mensagem: mensagemOriginal });
-
-        return res.json({
-          resposta: "🚫 IA Jurídica: operação bloqueada."
-        });
+        return res.json({ resposta: "🚫 IA Jurídica: operação bloqueada." });
       }
     }
 
@@ -109,7 +140,6 @@ app.post("/ia", (req, res, next) => {
         }
 
         log("IA", { mensagem: mensagemOriginal });
-
         res.json({ resposta });
       }
     );
