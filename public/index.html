@@ -1,30 +1,38 @@
-#intro {
+<script>
+function iniciarSistema(){
+ liberado = true;
+
+ const intro = document.getElementById("intro");
+
+ // 🔥 REMOVE COMPLETAMENTE (não só esconder)
+ intro.style.display = "none";
+ intro.style.visibility = "hidden";
+ intro.style.opacity = "0";
+
+ document.getElementById("audio").play().catch(()=>{});
+
+ mostrar("Luiza: Sistema iniciado.");
+ mostrar("Luiza: Você possui limitação visual, auditiva ou motora?");
+
+ resetarInatividade();
+}
+</script>
+z-index:10000;
+#chat {
  position:fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
-
- background: url("bg.jpg") no-repeat center center;
- background-size: cover;
-
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
-
- z-index:9999;
- text-align:center;
+ top:50%;
+ left:50%;
+ transform:translate(-50%, -50%);
+ width:320px;
+ background:white;
+ color:black;
+ border-radius:10px;
+ padding:10px;
+ box-shadow:0 0 10px rgba(0,0,0,0.5);
+ cursor:move;
+ z-index:10000;
 }
-
-/* camada escura por cima da imagem */
-#intro::before {
- content:"";
- position:absolute;
- top:0;
- left:0;
- width:100%;
- height:100%;
- background:rgba(0,0,0,0.6);
- z-index:-1;
-}
+const chat = document.getElementById("chat");
+chat.style.top = "50%";
+chat.style.left = "50%";
+chat.style.transform = "translate(-50%, -50%)";
