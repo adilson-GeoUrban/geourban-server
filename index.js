@@ -5,7 +5,7 @@ const CryptoJS = require("crypto-js");
 const fs = require("fs");
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 const SECRET = "geo_urban_chave_segura";
 
@@ -27,10 +27,20 @@ db.serialize(() => {
 // ================= STATIC =================
 app.use(express.static(path.join(__dirname, "public")));
 
+// ✅ ROTA PRINCIPAL (IMPORTANTE)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
 // ================= IA =================
 app.post("/ia", (req, res) => {
 
   const mensagemOriginal = req.body.mensagem || "";
+
+  if (!mensagemOriginal) {
+    return res.json({ resposta: "Digite uma mensagem." });
+  }
+
   const mensagem = mensagemOriginal.toLowerCase();
 
   // 🔒 BLOQUEIO LEGAL
@@ -46,27 +56,18 @@ app.post("/ia", (req, res) => {
 
   let resposta = "🤖 IA GeoUrban ativa.\n";
 
-  // ⚖️ JURÍDICO
   if (mensagem.includes("lei") || mensagem.includes("contrato")) {
     resposta = "⚖️ IA Jurídica: verifique legislação e documentação.";
   }
-
-  // 🌍 INTERNACIONAL
   else if (mensagem.includes("importar") || mensagem.includes("exportar")) {
     resposta = "🌍 Operação internacional exige NCM, impostos e licenças.";
   }
-
-  // 📊 CONTÁBIL
   else if (mensagem.includes("imposto")) {
     resposta = "📊 IA Contábil: avaliar regime tributário.";
   }
-
-  // 🛠 TÉCNICO
   else if (mensagem.includes("erro") || mensagem.includes("bug")) {
     resposta = "🛠 IA Técnica: verificar sistema.";
   }
-
-  // 🎨 DESIGN
   else if (mensagem.includes("tela")) {
     resposta = "🎨 IA Designer: ajustar layout.";
   }
@@ -76,7 +77,10 @@ app.post("/ia", (req, res) => {
 
   db.run(
     "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
-    [criptografado, new Date().toISOString()]
+    [criptografado, new Date().toISOString()],
+    (err) => {
+      if (err) console.log("Erro ao salvar:", err);
+    }
   );
 
   res.json({ resposta });
@@ -88,7 +92,10 @@ app.get("/operacoes", (req, res) => {
 
   db.all("SELECT * FROM operacoes ORDER BY id DESC", [], (err, rows) => {
 
-    if (err) return res.json([]);
+    if (err) {
+      console.log("Erro ao buscar:", err);
+      return res.json([]);
+    }
 
     const dados = rows.map(r => ({
       ...r,
@@ -108,14 +115,18 @@ setInterval(() => {
   const destino = "./backup_" + Date.now() + ".db";
 
   fs.copyFile(origem, destino, (err) => {
-    if (!err) console.log("Backup criado:", destino);
+    if (err) {
+      console.log("Erro no backup:", err);
+    } else {
+      console.log("Backup criado:", destino);
+    }
   });
 
-}, 60000); // 1 minuto
+}, 60000);
 
 // ================= START =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Servidor rodando em http://localhost:" + PORT);
+  console.log("Servidor rodando na porta " + PORT);
 });
