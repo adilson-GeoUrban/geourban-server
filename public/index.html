@@ -1,66 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url("/bg.jpg") no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+
+.box {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 320px;
+    background: #111;
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.log {
+    height: 120px;
+    overflow-y: auto;
+    background: black;
+    padding: 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: none;
+    background: #4caf50;
+    color: white;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="box">
+    <h3>GeoUrban 🤖</h3>
+
+    <div class="log" id="log"></div>
+
+    <input id="cpf" placeholder="CPF">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button type="button" onclick="cadastrar()">Cadastrar</button>
+    <button type="button" onclick="login()">Entrar</button>
+</div>
+
 <script>
+// ==========================
+// 🔥 ROBÔ + DEBUG ATIVO
+// ==========================
+
+function log(msg) {
+    const el = document.getElementById("log");
+    el.innerHTML += msg + "<br>";
+    el.scrollTop = el.scrollHeight;
+}
+
+// TESTE DE VIDA DO JS
+alert("Sistema carregado ✅");
+
+// INÍCIO
+window.onload = () => {
+    log("🤖 Sistema iniciado com sucesso");
+};
+
+// ==========================
+// 🔐 CADASTRO
+// ==========================
 async function cadastrar() {
+    log("📨 Tentando cadastrar...");
+
     const cpf = document.getElementById("cpf").value;
     const senha = document.getElementById("senha").value;
 
     if (!cpf || !senha) {
-        alert("Preencha CPF e senha");
+        log("⚠️ Preencha CPF e senha");
         return;
     }
 
     try {
         const res = await fetch("/cadastro", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ cpf, senha })
         });
 
         const data = await res.json();
 
         if (res.ok) {
-            alert("Cadastro realizado com sucesso ✅");
+            log("✅ Cadastro realizado");
         } else {
-            alert(data.erro || "Erro ao cadastrar ❌");
+            log("❌ " + data.erro);
         }
 
     } catch (e) {
-        alert("Erro de conexão com servidor ❌");
-        console.error(e);
+        log("❌ Erro conexão servidor");
+    }
+}
+
+// ==========================
+// 🔐 LOGIN
+// ==========================
+async function login() {
+    log("🔐 Tentando login...");
+
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    if (!cpf || !senha) {
+        log("⚠️ Preencha CPF e senha");
+        return;
+    }
+
+    try {
+        const res = await fetch("/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ cpf, senha })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+            log("✅ Login autorizado");
+        } else {
+            log("❌ Credenciais inválidas");
+        }
+
+    } catch (e) {
+        log("❌ Erro conexão servidor");
     }
 }
 </script>
-<script>
-async function cadastrar() {
-    const cpf = document.getElementById("cpf").value;
-    const senha = document.getElementById("senha").value;
 
-    if (!cpf || !senha) {
-        alert("Preencha CPF e senha");
-        return;
-    }
-
-    try {
-        const res = await fetch("/cadastro", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ cpf, senha })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            alert("Cadastro realizado com sucesso ✅");
-        } else {
-            alert(data.erro || "Erro ao cadastrar ❌");
-        }
-
-    } catch (e) {
-        alert("Erro de conexão com servidor ❌");
-        console.error(e);
-    }
-}
-</script>app.post("/cadastro", async (req, res) => {
+</body>
+</html>
