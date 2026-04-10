@@ -1,41 +1,155 @@
-.box {
-    position: fixed; /* 🔥 FIXA NA TELA */
-    bottom: 20px;
-    right: 20px;
-    width: 340px;
+<body>
 
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(10px);
+<!-- FUNDO -->
+<div class="overlay"></div>
 
-    border-radius: 12px;
+<!-- 🔐 LOGIN FIXO -->
+<div class="login-box">
+    <h3>GeoUrban 🔐</h3>
+
+    <input id="cpf" placeholder="CPF">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button onclick="cadastrar()">Cadastrar</button>
+    <button onclick="login()">Entrar</button>
+</div>
+
+<!-- 🤖 IA FLUTUANTE -->
+<div id="ia-bot">
+    <div id="ia-header" onclick="toggleIA()">
+        🤖 Assistente GeoUrban
+    </div>
+
+    <div id="ia-body">
+        <div id="ia-mensagens"></div>
+        <input id="ia-input" placeholder="Digite..." onkeydown="if(event.key==='Enter') enviarIA()">
+    </div>
+</div>
+
+<script>
+// =============================
+// 🔐 LOGIN / CADASTRO
+// =============================
+async function cadastrar() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/cadastro", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+    alert(data.ok ? "Cadastro OK" : data.erro);
+}
+
+async function login() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+    alert(data.ok ? "Login OK 🔐" : "Erro login");
+}
+
+// =============================
+// 🤖 IA HUMANIZADA
+// =============================
+function toggleIA() {
+    const body = document.getElementById("ia-body");
+    body.style.display = body.style.display === "flex" ? "none" : "flex";
+}
+
+function addMsg(texto) {
+    const box = document.getElementById("ia-mensagens");
+    box.innerHTML += "<div>" + texto + "</div>";
+    box.scrollTop = box.scrollHeight;
+}
+
+let etapa = 0;
+
+function iniciarIA() {
+    addMsg("👋 Bem-vindo ao GeoUrban.");
+    setTimeout(() => {
+        addMsg("Antes de começar:");
+        addMsg("Você possui alguma necessidade?");
+        addMsg("👁️ Visual | 👂 Auditiva | ♿ Mobilidade | ❌ Nenhuma");
+    }, 800);
+}
+
+function enviarIA() {
+    const input = document.getElementById("ia-input");
+    const texto = input.value;
+
+    if (!texto) return;
+
+    addMsg("🧑 " + texto);
+    input.value = "";
+
+    if (etapa === 0) {
+        addMsg("✅ Entendido. Vou adaptar o atendimento.");
+        etapa = 1;
+
+        setTimeout(() => {
+            addMsg("🔐 Use o painel ao lado para login ou cadastro.");
+        }, 800);
+    } else {
+        addMsg("🤖 Estou acompanhando sua navegação...");
+    }
+}
+
+window.onload = iniciarIA;
+</script>
+
+</body>
+.login-box {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 280px;
+    background: rgba(0,0,0,0.85);
     padding: 20px;
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-
-    z-index: 9999; /* 🔥 sempre na frente */
-}
-body {
-    margin: 0;
-    overflow-x: hidden;
-}
-html, body {
-    height: 100%;
-}
-.box h3 {
-    margin-top: 0;
-    color: #4caf50;
+    border-radius: 10px;
+    z-index: 9999;
 }
 
-input {
-    background: #222;
+#ia-bot {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    z-index: 9999;
+}
+
+#ia-header {
+    background: #2e7d32;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+}
+
+#ia-body {
+    background: rgba(0,0,0,0.9);
+    height: 300px;
+    display: none;
+    flex-direction: column;
+    padding: 10px;
+}
+
+#ia-mensagens {
+    flex: 1;
+    overflow-y: auto;
     color: white;
 }
 
-button {
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-button:hover {
-    background: #66bb6a;
+#ia-input {
+    width: 100%;
+    padding: 8px;
 }
