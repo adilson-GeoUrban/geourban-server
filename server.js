@@ -20,24 +20,20 @@ app.post("/cadastro", proteger, (req, res, next) => {
 
     // ================= VALIDAÇÃO =================
     if (!nome || !escolaridade || !profissao || !limitacoes) {
-      return res.status(400).json({
-        erro: "Dados obrigatórios incompletos"
-      });
+      return res.status(400).json({ erro: "Dados obrigatórios incompletos" });
     }
 
-    // 🔒 LIMITE DE TAMANHO (ANTI ATAQUE)
+    // 🔒 LIMITE DE TAMANHO
     if (
       nome.length > 100 ||
       profissao.length > 100 ||
       limitacoes.length > 300 ||
       registro.length > 100
     ) {
-      return res.status(400).json({
-        erro: "Dados excedem limite permitido"
-      });
+      return res.status(400).json({ erro: "Dados excedem limite permitido" });
     }
 
-    // 🔒 SANITIZAÇÃO SEGURA
+    // 🔒 SANITIZAÇÃO
     const padraoSeguro = /^[a-zA-ZÀ-ÿ0-9\s.,\-_/()]+$/;
 
     if (
@@ -45,9 +41,7 @@ app.post("/cadastro", proteger, (req, res, next) => {
       !padraoSeguro.test(profissao) ||
       !padraoSeguro.test(limitacoes)
     ) {
-      return res.status(400).json({
-        erro: "Caracteres inválidos detectados"
-      });
+      return res.status(400).json({ erro: "Caracteres inválidos detectados" });
     }
 
     // 🔒 REGRA PROFISSIONAL
@@ -56,6 +50,13 @@ app.post("/cadastro", proteger, (req, res, next) => {
     if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
       return res.status(400).json({
         erro: "Registro profissional obrigatório (ART/TRT/RRT)"
+      });
+    }
+
+    // 🔒 VALIDAÇÃO EXTRA DO REGISTRO
+    if (registro && registro.length < 5) {
+      return res.status(400).json({
+        erro: "Registro inválido"
       });
     }
 
@@ -68,41 +69,62 @@ app.post("/cadastro", proteger, (req, res, next) => {
 
     // ================= CRIPTOGRAFIA =================
     const nomeCripto = CryptoJS.AES.encrypt(nome, SECRET).toString();
-    const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
-    const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
-    const regCripto = registro
-      ? CryptoJS.AES.encrypt(registro, SECRET).toString()
-      : null;
 
-    // ================= SALVAR =================
-    db.run(
-      `INSERT INTO cadastros 
-      (nome, escolaridade, profissao, limitacoes, registro, data)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        nomeCripto,
-        escolaridade,
-        profCripto,
-        limCripto,
-        regCripto,
-        new Date().toISOString()
-      ],
-      (err) => {
+    // ================= ANTI DUPLICIDADE =================
+    db.get(
+      "SELECT id FROM cadastros WHERE nome = ?",
+      [nomeCripto],
+      (err, row) => {
+
         if (err) {
           log("ERRO_DB", { erro: err.message });
           return next(err);
         }
 
-        // 🔒 LOG SEGURO (SEM DADOS SENSÍVEIS)
-        log("CADASTRO", {
-          status: "ok",
-          nivel: escolaridade
-        });
+        if (row) {
+          return res.status(409).json({
+            erro: "Cadastro já existente"
+          });
+        }
 
-        res.status(200).json({
-          ok: true,
-          mensagem: "Cadastro realizado com sucesso"
-        });
+        // 🔐 CRIPTO RESTANTE
+        const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
+        const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
+        const regCripto = registro
+          ? CryptoJS.AES.encrypt(registro, SECRET).toString()
+          : null;
+
+        // ================= SALVAR =================
+        db.run(
+          `INSERT INTO cadastros 
+          (nome, escolaridade, profissao, limitacoes, registro, data)
+          VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            nomeCripto,
+            escolaridade,
+            profCripto,
+            limCripto,
+            regCripto,
+            new Date().toISOString()
+          ],
+          (err) => {
+            if (err) {
+              log("ERRO_DB", { erro: err.message });
+              return next(err);
+            }
+
+            log("CADASTRO", {
+              status: "ok",
+              nivel: escolaridade
+            });
+
+            res.status(201).json({
+              ok: true,
+              mensagem: "Cadastro realizado com sucesso"
+            });
+          }
+        );
+
       }
     );
 
