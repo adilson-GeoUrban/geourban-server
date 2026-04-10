@@ -12,11 +12,11 @@ app.post("/cadastro", proteger, (req, res, next) => {
     } = req.body;
 
     // ================= NORMALIZAÇÃO =================
-    nome = nome?.trim();
-    escolaridade = escolaridade?.trim();
-    profissao = profissao?.trim();
-    limitacoes = limitacoes?.trim();
-    registro = registro?.trim();
+    nome = typeof nome === "string" ? nome.trim() : "";
+    escolaridade = typeof escolaridade === "string" ? escolaridade.trim() : "";
+    profissao = typeof profissao === "string" ? profissao.trim() : "";
+    limitacoes = typeof limitacoes === "string" ? limitacoes.trim() : "";
+    registro = typeof registro === "string" ? registro.trim() : "";
 
     // ================= VALIDAÇÃO =================
     if (!nome || !escolaridade || !profissao || !limitacoes) {
@@ -25,35 +25,41 @@ app.post("/cadastro", proteger, (req, res, next) => {
       });
     }
 
-    // 🔒 LIMITE DE TAMANHO
+    // 🔒 LIMITE DE TAMANHO (ANTI ATAQUE)
     if (
       nome.length > 100 ||
       profissao.length > 100 ||
-      limitacoes.length > 300
+      limitacoes.length > 300 ||
+      registro.length > 100
     ) {
       return res.status(400).json({
         erro: "Dados excedem limite permitido"
       });
     }
 
-    // 🔒 SANITIZAÇÃO BÁSICA (anti-injeção)
+    // 🔒 SANITIZAÇÃO SEGURA
     const padraoSeguro = /^[a-zA-ZÀ-ÿ0-9\s.,\-_/()]+$/;
 
-    if (!padraoSeguro.test(nome) || !padraoSeguro.test(profissao)) {
+    if (
+      !padraoSeguro.test(nome) ||
+      !padraoSeguro.test(profissao) ||
+      !padraoSeguro.test(limitacoes)
+    ) {
       return res.status(400).json({
         erro: "Caracteres inválidos detectados"
       });
     }
 
+    // 🔒 REGRA PROFISSIONAL
     const esc = escolaridade.toLowerCase();
 
-    // 🔒 REGRA PROFISSIONAL
     if ((esc.includes("tecnico") || esc.includes("superior")) && !registro) {
       return res.status(400).json({
         erro: "Registro profissional obrigatório (ART/TRT/RRT)"
       });
     }
 
+    // 🔒 DECLARAÇÃO
     if (declaracao !== true) {
       return res.status(400).json({
         erro: "Declaração obrigatória não confirmada"
@@ -87,13 +93,13 @@ app.post("/cadastro", proteger, (req, res, next) => {
           return next(err);
         }
 
-        // 🔒 LOG SEM DADOS SENSÍVEIS
+        // 🔒 LOG SEGURO (SEM DADOS SENSÍVEIS)
         log("CADASTRO", {
           status: "ok",
           nivel: escolaridade
         });
 
-        res.json({
+        res.status(200).json({
           ok: true,
           mensagem: "Cadastro realizado com sucesso"
         });
