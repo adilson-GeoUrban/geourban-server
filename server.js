@@ -4,18 +4,16 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// permitir JSON
 app.use(express.json());
 
-// servir arquivos da pasta public
+// SERVE FRONTEND
 app.use(express.static(path.join(__dirname, "public")));
 
-// rota principal
+// ROTA PRINCIPAL
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// start servidor
 app.listen(PORT, () => {
     console.log("Servidor rodando na porta " + PORT);
 });
