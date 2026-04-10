@@ -1,45 +1,79 @@
-<script>
-async function cadastrar() {
-    const dados = {
-        nome: document.getElementById("nome").value,
-        cpf: document.getElementById("cpf").value,
-        telefone: document.getElementById("telefone").value,
-        endereco: document.getElementById("endereco").value,
-        perfil: document.getElementById("perfil").value,
-        nivel: document.getElementById("nivel").value,
-        documento: document.getElementById("documento").value,
-        termo: document.getElementById("termo").checked
-    };
+/geourban-server
+ ├── server.js
+ ├── /public
+ │     ├── index.html
+ │     ├── bg.jpg   ✅ (sua imagem)
+ <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
 
-    if (!dados.nome || !dados.cpf || !dados.telefone) {
-        alert("Preencha os campos obrigatórios ❌");
-        return;
-    }
-
-    if (!dados.termo) {
-        alert("Aceite os termos ⚠️");
-        return;
-    }
-
-    try {
-        const res = await fetch("/cadastro", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(dados)
-        });
-
-        const resposta = await res.json();
-
-        if (res.ok) {
-            alert("Cadastro salvo com segurança ✅");
-        } else {
-            alert(resposta.erro || "Erro no cadastro ❌");
-        }
-
-    } catch (e) {
-        alert("Erro de conexão ⚠️");
-    }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("/bg.jpg") no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
 }
-</script>
+
+/* camada escura */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+/* caixa estilo chat */
+.login-box {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 300px;
+    background: #111;
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: #4CAF50;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="login-box">
+    <h3>GeoUrban</h3>
+
+    <input type="text" placeholder="CPF">
+    <input type="password" placeholder="Senha">
+
+    <button>Entrar</button>
+    <button>Cadastrar</button>
+</div>
+
+</body>
+</html>
