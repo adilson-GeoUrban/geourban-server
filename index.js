@@ -1,43 +1,45 @@
-const express = require("express");
-const path = require("path");
+app.post("/ia", async (req, res) => {
+  const { mensagem } = req.body;
 
-const app = express();
+  let sistema = "Você é uma IA especialista geral.";
 
-// 🔓 Permitir JSON (necessário pro login/cadastro)
-app.use(express.json());
-
-// 🔥 SERVIR ARQUIVOS DA PASTA PUBLIC
-app.use(express.static(path.join(__dirname, "public")));
-
-// 🏠 ROTA PRINCIPAL
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
-});
-
-// 🔐 LOGIN (teste simples)
-app.post("/login", (req, res) => {
-  const { usuario, senha } = req.body;
-
-  if (usuario === "admin" && senha === "123") {
-    return res.json({ ok: true });
+  // 🔍 DETECÇÃO AUTOMÁTICA
+  if (mensagem.includes("lei") || mensagem.includes("direito")) {
+    sistema = "Você é uma IA jurídica especialista em legislação brasileira (LGPD, civil, penal).";
   }
 
-  res.status(401).json({ erro: "Login inválido" });
-});
+  if (mensagem.includes("internacional")) {
+    sistema = "Você é uma IA especialista em direito internacional e normas globais.";
+  }
 
-// 📝 CADASTRO (teste)
-app.post("/cadastro", (req, res) => {
-  res.json({ ok: true });
-});
+  if (mensagem.includes("imposto") || mensagem.includes("contabilidade")) {
+    sistema = "Você é uma IA contábil especialista em normas brasileiras e tributação.";
+  }
 
-// 📋 LOG (auditoria)
-app.post("/log", (req, res) => {
-  console.log("LOG:", req.body);
-  res.json({ ok: true });
-});
+  if (mensagem.includes("global") || mensagem.includes("internacional contábil")) {
+    sistema = "Você é uma IA contábil internacional (IFRS, compliance global).";
+  }
 
-// 🚀 START
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
+  if (mensagem.includes("erro") || mensagem.includes("bug")) {
+    sistema = "Você é uma IA engenheira de software especialista em corrigir bugs.";
+  }
+
+  if (mensagem.includes("layout") || mensagem.includes("tela")) {
+    sistema = "Você é uma IA designer especialista em UX/UI e correção visual.";
+  }
+
+  try {
+    const resposta = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: sistema },
+        { role: "user", content: mensagem }
+      ]
+    });
+
+    res.json({ resposta: resposta.choices[0].message.content });
+
+  } catch (err) {
+    res.status(500).json({ erro: "Falha IA" });
+  }
 });
