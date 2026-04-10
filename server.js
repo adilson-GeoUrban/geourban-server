@@ -1,4 +1,4 @@
-// ================= 🔒 CORS PROFISSIONAL FINAL (APP + WEB) =================
+// ================= 🔒 CORS PROFISSIONAL FINAL (BLINDADO) =================
 const ORIGENS_PERMITIDAS = [
   "http://localhost:3000",
   "https://seudominio.com",
@@ -11,25 +11,34 @@ const regexDominio = /^https:\/\/([a-z0-9-]+\.)?seudominio\.com$/i;
 app.use(cors({
   origin: function (origin, callback) {
 
-    // 📱 PERMITE APP MOBILE (sem origin)
-    if (!origin) {
-      log("CORS_INFO", { tipo: "mobile_app_sem_origin" });
+    const originNormalizado = origin ? origin.toLowerCase() : null;
+
+    // ================= 📱 MOBILE / SEM ORIGIN =================
+    if (!originNormalizado) {
+
+      // 🔒 exige autenticação para liberar
+      const auth = this?.req?.headers?.authorization;
+
+      if (!auth) {
+        log("CORS_BLOQUEADO", { motivo: "sem_origin_sem_token" });
+        return callback(new Error("CORS_BLOCK"));
+      }
+
+      log("CORS_INFO", { tipo: "mobile_autenticado" });
       return callback(null, true);
     }
 
-    const originNormalizado = origin.toLowerCase();
-
-    // ✅ whitelist direta
+    // ================= ✅ WHITELIST =================
     if (ORIGENS_PERMITIDAS.includes(originNormalizado)) {
       return callback(null, true);
     }
 
-    // ✅ subdomínio seguro
+    // ================= ✅ SUBDOMÍNIO =================
     if (regexDominio.test(originNormalizado)) {
       return callback(null, true);
     }
 
-    // ❌ bloqueio
+    // ================= ❌ BLOQUEIO =================
     log("CORS_BLOQUEADO", { origin: originNormalizado });
 
     return callback(new Error("CORS_BLOCK"));
