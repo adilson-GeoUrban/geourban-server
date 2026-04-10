@@ -8,8 +8,13 @@ const cors = require("cors");
 
 const app = express();
 
-// 🔐 CHAVE
-const SECRET = process.env.SECRET || "geo_urban_local";
+// ================= 🔐 SECRET SEGURA =================
+const SECRET = process.env.SECRET;
+
+if (!SECRET) {
+  console.error("❌ SECRET não definida!");
+  process.exit(1);
+}
 
 // ================= SEGURANÇA HTTP =================
 app.use(helmet());
@@ -17,12 +22,25 @@ app.use(helmet());
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json({ limit: "10kb" }));
 
-// ================= RATE LIMIT (BÁSICO) =================
+// ================= AUTH SIMPLES =================
+const TOKEN_FIXO = process.env.TOKEN || "geo_token_local";
+
+function proteger(req, res, next) {
+  const token = req.headers["authorization"];
+
+  if (!token || token !== TOKEN_FIXO) {
+    return res.status(401).json({ erro: "Não autorizado" });
+  }
+
+  next();
+}
+
+// ================= RATE LIMIT =================
 let requisicoes = {};
 
 app.use((req, res, next) => {
@@ -117,9 +135,8 @@ function iaTecnica(msg) {
 }
 
 // ================= IA GLOBAL =================
-app.post("/ia", (req, res, next) => {
+app.post("/ia", proteger, (req, res, next) => {
   try {
-
     const mensagemOriginal = req.body.mensagem || "";
 
     if (!mensagemOriginal) {
@@ -133,10 +150,7 @@ app.post("/ia", (req, res, next) => {
     for (let p of proibidos) {
       if (mensagem.includes(p)) {
         log("BLOQUEIO", { mensagem: mensagemOriginal });
-
-        return res.json({
-          resposta: "🚫 Operação bloqueada."
-        });
+        return res.json({ resposta: "🚫 Operação bloqueada." });
       }
     }
 
@@ -158,7 +172,6 @@ app.post("/ia", (req, res, next) => {
         }
 
         log("IA", { entrada: mensagemOriginal, resposta });
-
         res.json({ resposta });
       }
     );
@@ -171,7 +184,6 @@ app.post("/ia", (req, res, next) => {
 // ================= CADASTRO =================
 app.post("/cadastro", (req, res, next) => {
   try {
-
     const {
       nome,
       escolaridade,
@@ -221,7 +233,6 @@ app.post("/cadastro", (req, res, next) => {
         }
 
         log("CADASTRO", { nome });
-
         res.json({ ok: true });
       }
     );
@@ -232,7 +243,7 @@ app.post("/cadastro", (req, res, next) => {
 });
 
 // ================= LISTAR =================
-app.get("/operacoes", (req, res) => {
+app.get("/operacoes", proteger, (req, res) => {
   db.all("SELECT * FROM operacoes ORDER BY id DESC", [], (err, rows) => {
     if (err) return res.json([]);
 
