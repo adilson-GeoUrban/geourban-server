@@ -1,45 +1,150 @@
-app.post("/ia", async (req, res) => {
+const express = require("express");
+const path = require("path");
+
+const app = express();
+app.use(express.json());
+
+// ================= STATIC =================
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+// ================= "BANCO" (BASE INICIAL) =================
+let operacoes = [];
+
+// ================= REGRA LEGAL GLOBAL =================
+function validarLegalidade(msg) {
+  const proibidos = ["ilegal", "sonegar", "fraude", "burlar"];
+
+  for (let p of proibidos) {
+    if (msg.includes(p)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// ================= CALCULO SIMPLES DE IMPOSTO =================
+function calcularImposto(valor) {
+  const ii = valor * 0.60;   // Importação
+  const icms = valor * 0.18; // ICMS médio
+  const total = valor + ii + icms;
+
+  return {
+    valor,
+    ii,
+    icms,
+    total
+  };
+}
+
+// ================= IA CENTRAL =================
+app.post("/ia", (req, res) => {
   const { mensagem } = req.body;
 
-  let sistema = "Você é uma IA especialista geral.";
-
-  // 🔍 DETECÇÃO AUTOMÁTICA
-  if (mensagem.includes("lei") || mensagem.includes("direito")) {
-    sistema = "Você é uma IA jurídica especialista em legislação brasileira (LGPD, civil, penal).";
-  }
-
-  if (mensagem.includes("internacional")) {
-    sistema = "Você é uma IA especialista em direito internacional e normas globais.";
-  }
-
-  if (mensagem.includes("imposto") || mensagem.includes("contabilidade")) {
-    sistema = "Você é uma IA contábil especialista em normas brasileiras e tributação.";
-  }
-
-  if (mensagem.includes("global") || mensagem.includes("internacional contábil")) {
-    sistema = "Você é uma IA contábil internacional (IFRS, compliance global).";
-  }
-
-  if (mensagem.includes("erro") || mensagem.includes("bug")) {
-    sistema = "Você é uma IA engenheira de software especialista em corrigir bugs.";
-  }
-
-  if (mensagem.includes("layout") || mensagem.includes("tela")) {
-    sistema = "Você é uma IA designer especialista em UX/UI e correção visual.";
-  }
-
-  try {
-    const resposta = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: sistema },
-        { role: "user", content: mensagem }
-      ]
+  // 🔒 BLOQUEIO AUTOMÁTICO
+  if (!validarLegalidade(mensagem)) {
+    return res.json({
+      resposta: "⚠️ Operação bloqueada por possível ilegalidade."
     });
-
-    res.json({ resposta: resposta.choices[0].message.content });
-
-  } catch (err) {
-    res.status(500).json({ erro: "Falha IA" });
   }
+
+  let resposta = "IA GeoUrban ativa.\n";
+
+  // 🌍 IMPORTAÇÃO / EXPORTAÇÃO
+  if (mensagem.includes("importar") || mensagem.includes("exportar")) {
+    const valor = 1000; // exemplo padrão
+
+    const calc = calcularImposto(valor);
+
+    resposta += `
+🌍 Operação internacional detectada
+
+Valor base: R$ ${calc.valor}
+Imposto Importação: R$ ${calc.ii}
+ICMS: R$ ${calc.icms}
+Total estimado: R$ ${calc.total}
+
+⚖️ Necessário:
+- Classificação NCM
+- Verificação de licença
+- Regularização fiscal
+`;
+  }
+
+  // ⚖️ JURÍDICO
+  else if (mensagem.includes("lei")) {
+    resposta += "⚖️ Operação analisada conforme legislação brasileira.";
+  }
+
+  // 📊 CONTÁBIL
+  else if (mensagem.includes("imposto")) {
+    resposta += "📊 Consulte regime tributário adequado (Simples, Lucro Presumido).";
+  }
+
+  // 🛠 BUG / SISTEMA
+  else if (mensagem.includes("erro") || mensagem.includes("bug")) {
+    resposta += "🛠 Diagnóstico: verificar CSS, backend e carregamento de assets.";
+  }
+
+  // 🎨 DESIGN
+  else if (mensagem.includes("tela")) {
+    resposta += "🎨 Ajustar layout, centralização e responsividade.";
+  }
+
+  // ================= REGISTRO =================
+  operacoes.push({
+    mensagem,
+    data: new Date()
+  });
+
+  res.json({ resposta });
 });
+
+// ================= API DE OPERAÇÕES =================
+app.get("/operacoes", (req, res) => {
+  res.json(operacoes);
+});
+
+// ================= LOGIN SIMPLES =================
+app.post("/login", (req, res) => {
+  const { usuario, senha } = req.body;
+
+  if (usuario === "admin" && senha === "123") {
+    return res.json({ ok: true });
+  }
+
+  res.status(401).json({ erro: "Login inválido" });
+});
+
+// ================= START =================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
+<!DOCTYPE html>
+<html>
+<head>
+<title>Painel GeoUrban</title>
+</head>
+<body>
+
+<h2>Operações registradas</h2>
+<div id="lista"></div>
+
+<script>
+fetch("/operacoes")
+.then(r => r.json())
+.then(data => {
+  const div = document.getElementById("lista");
+
+  data.forEach(op => {
+    div.innerHTML += `<p>${op.data} - ${op.mensagem}</p>`;
+  });
+});
+</script>
+
+</body>
+</html>
