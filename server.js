@@ -116,3 +116,41 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log("Servidor rodando na porta " + PORT);
 });
+<input id="cpf" placeholder="CPF">
+<input id="senha" type="password" placeholder="Senha">
+    <script>
+async function login() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+        localStorage.setItem("token", data.token);
+        alert("Login realizado com sucesso 🔐");
+    } else {
+        alert("Erro no login");
+    }
+}
+
+async function cadastrar() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/cadastro", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+
+    alert(data.ok ? "Cadastro realizado" : data.erro);
+}
+</script>
