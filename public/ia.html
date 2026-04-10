@@ -148,3 +148,23 @@ function mostrar(txt){
  d.scrollTop=d.scrollHeight;
 }
 </script>
+<script>
+const chat = document.getElementById("chat");
+
+let isDown = false, offsetX, offsetY;
+
+chat.onmousedown = (e) => {
+ isDown = true;
+ offsetX = e.offsetX;
+ offsetY = e.offsetY;
+};
+
+document.onmousemove = (e) => {
+ if (!isDown) return;
+ chat.style.left = (e.clientX - offsetX) + "px";
+ chat.style.top = (e.clientY - offsetY) + "px";
+ chat.style.bottom = "auto";
+};
+
+document.onmouseup = () => isDown = false;
+</script>
