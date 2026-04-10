@@ -175,3 +175,38 @@ function mostrar(texto) {
     div.innerHTML += "<p>" + texto + "</p>";
 }
 </script>
+<script>
+function fazerCadastro() {
+    fetch("/cadastro", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+            usuario: "admin",
+            senha: "123"
+        })
+    }).then(r => r.json()).then(d => {
+        console.log(d);
+        mostrar("Luiza: Cadastro processado.");
+    });
+}
+
+function fazerLogin() {
+    fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+            usuario: "admin",
+            senha: "123"
+        })
+    }).then(r => r.json()).then(d => {
+        console.log(d);
+        mostrar("Luiza: Login processado.");if (msg.includes("login")) {
+    fazerLogin();
+}
+
+if (msg.includes("cadastro")) {
+    fazerCadastro();
+}
+    });
+}
+</script>
