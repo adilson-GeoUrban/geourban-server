@@ -62,3 +62,13 @@ app.post("/cadastro", (req, res) => {
 
     res.json({ ok: true });
 });
+function salvarCadastro(){
+ fetch("/cadastro",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    ...dados,
+    declaracao: true
+  })
+ });
+}
