@@ -1,64 +1,54 @@
 // =============================
-// 🤖 IA DESIGNER (INTERNO BLINDADO)
+// 💾 BACKUP AUTOMÁTICO
 // =============================
+const BACKUP_PATH = path.join(__dirname, "backup.json");
 
-let relatorio = {
-    inicio: new Date(),
-    acessos: 0,
-    logins: 0,
-    cadastros: 0,
-    erros: []
-};
+function gerarBackup() {
+    try {
+        const dados = fs.readFileSync(DB_PATH);
+        fs.writeFileSync(BACKUP_PATH, dados);
+        console.log("✅ Backup gerado");
+    } catch (e) {
+        console.log("❌ Erro backup:", e.message);
+    }
+}
+// =============================
+// 🤖 GUARDIÃO DO SISTEMA
+// =============================
+setInterval(() => {
+    console.log("🔎 Verificando sistema...");
 
-app.use((req, res, next) => {
-    relatorio.acessos++;
+    try {
+        const banco = lerBanco();
 
-    const originalJson = res.json;
-    const originalSend = res.send;
+        if (!Array.isArray(banco)) {
+            throw new Error("Banco corrompido");
+        }
 
-    function registrar() {
-        try {
-            if (req.url.includes("/login") && res.statusCode === 200) {
-                relatorio.logins++;
-            }
+        // gerar backup automático
+        gerarBackup();
 
-            if (req.url.includes("/cadastro") && res.statusCode === 200) {
-                relatorio.cadastros++;
-            }
+        console.log("🛡️ Sistema íntegro");
 
-            if (res.statusCode >= 400) {
-                relatorio.erros.push({
-                    rota: req.url,
-                    status: res.statusCode,
-                    data: new Date()
-                });
-            }
-        } catch (e) {}
+    } catch (e) {
+        console.log("🚨 ALERTA:", e.message);
+
+        relatorio.erros.push({
+            tipo: "sistema",
+            erro: e.message,
+            data: new Date()
+        });
     }
 
-    res.json = function (body) {
-        registrar();
-        return originalJson.call(this, body);
-    };
-
-    res.send = function (body) {
-        registrar();
-        return originalSend.call(this, body);
-    };
-
-    next();
-});
-
-// =============================
-// 📊 RELATÓRIO
-// =============================
+}, 30000); // a cada 30s
 app.get("/relatorio", (req, res) => {
     res.json({
-        status: "IA ativa e monitorando",
+        status: "GUARDIÃO ATIVO",
         inicio: relatorio.inicio,
         acessos: relatorio.acessos,
         logins: relatorio.logins,
         cadastros: relatorio.cadastros,
-        erros: relatorio.erros
+        erros: relatorio.erros,
+        backup: fs.existsSync(BACKUP_PATH) ? "OK" : "FALHOU"
     });
 });
