@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban v2</title>
+<title>GeoUrban v3</title>
 
 <style>
 body {
@@ -12,7 +12,7 @@ body {
  color:white;
 }
 
-/* INTRO COM IMAGEM */
+/* INTRO */
 #intro {
  position:fixed;
  top:0;
@@ -32,7 +32,6 @@ body {
  text-align:center;
 }
 
-/* camada escura */
 #intro::before {
  content:"";
  position:absolute;
@@ -42,12 +41,9 @@ body {
  z-index:-1;
 }
 
-/* CHAT CENTRAL */
+/* CHAT (BASE) */
 #chat {
  position:fixed;
- top:50%;
- left:50%;
- transform:translate(-50%, -50%);
  width:320px;
  background:white;
  color:black;
@@ -96,6 +92,21 @@ button {
 
 <script>
 
+// ================= FORÇA POSIÇÃO GLOBAL =================
+function forcarCentro(){
+ const chat = document.getElementById("chat");
+
+ chat.style.position = "fixed";
+ chat.style.top = "50%";
+ chat.style.left = "50%";
+ chat.style.right = "auto";
+ chat.style.bottom = "auto";
+ chat.style.transform = "translate(-50%, -50%)";
+}
+
+// roda ao carregar
+window.onload = forcarCentro;
+
 // ================= SLIDES =================
 const slides = [
 "🌍 GeoUrban",
@@ -120,13 +131,10 @@ function iniciarSistema(){
 
  liberado = true;
 
- const intro = document.getElementById("intro");
- intro.style.display = "none";
+ document.getElementById("intro").style.display = "none";
 
- const chat = document.getElementById("chat");
- chat.style.top = "50%";
- chat.style.left = "50%";
- chat.style.transform = "translate(-50%, -50%)";
+ // 💥 FORÇA CENTRO NOVAMENTE
+ forcarCentro();
 
  document.getElementById("audio").play().catch(()=>{});
 
