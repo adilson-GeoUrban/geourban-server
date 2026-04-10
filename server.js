@@ -88,4 +88,4 @@ app.post("/cadastro", (req, res, next) => {
   } catch (erro) {
     next(erro);
   }
-});
+app.post("/cadastro", proteger, (req, res, next) => {
