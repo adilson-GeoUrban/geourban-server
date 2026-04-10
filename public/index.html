@@ -1,3 +1,41 @@
-git add .
-git commit -m "fix: unificação total frontend IA + login"
-git push origin main
+.box {
+    position: fixed; /* 🔥 FIXA NA TELA */
+    bottom: 20px;
+    right: 20px;
+    width: 340px;
+
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+
+    border-radius: 12px;
+    padding: 20px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+
+    z-index: 9999; /* 🔥 sempre na frente */
+}
+body {
+    margin: 0;
+    overflow-x: hidden;
+}
+html, body {
+    height: 100%;
+}
+.box h3 {
+    margin-top: 0;
+    color: #4caf50;
+}
+
+input {
+    background: #222;
+    color: white;
+}
+
+button {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #66bb6a;
+}
