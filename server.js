@@ -1,4 +1,4 @@
-// ================= 🔒 CORS PROFISSIONAL FINAL (SEGURO E ESTÁVEL) =================
+// ================= 🔒 CORS PROFISSIONAL FINAL (PADRÃO ÚNICO) =================
 
 const ORIGENS_PERMITIDAS = [
   "http://localhost:3000",
@@ -13,14 +13,20 @@ app.use(cors({
 
   origin: function (origin, callback) {
 
-    // ================= 📱 SEM ORIGIN (apps / backend / curl) =================
+    // ================= 📱 SEM ORIGIN (mobile, curl, backend) =================
     if (!origin) {
-      // 🔐 NÃO confiar aqui — validação será feita pelo JWT depois
-      log("CORS_INFO", { tipo: "sem_origin_permitido" });
-      return callback(null, true);
+      log("CORS_INFO", { tipo: "sem_origin_controlado" });
+      return callback(null, true); // JWT vai proteger depois
     }
 
-    const originNormalizado = origin.toLowerCase();
+    // 🔒 normalização segura
+    let originNormalizado;
+    try {
+      originNormalizado = origin.toLowerCase();
+    } catch (e) {
+      log("CORS_ERRO", { origin });
+      return callback(new Error("CORS_BLOCK"));
+    }
 
     // ================= ✅ WHITELIST =================
     if (ORIGENS_PERMITIDAS.includes(originNormalizado)) {
