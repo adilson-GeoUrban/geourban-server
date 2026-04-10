@@ -1,5 +1,5 @@
 // =============================
-// 🤖 IA DESIGNER (INTERNO)
+// 🤖 IA DESIGNER (INTERNO BLINDADO)
 // =============================
 
 let relatorio = {
@@ -10,19 +10,19 @@ let relatorio = {
     erros: []
 };
 
-// monitorar requisições
 app.use((req, res, next) => {
     relatorio.acessos++;
 
+    const originalJson = res.json;
     const originalSend = res.send;
 
-    res.send = function (body) {
+    function registrar() {
         try {
-            if (req.url.includes("login") && res.statusCode === 200) {
+            if (req.url.includes("/login") && res.statusCode === 200) {
                 relatorio.logins++;
             }
 
-            if (req.url.includes("cadastro") && res.statusCode === 200) {
+            if (req.url.includes("/cadastro") && res.statusCode === 200) {
                 relatorio.cadastros++;
             }
 
@@ -33,17 +33,28 @@ app.use((req, res, next) => {
                     data: new Date()
                 });
             }
-
         } catch (e) {}
+    }
 
+    res.json = function (body) {
+        registrar();
+        return originalJson.call(this, body);
+    };
+
+    res.send = function (body) {
+        registrar();
         return originalSend.call(this, body);
     };
 
     next();
 });
+
+// =============================
+// 📊 RELATÓRIO
+// =============================
 app.get("/relatorio", (req, res) => {
     res.json({
-        status: "IA ativa",
+        status: "IA ativa e monitorando",
         inicio: relatorio.inicio,
         acessos: relatorio.acessos,
         logins: relatorio.logins,
