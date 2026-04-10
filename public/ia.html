@@ -1,3 +1,17 @@
-git add public/ia.html
-git commit -m "Unifica ia.html com login desktop funcional"
-git push origin main
+<div id="chat" style="position:fixed;bottom:10px;right:10px;width:320px;background:white;color:black;border-radius:10px;padding:10px;box-shadow:0 0 10px rgba(0,0,0,0.5);">
+
+    <!-- 👤 LUIZA (TOPO) -->
+    <div style="background:#2e7d32;color:white;padding:8px;border-radius:8px 8px 0 0;font-weight:bold;">
+        🤖 Luiza • Atendimento Inteligente
+    </div>
+
+    <!-- 💬 MENSAGENS -->
+    <div id="mensagens" style="height:200px;overflow:auto;font-size:14px;margin-top:5px;"></div>
+
+    <!-- ⌨️ INPUT -->
+    <div style="margin-top:5px;">
+        <input id="input" placeholder="Digite..." style="width:70%">
+        <button onclick="enviar()">OK</button>
+    </div>
+
+</div>
