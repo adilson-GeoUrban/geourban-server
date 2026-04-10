@@ -1,117 +1,19 @@
-<div style="position:fixed; top:10px; left:50%; transform:translateX(-50%);
-background:#000; color:#fff; padding:8px 15px; font-size:12px; z-index:9999; border-radius:8px;">
-🔐 Sistema protegido — uso de dados conforme LGPD (Lei nº 13.709/2018)
-</div>
-<body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
 
-<!-- FUNDO -->
-<div class="overlay"></div>
-
-<!-- 🔐 LOGIN FIXO -->
-<div class="login-box">
-    <h3>GeoUrban 🔐</h3>
-
-    <input id="cpf" placeholder="CPF">
-    <input id="senha" type="password" placeholder="Senha">
-
-    <button onclick="cadastrar()">Cadastrar</button>
-    <button onclick="login()">Entrar</button>
-</div>
-
-<!-- 🤖 IA FLUTUANTE -->
-<div id="ia-bot">
-    <div id="ia-header" onclick="toggleIA()">
-        🤖 Assistente GeoUrban
-    </div>
-
-    <div id="ia-body">
-        <div id="ia-mensagens"></div>
-        <input id="ia-input" placeholder="Digite..." onkeydown="if(event.key==='Enter') enviarIA()">
-    </div>
-</div>
-
-<script>
-// =============================
-// 🔐 LOGIN / CADASTRO
-// =============================
-async function cadastrar() {
-    const cpf = document.getElementById("cpf").value;
-    const senha = document.getElementById("senha").value;
-
-    const res = await fetch("/cadastro", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ cpf, senha })
-    });
-
-    const data = await res.json();
-    alert(data.ok ? "Cadastro OK" : data.erro);
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url("bg.jpg") no-repeat center center fixed;
+    background-size: cover;
 }
 
-async function login() {
-    const cpf = document.getElementById("cpf").value;
-    const senha = document.getElementById("senha").value;
-
-    const res = await fetch("/login", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ cpf, senha })
-    });
-
-    const data = await res.json();
-    alert(data.ok ? "Login OK 🔐" : "Erro login");
-}
-
-// =============================
-// 🤖 IA HUMANIZADA
-// =============================
-function toggleIA() {
-    const body = document.getElementById("ia-body");
-    body.style.display = body.style.display === "flex" ? "none" : "flex";
-}
-
-function addMsg(texto) {
-    const box = document.getElementById("ia-mensagens");
-    box.innerHTML += "<div>" + texto + "</div>";
-    box.scrollTop = box.scrollHeight;
-}
-
-let etapa = 0;
-
-function iniciarIA() {
-    addMsg("👋 Bem-vindo ao GeoUrban.");
-    setTimeout(() => {
-        addMsg("Antes de começar:");
-        addMsg("Você possui alguma necessidade?");
-        addMsg("👁️ Visual | 👂 Auditiva | ♿ Mobilidade | ❌ Nenhuma");
-    }, 800);
-}
-
-function enviarIA() {
-    const input = document.getElementById("ia-input");
-    const texto = input.value;
-
-    if (!texto) return;
-
-    addMsg("🧑 " + texto);
-    input.value = "";
-
-    if (etapa === 0) {
-        addMsg("✅ Entendido. Vou adaptar o atendimento.");
-        etapa = 1;
-
-        setTimeout(() => {
-            addMsg("🔐 Use o painel ao lado para login ou cadastro.");
-        }, 800);
-    } else {
-        addMsg("🤖 Estou acompanhando sua navegação...");
-    }
-}
-
-window.onload = iniciarIA;
-</script>
-
-</body>
+/* 🔐 LOGIN */
 .login-box {
     position: fixed;
     bottom: 30px;
@@ -120,9 +22,11 @@ window.onload = iniciarIA;
     background: rgba(0,0,0,0.85);
     padding: 20px;
     border-radius: 10px;
+    color: white;
     z-index: 9999;
 }
 
+/* 🤖 IA */
 #ia-bot {
     position: fixed;
     bottom: 20px;
@@ -152,17 +56,111 @@ window.onload = iniciarIA;
     overflow-y: auto;
     color: white;
 }
-<div style="position:fixed; bottom:0; width:100%; background:#000; color:#ccc;
-text-align:center; font-size:11px; padding:6px; z-index:9999;">
-🔐 Aviso LGPD: Reprodução, cópia ou uso não autorizado deste conteúdo é proibido.
-GeoUrban © 2026 — Proteção de dados conforme LGPD.
-</div>
+
 #ia-input {
-addMsg("🔐 Este ambiente é protegido. Seus dados seguem as diretrizes da LGPD.");
     width: 100%;
     padding: 8px;
 }
-banco.json
-backup.json
-server.js
-public/index.html
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 AVISO LGPD TOPO -->
+<div style="position:fixed; top:10px; left:50%; transform:translateX(-50%);
+background:#000; color:#fff; padding:8px 15px; font-size:12px; z-index:9999; border-radius:8px;">
+🔐 Sistema protegido — LGPD
+</div>
+
+<!-- 🔐 LOGIN -->
+<div class="login-box">
+    <h3>GeoUrban 🔐</h3>
+
+    <input id="cpf" placeholder="CPF"><br><br>
+    <input id="senha" type="password" placeholder="Senha"><br><br>
+
+    <button onclick="cadastrar()">Cadastrar</button>
+    <button onclick="login()">Entrar</button>
+</div>
+
+<!-- 🤖 IA -->
+<div id="ia-bot">
+    <div id="ia-header" onclick="toggleIA()">🤖 Assistente</div>
+
+    <div id="ia-body">
+        <div id="ia-mensagens"></div>
+        <input id="ia-input" placeholder="Digite..." onkeydown="if(event.key==='Enter') enviarIA()">
+    </div>
+</div>
+
+<!-- 🔐 RODAPÉ -->
+<div style="position:fixed; bottom:0; width:100%; background:#000; color:#ccc;
+text-align:center; font-size:11px; padding:6px; z-index:9999;">
+🔐 Aviso LGPD — GeoUrban © 2026
+</div>
+
+<script>
+// LOGIN
+async function cadastrar() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/cadastro", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+    alert(data.ok ? "Cadastro OK" : data.erro);
+}
+
+async function login() {
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ cpf, senha })
+    });
+
+    const data = await res.json();
+    alert(data.ok ? "Login OK 🔐" : "Erro login");
+}
+
+// IA
+function toggleIA() {
+    const body = document.getElementById("ia-body");
+    body.style.display = body.style.display === "flex" ? "none" : "flex";
+}
+
+function addMsg(texto) {
+    const box = document.getElementById("ia-mensagens");
+    box.innerHTML += "<div>" + texto + "</div>";
+    box.scrollTop = box.scrollHeight;
+}
+
+function iniciarIA() {
+    addMsg("👋 Bem-vindo ao GeoUrban.");
+    setTimeout(() => {
+        addMsg("Você possui alguma necessidade?");
+        addMsg("👁️ Visual | 👂 Auditiva | ♿ Mobilidade | ❌ Nenhuma");
+    }, 800);
+}
+
+function enviarIA() {
+    const input = document.getElementById("ia-input");
+    const texto = input.value;
+
+    if (!texto) return;
+
+    addMsg("🧑 " + texto);
+    input.value = "";
+}
+
+window.onload = iniciarIA;
+</script>
+
+</body>
+</html>
