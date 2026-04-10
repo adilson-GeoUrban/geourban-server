@@ -3,3 +3,7 @@ git commit -m "checkpoint seguro: sistema funcional + IA + LGPD + guardião ativ
 git push origin main
 git tag v1.0-seguro
 git push origin v1.0-seguro
+banco.json
+backup.json
+server.js
+public/index.html
