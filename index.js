@@ -46,6 +46,8 @@ app.post("/ia", (req, res, next) => {
 
     for (let p of proibidos) {
       if (mensagem.includes(p)) {
+        log("BLOQUEIO", { mensagem: mensagemOriginal });
+
         return res.json({
           resposta: "🚫 IA Jurídica: operação bloqueada."
         });
@@ -59,14 +61,24 @@ app.post("/ia", (req, res, next) => {
       iaTecnica(mensagem) ||
       "🤖 IA GeoUrban: análise não classificada.";
 
-    // 🔐 SALVAR CRIPTOGRAFADO
+    // 🔐 CRIPTOGRAFIA
     const criptografado = CryptoJS.AES.encrypt(mensagemOriginal, SECRET).toString();
 
+    // 💾 SALVAR + LOG
     db.run(
       "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
       [criptografado, new Date().toISOString()],
       (err) => {
-        if (err) return next(err);
+        if (err) {
+          log("ERRO_DB", { erro: err.message });
+          return next(err);
+        }
+
+        log("IA", {
+          entrada: mensagemOriginal,
+          resposta
+        });
+
         res.json({ resposta });
       }
     );
