@@ -2,7 +2,7 @@
 app.post("/cadastro", (req, res, next) => {
   try {
 
-    const {
+    let {
       nome,
       escolaridade,
       profissao,
@@ -11,9 +11,25 @@ app.post("/cadastro", (req, res, next) => {
       declaracao
     } = req.body;
 
-    // 🔴 VALIDAÇÃO
+    // ================= NORMALIZAÇÃO =================
+    nome = nome?.trim();
+    escolaridade = escolaridade?.trim();
+    profissao = profissao?.trim();
+    limitacoes = limitacoes?.trim();
+    registro = registro?.trim();
+
+    // ================= VALIDAÇÃO =================
     if (!nome || !escolaridade || !profissao || !limitacoes) {
-      return res.status(400).json({ erro: "Dados obrigatórios incompletos" });
+      return res.status(400).json({
+        erro: "Dados obrigatórios incompletos"
+      });
+    }
+
+    // 🔒 LIMITE DE TAMANHO (ANTI ATAQUE)
+    if (nome.length > 100 || profissao.length > 100) {
+      return res.status(400).json({
+        erro: "Dados muito longos"
+      });
     }
 
     const esc = escolaridade.toLowerCase();
@@ -30,7 +46,7 @@ app.post("/cadastro", (req, res, next) => {
       });
     }
 
-    // 🔐 CRIPTOGRAFIA
+    // ================= CRIPTOGRAFIA =================
     const nomeCripto = CryptoJS.AES.encrypt(nome, SECRET).toString();
     const profCripto = CryptoJS.AES.encrypt(profissao, SECRET).toString();
     const limCripto = CryptoJS.AES.encrypt(limitacoes, SECRET).toString();
@@ -38,7 +54,7 @@ app.post("/cadastro", (req, res, next) => {
       ? CryptoJS.AES.encrypt(registro, SECRET).toString()
       : null;
 
-    // 💾 SALVAR NO SQLITE
+    // ================= SALVAR =================
     db.run(
       `INSERT INTO cadastros 
       (nome, escolaridade, profissao, limitacoes, registro, data)
@@ -57,10 +73,9 @@ app.post("/cadastro", (req, res, next) => {
           return next(err);
         }
 
-        // 🔒 LOG SEGURO (SEM DADOS SENSÍVEIS)
+        // 🔒 LOG SEGURO
         log("CADASTRO", {
-          status: "ok",
-          tipo: escolaridade
+          status: "ok"
         });
 
         res.json({
