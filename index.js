@@ -21,36 +21,109 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ================= IA =================
 app.post("/ia", (req, res) => {
+
   const mensagem = (req.body.mensagem || "").toLowerCase();
 
-  // BLOQUEIO
-  if (mensagem.includes("ilegal") || mensagem.includes("fraude")) {
-    return res.json({ resposta: "🚫 Operação bloqueada" });
+  // 🔒 BLOQUEIO LEGAL
+  const proibidos = ["ilegal", "fraude", "sonegar", "burlar"];
+
+  for (let p of proibidos) {
+    if (mensagem.includes(p)) {
+      return res.json({
+        resposta: "🚫 IA Jurídica: operação bloqueada por possível ilegalidade."
+      });
+    }
   }
 
-  let resposta = "IA ativa\n";
+  let resposta = "🤖 IA GeoUrban ativa.\n";
 
-  if (mensagem.includes("importar")) {
-    resposta += "🌍 Importação exige impostos e regularização.";
+  // ⚖️ IA JURÍDICA
+  if (
+    mensagem.includes("lei") ||
+    mensagem.includes("direito") ||
+    mensagem.includes("contrato") ||
+    mensagem.includes("processo")
+  ) {
+    resposta = `
+⚖️ IA Jurídica
+
+- Verificar legislação aplicável
+- Validar documentação
+- Consultar profissional habilitado
+
+⚠️ Uso orientativo
+`;
   }
 
-  // SALVAR NO BANCO
+  // 🌍 INTERNACIONAL
+  else if (
+    mensagem.includes("importar") ||
+    mensagem.includes("exportar")
+  ) {
+    resposta = `
+🌍 Operação Internacional
+
+- Classificação NCM obrigatória
+- Impostos (II + ICMS)
+- Possível licenciamento
+
+⚖️ Seguir legislação vigente
+`;
+  }
+
+  // 📊 CONTÁBIL
+  else if (mensagem.includes("imposto")) {
+    resposta = `
+📊 IA Contábil
+
+- Avaliar regime tributário
+- Simples / Lucro Presumido
+
+⚠️ Consultar contador
+`;
+  }
+
+  // 🛠 TÉCNICO
+  else if (
+    mensagem.includes("erro") ||
+    mensagem.includes("bug")
+  ) {
+    resposta = "🛠 IA Técnica: verificar backend, rotas e arquivos.";
+  }
+
+  // 🎨 DESIGN
+  else if (mensagem.includes("tela")) {
+    resposta = "🎨 IA Designer: ajustar layout e responsividade.";
+  }
+
+  // 🤖 PADRÃO
+  else {
+    resposta = "🤖 IA GeoUrban pronta. Informe melhor sua necessidade.";
+  }
+
+  // 💾 SALVAR NO BANCO
   db.run(
     "INSERT INTO operacoes (mensagem, data) VALUES (?, ?)",
     [mensagem, new Date().toISOString()]
   );
 
   res.json({ resposta });
+
 });
 
 // ================= LISTAR =================
 app.get("/operacoes", (req, res) => {
   db.all("SELECT * FROM operacoes ORDER BY id DESC", [], (err, rows) => {
+    if (err) {
+      return res.json([]);
+    }
     res.json(rows);
   });
 });
 
 // ================= START =================
-app.listen(3000, () => {
-  console.log("Rodando em http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor rodando em http://localhost:" + PORT);
 });
