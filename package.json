@@ -10,6 +10,3 @@
     "express": "^4.18.2"
   }
 }
-Root Directory: (vazio)
-Build Command: npm install
-Start Command: node server.js
