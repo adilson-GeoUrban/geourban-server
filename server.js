@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ================= 🔒 CONFIG =================
-const JWT_SECRET = process.env.JWT_SECRET || "trocar_urgente_super_secreto";
+const JWT_SECRET = process.env.JWT_SECRET || "ERRO_SEM_SECRET";
 const USERS_PATH = path.join(__dirname, "users.json");
 const LOG_PATH = path.join(__dirname, "logs.json");
 
@@ -53,7 +53,14 @@ function lerJSON(caminho) {
 
 // ================= 📦 MIDDLEWARE =================
 app.use(express.json());
+
+// 🔥 STATIC GARANTIDO
 app.use(express.static(path.join(__dirname, "public")));
+
+// ================= 🧪 TESTE =================
+app.get('/teste', (req, res) => {
+    res.send("SERVIDOR OK");
+});
 
 // ================= 👤 REGISTRO =================
 app.post('/api/register', (req, res) => {
@@ -92,7 +99,7 @@ app.post('/api/login', (req, res) => {
     res.json({ token });
 });
 
-// ================= 🔐 PROTEÇÃO =================
+// ================= 🔐 AUTH =================
 function auth(req, res, next) {
     const token = req.headers.authorization;
 
@@ -118,15 +125,20 @@ app.post('/api/log', (req, res) => {
     res.json({ ok: true });
 });
 
-// ================= 📄 RELATÓRIO PROTEGIDO =================
+// ================= 📄 RELATÓRIO =================
 app.get('/api/relatorio', auth, (req, res) => {
     const logs = lerJSON(LOG_PATH);
     res.json(logs);
 });
 
-// ================= 🌐 ROTAS =================
+// ================= 🌐 HOME =================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+// 🔥 FALLBACK (CORRIGE NOT FOUND)
+app.use((req, res) => {
+    res.status(404).send("Rota não encontrada");
 });
 
 app.listen(PORT, () => {
