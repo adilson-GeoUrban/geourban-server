@@ -1,91 +1,84 @@
-<!-- ================= 🟨 FRONTEND LOGIN ================= -->
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
+    /* 🔵 FUNDO COM IMAGEM */
+    background: url('bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* 🔵 CAIXA FLUTUANTE */
+#lgpd-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: rgba(0,0,0,0.75);
+    color: white;
+
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    animation: aparecer 0.5s ease;
+}
+
+/* BOTÃO */
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #4caf50;
+    color: white;
+    cursor: pointer;
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+</style>
 </head>
+
 <body>
 
-<h2>Login</h2>
-
-<input id="usuario" placeholder="Usuário"><br><br>
-<input id="senha" type="password" placeholder="Senha"><br><br>
-
-<button onclick="logar()">Entrar</button>
+<!-- 🔵 LGPD -->
+<div id="lgpd-box">
+    <div>🤖 IA Luiza</div>
+    <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
+    <button onclick="aceitar()">Aceito e continuar</button>
+</div>
 
 <script>
-async function logar() {
-  const res = await fetch("/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      usuario: usuario.value,
-      senha: senha.value
-    })
-  });
+function aceitar() {
+    localStorage.setItem("lgpd", "ok");
 
-  const data = await res.json();
+    // 🔵 abre login em nova aba segura
+    window.open("/login", "_blank", "noopener,noreferrer");
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    window.location.href = "/admin.html";
-  } else {
-    alert("Erro login");
-  }
+    // 🔵 esconde caixa
+    document.getElementById("lgpd-box").style.display = "none";
 }
 </script>
 
 </body>
- <!-- ================= 🟨 PAINEL ADMIN ================= -->
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Painel</title>
-
-  <style>
-    body {
-      background: url("/bg.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-
-<h2>Painel Admin</h2>
-
-<button onclick="teste()">Testar API</button>
-<button onclick="auditoria()">Auditoria</button>
-<button onclick="backup()">Backup</button>
-<button onclick="ia()">IA Designer</button>
-
-<pre id="saida"></pre>
-
-<script>
-const token = localStorage.getItem("token");
-
-if (!token) {
-  window.location.href = "/login.html";
-}
-
-async function api(url) {
-  const res = await fetch(url, {
-    headers: {
-      "Authorization": "Bearer " + token
-    }
-  });
-
-  const data = await res.json();
-  document.getElementById("saida").innerText =
-    JSON.stringify(data, null, 2);
-}
-
-function teste(){ api("/api/teste"); }
-function auditoria(){ api("/admin/auditoria"); }
-function backup(){ api("/admin/backup"); }
-function ia(){ api("/ia/designer"); }
-</script>
-
-</body>
-</html>
 </html>
