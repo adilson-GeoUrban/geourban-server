@@ -3,8 +3,8 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
 
-    /* 🔵 FUNDO CORRIGIDO */
-    background: url('/bg.jpg') no-repeat center center fixed;
+    /* 🔵 FUNDO CORRETO (geo.jpg) */
+    background: url('/geo.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -24,6 +24,7 @@ body {
 
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     animation: aparecer 0.5s ease;
+    z-index: 999;
 }
 
 /* 🔵 IA LUÍZA (FIXA CANTO) */
@@ -41,6 +42,8 @@ body {
 
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
     font-size: 13px;
+
+    z-index: 998;
 }
 
 /* BOTÃO */
