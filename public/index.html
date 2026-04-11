@@ -1,37 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("/bg.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* LGPD */
+#lgpd-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 999;
+}
+
+/* LOGIN */
+#login-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    display: none;
+}
+
+#login-box input {
+    width: 90%;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+#app {
+    display: none;
+    padding: 20px;
+    color: white;
+}
+
+/* LUÍZA */
+#luiza {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LGPD -->
+<div id="lgpd-box">
+    <h3>🔒 LGPD</h3>
+    <p>Seus dados são protegidos.</p>
+    <button onclick="aceitarLGPD()">Aceitar</button>
+</div>
+
+<!-- LOGIN -->
+<div id="login-box">
+    <h2>Acesso</h2>
+    <input id="user" placeholder="Usuário">
+    <input id="pass" type="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <p id="msg"></p>
+</div>
+
+<!-- APP -->
+<div id="app">
+    <h2>✅ Sistema Ativo</h2>
+    <button onclick="logout()">Sair</button>
+    <button onclick="getRelatorio()">Ver Logs</button>
+    <pre id="saida"></pre>
+</div>
+
+<!-- LUÍZA -->
+<div id="luiza">
+    <b>Luiza:</b>
+    <div id="chat-area"></div>
+</div>
+
+<script>
 const API = "https://geourban-server-1.onrender.com";
 
+// ================= LGPD =================
 function aceitarLGPD() {
-    // salva aceite
     localStorage.setItem("lgpd", "true");
 
-    const lgpd = document.getElementById("lgpd-box");
-    const luiza = document.getElementById("luiza");
-    const chat = document.getElementById("chat-area");
+    document.getElementById("lgpd-box").style.display = "none";
+    document.getElementById("login-box").style.display = "block";
 
-    // segurança: verifica se elementos existem
-    if (lgpd) lgpd.style.display = "none";
+    iniciarSessao();
+    iniciarLuiza();
 
-    if (luiza) {
-        luiza.style.display = "block";
-        luiza.style.opacity = "1";
-        luiza.style.visibility = "visible";
-    }
-
-    // inicia sessão
-    if (typeof iniciarSessao === "function") {
-        iniciarSessao();
-    }
-
-    // limpa chat
-    if (chat) {
-        chat.innerHTML = "";
-    }
-
-    // inicia assistente
-    if (typeof iniciarLuiza === "function") {
-        iniciarLuiza();
-    }
-
-    // registra log no backend
     registrarLog("LGPD", "Aceito");
 }
+
+// ================= LOGIN =================
+async function login() {
+    const user = document.getElementById("user").value;
+    const pass = document.getElementById("pass").value;
+
+    const res = await fetch(API + "/api/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ user, pass })
+    });
+
+    const data = await res.json();
+
+    if (data.token) {
+        localStorage.setItem("token", data.token);
+        entrarSistema();
+        registrarLog("LOGIN", "Sucesso");
+    } else {
+        document.getElementById("msg").innerText = "Erro login";
+    }
+}
+
+// ================= ENTRAR =================
+function entrarSistema() {
+    document.getElementById("login-box").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("luiza").style.display = "block";
+}
+
+// ================= LOGOUT =================
+function logout() {
+    localStorage.clear();
+    location.reload();
+}
+
+// ================= RELATORIO =================
+function getRelatorio() {
+    const token = localStorage.getItem("token");
+
+    fetch(API + "/api/relatorio", {
+        headers: { Authorization: token }
+    })
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById("saida").innerText = JSON.stringify(d, null, 2);
+    });
+}
+
+// ================= LOG =================
+function registrarLog(tipo, acao) {
+    fetch(API + "/api/log", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ tipo, acao })
+    });
+}
+
+// ================= LUÍZA =================
+function iniciarLuiza() {
+    document.getElementById("chat-area").innerHTML =
+        "🔒 Sistema seguro ativo<br>🤖 Pronta para análise";
+}
+
+// ================= SESSÃO =================
+function iniciarSessao() {
+    const id = "sess_" + Math.random().toString(36).substring(2);
+    localStorage.setItem("sessao", id);
+}
+
+// ================= AUTO LOAD =================
+window.onload = () => {
+    if (localStorage.getItem("lgpd")) {
+        document.getElementById("lgpd-box").style.display = "none";
+        document.getElementById("login-box").style.display = "block";
+    }
+
+    if (localStorage.getItem("token")) {
+        entrarSistema();
+    }
+};
+</script>
+
+</body>
+</html>
