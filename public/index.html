@@ -1,75 +1,156 @@
 <script>
+// ================= 🔒 CONFIG SEGURANÇA =================
+const LUIZA_CONFIG = {
+    versao: "2.0",
+    modo: "PERICIAL",
+    lgpd: true
+};
+
+// ================= 🧾 LOG AUDITORIA =================
+function registrarLog(tipo, detalhe) {
+    const log = {
+        data: new Date().toISOString(),
+        tipo: tipo,
+        detalhe: detalhe,
+        ip: "oculto",
+        sessao: localStorage.getItem("sessao") || "anonima"
+    };
+
+    let logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+    logs.push(log);
+    localStorage.setItem("logs_luiza", JSON.stringify(logs));
+}
+
+// ================= 🔐 SESSÃO =================
+function iniciarSessao() {
+    const id = "sess_" + Math.random().toString(36).substring(2);
+    localStorage.setItem("sessao", id);
+}
+
+// ================= 🚀 INÍCIO =================
 function aceitarLGPD() {
     localStorage.setItem("lgpd", "true");
     document.getElementById("lgpd-box").style.display = "none";
     document.getElementById("luiza").style.display = "block";
 
+    iniciarSessao();
     iniciarLuiza();
+
+    registrarLog("LGPD", "Usuário aceitou termos");
 }
 
+// ================= 🤖 INICIALIZAÇÃO =================
 function iniciarLuiza() {
     const area = document.getElementById("chat-area");
 
     area.innerHTML += `
-    <div><b>Luiza:</b> 🔒 Sistema iniciado com protocolo de segurança.</div>
-    <div><b>Luiza:</b> 📊 Modo ativo: Análise Técnica Pericial.</div>
-    <div><b>Luiza:</b> 🛡️ Seus dados estão protegidos e não são compartilhados com terceiros.</div>
-    <div><b>Luiza:</b> 🤖 Posso analisar, auditar e orientar com precisão técnica.</div>
+    <div><b>Luiza:</b> 🔒 Protocolo de Segurança Ativo</div>
+    <div><b>Luiza:</b> 📊 Modo: Auditoria Técnica Pericial</div>
+    <div><b>Luiza:</b> 🧾 Sessão registrada com conformidade LGPD</div>
+    <div><b>Luiza:</b> 🤖 Pronta para análise, diagnóstico e segurança</div>
     `;
 }
 
+// ================= 💬 CHAT =================
 function enviar() {
     const input = document.getElementById("chat-input");
     const area = document.getElementById("chat-area");
-    const msg = input.value.toLowerCase();
+    const msgOriginal = input.value;
+    const msg = msgOriginal.toLowerCase();
 
     if (!msg) return;
 
-    area.innerHTML += "<div><b>Você:</b> " + input.value + "</div>";
+    area.innerHTML += "<div><b>Você:</b> " + msgOriginal + "</div>";
+
+    registrarLog("INPUT", msgOriginal);
 
     let resposta = "";
+    let nivel = "INFO";
 
-    if (msg.includes("segurança") || msg.includes("vazamento")) {
+    // 🔒 SEGURANÇA
+    if (msg.includes("senha") || msg.includes("login")) {
         resposta = `
-        🔒 LAUDO TÉCNICO:
-        Não há evidência de vazamento.
-        Sistema operando dentro dos padrões seguros.
-        Recomenda-se validação de logs e controle de acesso.
+        🔐 ALERTA DE SEGURANÇA:
+        Nunca compartilhe credenciais.
+        A autenticação deve ocorrer em ambiente seguro separado.
         `;
+        nivel = "ALERTA";
     }
 
-    else if (msg.includes("invas") || msg.includes("hack")) {
+    // 🚫 INVASÃO
+    else if (msg.includes("invad") || msg.includes("hack")) {
         resposta = `
-        🚫 ANÁLISE DE INCIDENTE:
-        Não foram identificados sinais de invasão.
-        Nenhuma alteração externa detectada.
-        Ambiente íntegro.
+        🚫 LAUDO TÉCNICO:
+        Não há evidência de invasão no sistema atual.
+        Recomenda-se análise de logs e controle de acesso.
         `;
+        nivel = "PERICIAL";
     }
 
+    // 📊 VAZAMENTO
+    else if (msg.includes("vazamento") || msg.includes("dados")) {
+        resposta = `
+        🔒 ANÁLISE LGPD:
+        Nenhum vazamento identificado.
+        Sistema operando dentro dos padrões de proteção de dados.
+        `;
+        nivel = "PERICIAL";
+    }
+
+    // ⚠️ ERRO
     else if (msg.includes("erro") || msg.includes("bug")) {
         resposta = `
         ⚠️ DIAGNÓSTICO:
         Possível falha operacional ou deploy não atualizado.
-        Verificar logs e ambiente de execução.
+        Verificar ambiente e logs do servidor.
         `;
+        nivel = "DIAGNOSTICO";
     }
 
+    // 📄 RELATÓRIO
+    else if (msg.includes("relatorio")) {
+        gerarRelatorio();
+        return;
+    }
+
+    // PADRÃO
     else {
         resposta = `
         📊 ANÁLISE:
-        Solicitação recebida.
-        Processando com base em critérios técnicos e segurança.
+        Solicitação registrada e processada.
+        Sistema operando com monitoramento ativo.
         `;
     }
 
     area.innerHTML += "<div><b>Luiza:</b> " + resposta + "</div>";
 
+    registrarLog("RESPOSTA", nivel);
+
     input.value = "";
     area.scrollTop = area.scrollHeight;
 }
 
+// ================= 📄 RELATÓRIO =================
+function gerarRelatorio() {
+    const logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+
+    let relatorio = `
+    🧾 RELATÓRIO DE AUDITORIA
+    -------------------------
+    Sessão: ${localStorage.getItem("sessao")}
+    Registros: ${logs.length}
+    Status: SISTEMA MONITORADO
+    `;
+
+    const area = document.getElementById("chat-area");
+    area.innerHTML += "<div><b>Luiza:</b><pre>" + relatorio + "</pre></div>";
+
+    registrarLog("RELATORIO", "Gerado pelo usuário");
+}
+
+// ================= 🔑 LOGIN =================
 function abrirLogin() {
+    registrarLog("LOGIN", "Acesso solicitado");
     window.open("/login", "_blank", "noopener,noreferrer");
 }
 </script>
