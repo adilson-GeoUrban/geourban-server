@@ -1,3 +1,7 @@
+// ================= 🧪 TESTE =================
+app.get('/teste', (req, res) => {
+    res.send("SERVIDOR OK");
+});
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
