@@ -1,71 +1,36 @@
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+<!DOCTYPE html>
+<html>
+<body style="font-family:Arial;padding:20px;">
 
-    /* 🔵 FUNDO CORRETO (geo.jpg) */
-    background: url('/geo.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
+<h3>🔐 Login Seguro</h3>
 
-/* 🔵 LGPD CENTRAL */
-#lgpd-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+<input id="user" placeholder="Usuário"><br><br>
+<input id="pass" type="password" placeholder="Senha"><br><br>
 
-    background: rgba(0,0,0,0.75);
-    color: white;
+<button onclick="login()">Entrar</button>
 
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
+<script>
+async function login() {
+    const user = document.getElementById("user").value;
+    const pass = document.getElementById("pass").value;
 
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    animation: aparecer 0.5s ease;
-    z-index: 999;
-}
+    const res = await fetch('/api/login', {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ user, pass })
+    });
 
-/* 🔵 IA LUÍZA (FIXA CANTO) */
-#luiza-box {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    const data = await res.json();
 
-    background: white;
-    color: black;
-
-    padding: 15px;
-    border-radius: 10px;
-    width: 260px;
-
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    font-size: 13px;
-
-    z-index: 998;
-}
-
-/* BOTÃO */
-button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: #4caf50;
-    color: white;
-    cursor: pointer;
-}
-
-/* ANIMAÇÃO */
-@keyframes aparecer {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -40%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
+    if (data.token) {
+        localStorage.setItem("token", data.token);
+        alert("Login OK");
+        window.close();
+    } else {
+        alert("Erro login");
     }
 }
-</style>
+</script>
+
+</body>
+</html>
