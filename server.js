@@ -1,5 +1,4 @@
 // 🟩 BACKEND (server.js)
-
 const fs = require("fs");
 
 // ================= 📊 AUDITORIA =================
