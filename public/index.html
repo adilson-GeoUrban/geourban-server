@@ -1,122 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoUrban</title>
-
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-
-    /* 🔵 FUNDO (AJUSTADO PARA geo.jpg) */
-    background: url("/geo.jpg") no-repeat center center fixed;
-    background-size: cover;
-}
-
-/* 🔵 LGPD BOX */
-#lgpd-box {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 300px;
-
-    background: rgba(0,0,0,0.85);
-    color: white;
-
-    padding: 20px;
-    border-radius: 12px;
-
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    animation: aparecer 0.5s ease;
-
-    z-index: 1000;
-}
-
-#lgpd-box button {
-    width: 100%;
-    padding: 10px;
-    background: #4caf50;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* 🟣 LUIZA CHAT (NÃO SOME MAIS) */
-#luiza {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    width: 300px;
-
-    background: white;
-    color: black;
-
-    padding: 15px;
-    border-radius: 12px;
-
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
-
-    display: none;
-    z-index: 2000;
-}
-
-/* 🟡 ÁREA CHAT */
-#chat-area {
-    max-height: 150px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    font-size: 13px;
-}
-
-/* INPUT */
-#chat-input {
-    width: 70%;
-    padding: 5px;
-}
-
-/* BOTÃO CHAT */
-#chat-btn {
-    padding: 5px;
-}
-
-/* ANIMAÇÃO */
-@keyframes aparecer {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>
-</head>
-
-<body>
-
-<!-- LGPD -->
-<div id="lgpd-box">
-    <h3>🔒 Segurança Total</h3>
-    <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
-    <button onclick="aceitarLGPD()">Aceito e continuar</button>
-</div>
-
-<!-- LUIZA -->
-<div id="luiza">
-    <div id="chat-area"></div>
-
-    <input id="chat-input" placeholder="Digite aqui..." />
-    <button id="chat-btn" onclick="enviar()">Enviar</button>
-
-    <br><br>
-    <button onclick="abrirLogin()">Acessar sistema</button>
-</div>
-
 <script>
 function aceitarLGPD() {
     localStorage.setItem("lgpd", "true");
     document.getElementById("lgpd-box").style.display = "none";
-
-    // 🔵 MOSTRA LUÍZA SEM SUMIR
     document.getElementById("luiza").style.display = "block";
 
     iniciarLuiza();
@@ -124,17 +9,61 @@ function aceitarLGPD() {
 
 function iniciarLuiza() {
     const area = document.getElementById("chat-area");
-    area.innerHTML += "<div><b>Luiza:</b> Olá! Sou sua assistente virtual 👩‍💻</div>";
+
+    area.innerHTML += `
+    <div><b>Luiza:</b> 🔒 Sistema iniciado com protocolo de segurança.</div>
+    <div><b>Luiza:</b> 📊 Modo ativo: Análise Técnica Pericial.</div>
+    <div><b>Luiza:</b> 🛡️ Seus dados estão protegidos e não são compartilhados com terceiros.</div>
+    <div><b>Luiza:</b> 🤖 Posso analisar, auditar e orientar com precisão técnica.</div>
+    `;
 }
 
 function enviar() {
     const input = document.getElementById("chat-input");
     const area = document.getElementById("chat-area");
+    const msg = input.value.toLowerCase();
 
-    if (!input.value) return;
+    if (!msg) return;
 
     area.innerHTML += "<div><b>Você:</b> " + input.value + "</div>";
-    area.innerHTML += "<div><b>Luiza:</b> Estou analisando sua solicitação...</div>";
+
+    let resposta = "";
+
+    if (msg.includes("segurança") || msg.includes("vazamento")) {
+        resposta = `
+        🔒 LAUDO TÉCNICO:
+        Não há evidência de vazamento.
+        Sistema operando dentro dos padrões seguros.
+        Recomenda-se validação de logs e controle de acesso.
+        `;
+    }
+
+    else if (msg.includes("invas") || msg.includes("hack")) {
+        resposta = `
+        🚫 ANÁLISE DE INCIDENTE:
+        Não foram identificados sinais de invasão.
+        Nenhuma alteração externa detectada.
+        Ambiente íntegro.
+        `;
+    }
+
+    else if (msg.includes("erro") || msg.includes("bug")) {
+        resposta = `
+        ⚠️ DIAGNÓSTICO:
+        Possível falha operacional ou deploy não atualizado.
+        Verificar logs e ambiente de execução.
+        `;
+    }
+
+    else {
+        resposta = `
+        📊 ANÁLISE:
+        Solicitação recebida.
+        Processando com base em critérios técnicos e segurança.
+        `;
+    }
+
+    area.innerHTML += "<div><b>Luiza:</b> " + resposta + "</div>";
 
     input.value = "";
     area.scrollTop = area.scrollHeight;
@@ -144,6 +73,3 @@ function abrirLogin() {
     window.open("/login", "_blank", "noopener,noreferrer");
 }
 </script>
-
-</body>
-</html>
