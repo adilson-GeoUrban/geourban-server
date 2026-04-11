@@ -1,81 +1,77 @@
-// ================= 🔒 CORS PROFISSIONAL FINAL (ÚNICO E DEFINITIVO) =================
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+const app = express();
+
+// ================= 🔐 SEGURANÇA BASE =================
+app.use(helmet());
+app.disable("x-powered-by");
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+}));
+
+// ================= 🔒 CORS PROFISSIONAL =================
 const ORIGENS_PERMITIDAS = [
   "http://localhost:3000",
-  "https://seudominio.com",
-  "https://www.seudominio.com"
+  "https://geourbanapp.com.br",
+  "https://www.geourbanapp.com.br"
 ];
 
-// 🔒 aceita subdomínios controlados
-const regexDominio = /^https:\/\/([a-z0-9-]+\.)?seudominio\.com$/i;
+// 🔒 subdomínios
+const regexDominio = /^https:\/\/([a-z0-9-]+\.)?geourbanapp\.com\.br$/i;
 
 app.use(cors({
-
   origin: function (origin, callback) {
 
-    // 📱 SEM ORIGIN (mobile, backend, curl)
     if (!origin) {
-      log("CORS_INFO", { tipo: "sem_origin_controlado" });
-      return callback(null, true); // JWT protege depois
+      return callback(null, true);
     }
 
     let originNormalizado;
 
     try {
       originNormalizado = origin.toLowerCase();
-    } catch (e) {
-      log("CORS_ERRO", { origin });
+    } catch {
       return callback(new Error("CORS_BLOCK"));
     }
 
-    // ✅ whitelist direta
     if (ORIGENS_PERMITIDAS.includes(originNormalizado)) {
       return callback(null, true);
     }
 
-    // ✅ subdomínios seguros
     if (regexDominio.test(originNormalizado)) {
       return callback(null, true);
     }
-
-    // ❌ bloqueio
-    log("CORS_BLOQUEADO", { origin: originNormalizado });
 
     return callback(new Error("CORS_BLOCK"));
   },
 
   methods: ["GET", "POST"],
-
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization"
-  ],
-
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
-
 }));
 
-// ================= 🔐 HTTPS + REDIRECIONAMENTO =================
-const https = require("https");
-const http = require("http");
+// ================= 📦 BODY =================
+app.use(express.json());
 
-const options = {
-  key: fs.readFileSync("./certs/privkey.pem"),
-  cert: fs.readFileSync("./certs/fullchain.pem"),
+// ================= 🔐 ROTA PROTEGIDA =================
+app.use("/api", (req, res, next) => {
+  const token = req.headers.authorization;
 
-  // 🔒 preparação para certificado A3 (mTLS futuro)
-  requestCert: true,
-  rejectUnauthorized: false
-};
+  if (!token || token !== process.env.TOKEN_SEGURO) {
+    return res.status(403).json({ erro: "Acesso negado" });
+  }
 
-// 🚀 SERVIDOR HTTPS (OFICIAL)
-https.createServer(options, app).listen(443, () => {
-  log("HTTPS_START", { porta: 443 });
+  next();
 });
 
-// 🔁 REDIRECIONA HTTP → HTTPS
-http.createServer((req, res) => {
-  res.writeHead(301, {
-    Location: "https://" + req.headers.host + req.url
-  });
-  res.end();
-}).listen(80);
+// ================= 🚀 PORTA (RENDER) =================
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta", PORT);
+});
