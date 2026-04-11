@@ -1,15 +1,16 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ================= CONFIG =================
-const JWT_SECRET = process.env.JWT_SECRET || "trocar_urgente_super_secreto";
-const USERS_PATH = path.join(__dirname, "users.json");
-const LOG_PATH = path.join(__dirname, "logs.json");
+// ================= SEGURANÇA =================
+const JWT_SECRET = process.env.JWT_SECRET || "trocar_urgente";
+
+// ================= MEMÓRIA (SAFE PARA RENDER FREE) =================
+let users = [];
+let logs = [];
 
 // ================= HELPERS =================
 function hashSenha(senha) {
@@ -19,16 +20,19 @@ function hashSenha(senha) {
 function gerarToken(payload) {
     const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString('base64url');
     const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+
     const assinatura = crypto
         .createHmac('sha256', JWT_SECRET)
         .update(header + "." + body)
         .digest('base64url');
+
     return `${header}.${body}.${assinatura}`;
 }
 
 function verificarToken(token) {
     try {
         const [header, body, assinatura] = token.split('.');
+
         const valid = crypto
             .createHmac('sha256', JWT_SECRET)
             .update(header + "." + body)
@@ -40,15 +44,6 @@ function verificarToken(token) {
     } catch {
         return null;
     }
-}
-
-function salvarJSON(caminho, dados) {
-    fs.writeFileSync(caminho, JSON.stringify(dados, null, 2));
-}
-
-function lerJSON(caminho) {
-    if (!fs.existsSync(caminho)) return [];
-    return JSON.parse(fs.readFileSync(caminho));
 }
 
 // ================= MIDDLEWARE =================
@@ -68,8 +63,6 @@ app.post('/api/register', (req, res) => {
         return res.status(400).json({ erro: "Dados obrigatórios" });
     }
 
-    let users = lerJSON(USERS_PATH);
-
     if (users.find(u => u.user === user)) {
         return res.status(400).json({ erro: "Usuário já existe" });
     }
@@ -79,8 +72,6 @@ app.post('/api/register', (req, res) => {
         pass: hashSenha(pass)
     });
 
-    salvarJSON(USERS_PATH, users);
-
     res.json({ status: "ok" });
 });
 
@@ -88,9 +79,9 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
     const { user, pass } = req.body;
 
-    let users = lerJSON(USERS_PATH);
-
-    const encontrado = users.find(u => u.user === user && u.pass === hashSenha(pass));
+    const encontrado = users.find(
+        u => u.user === user && u.pass === hashSenha(pass)
+    );
 
     if (!encontrado) {
         return res.status(401).json({ erro: "Credenciais inválidas" });
@@ -121,22 +112,17 @@ function auth(req, res, next) {
 
 // ================= LOG =================
 app.post('/api/log', (req, res) => {
-    let logs = lerJSON(LOG_PATH);
-
     logs.push({
         data: new Date().toISOString(),
         ip: req.socket.remoteAddress,
         ...req.body
     });
 
-    salvarJSON(LOG_PATH, logs);
-
     res.json({ ok: true });
 });
 
 // ================= RELATÓRIO =================
 app.get('/api/relatorio', auth, (req, res) => {
-    const logs = lerJSON(LOG_PATH);
     res.json(logs);
 });
 
