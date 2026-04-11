@@ -1,4 +1,15 @@
-"scripts": {
-  "start": "node server.js",
-  "build": "echo build ok"
+{
+  "name": "geourban-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo build ok"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
+Root Directory: (vazio)
+Build Command: npm install
+Start Command: node server.js
