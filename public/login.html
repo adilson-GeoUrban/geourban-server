@@ -1,22 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>GeoUrban</title>
-
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
 
-    /* 🔵 FUNDO COM IMAGEM */
-    background: url('bg.jpg') no-repeat center center fixed;
+    /* 🔵 FUNDO CORRIGIDO */
+    background: url('/bg.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
-/* 🔵 CAIXA FLUTUANTE */
+/* 🔵 LGPD CENTRAL */
 #lgpd-box {
     position: fixed;
     top: 50%;
@@ -32,6 +24,23 @@ body {
 
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     animation: aparecer 0.5s ease;
+}
+
+/* 🔵 IA LUÍZA (FIXA CANTO) */
+#luiza-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    background: white;
+    color: black;
+
+    padding: 15px;
+    border-radius: 10px;
+    width: 260px;
+
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    font-size: 13px;
 }
 
 /* BOTÃO */
@@ -57,28 +66,3 @@ button {
     }
 }
 </style>
-</head>
-
-<body>
-
-<!-- 🔵 LGPD -->
-<div id="lgpd-box">
-    <div>🤖 IA Luiza</div>
-    <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
-    <button onclick="aceitar()">Aceito e continuar</button>
-</div>
-
-<script>
-function aceitar() {
-    localStorage.setItem("lgpd", "ok");
-
-    // 🔵 abre login em nova aba segura
-    window.open("/login", "_blank", "noopener,noreferrer");
-
-    // 🔵 esconde caixa
-    document.getElementById("lgpd-box").style.display = "none";
-}
-</script>
-
-</body>
-</html>
