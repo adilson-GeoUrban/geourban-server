@@ -1,22 +1,37 @@
+const API = "https://geourban-server-1.onrender.com";
+
 function aceitarLGPD() {
+    // salva aceite
     localStorage.setItem("lgpd", "true");
 
     const lgpd = document.getElementById("lgpd-box");
     const luiza = document.getElementById("luiza");
+    const chat = document.getElementById("chat-area");
 
-    lgpd.style.display = "none";
+    // segurança: verifica se elementos existem
+    if (lgpd) lgpd.style.display = "none";
 
-    // 🔥 FORÇA RESET VISUAL
-    luiza.style.display = "block";
-    luiza.style.opacity = "1";
-    luiza.style.visibility = "visible";
+    if (luiza) {
+        luiza.style.display = "block";
+        luiza.style.opacity = "1";
+        luiza.style.visibility = "visible";
+    }
 
-    iniciarSessao();
+    // inicia sessão
+    if (typeof iniciarSessao === "function") {
+        iniciarSessao();
+    }
 
-    // 🔥 LIMPA CHAT ANTES DE INICIAR
-    document.getElementById("chat-area").innerHTML = "";
+    // limpa chat
+    if (chat) {
+        chat.innerHTML = "";
+    }
 
-    iniciarLuiza();
+    // inicia assistente
+    if (typeof iniciarLuiza === "function") {
+        iniciarLuiza();
+    }
 
+    // registra log no backend
     registrarLog("LGPD", "Aceito");
 }
