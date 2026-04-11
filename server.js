@@ -1,26 +1,55 @@
-// ================= 🛡️ GUARDIÕES (FRENTE + FUNDOS) =================
+// ================= 🛡️ GUARDIÕES + AUDITORIA COMPLETA =================
+
+const fs = require("fs");
+const path = require("path");
+const jwt = require("jsonwebtoken");
+
+// 📁 arquivo de log
+const logFile = path.join(__dirname, "access.log");
 
 // 📊 controle interno
 const tentativas = {};
 const LIMITE_TENTATIVAS = 5;
 const BLOQUEIO_MS = 15 * 60 * 1000; // 15 minutos
 
+// 🧠 sistema base (evita erro se não existir)
+const sistema = {
+  ipsBloqueados: []
+};
+
 // 🧠 pega IP real (Render / Proxy / Local)
 function getIP(req) {
   return req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 }
+
+// 📝 função de log centralizada
+function registrarLog(tipo, mensagem) {
+  const log = `[${new Date().toISOString()}] ${tipo} | ${mensagem}\n`;
+  fs.appendFile(logFile, log, (err) => {
+    if (err) console.error("Erro ao salvar log");
+  });
+}
+
+// ================= 🔍 AUDITORIA GLOBAL =================
+app.use((req, res, next) => {
+  const ip = getIP(req);
+
+  registrarLog(
+    "ACESSO",
+    `IP: ${ip} | ${req.method} ${req.url} | UA: ${req.headers["user-agent"]}`
+  );
+
+  next();
+});
 
 // ================= 🚪 GUARDIÃO DA FRENTE (LOGIN) =================
 app.post("/login", (req, res) => {
   const ip = getIP(req);
   const agora = Date.now();
 
-  // 🔒 IP bloqueado temporariamente
-  if (
-    tentativas[ip] &&
-    tentativas[ip].bloqueadoAte &&
-    tentativas[ip].bloqueadoAte > agora
-  ) {
+  // 🔒 IP bloqueado
+  if (tentativas[ip]?.bloqueadoAte > agora) {
+    registrarLog("BLOQUEADO", `IP: ${ip} tentou acessar login`);
     return res.status(429).json({
       erro: "Muitas tentativas. Tente novamente mais tarde 🚫"
     });
@@ -32,22 +61,27 @@ app.post("/login", (req, res) => {
     usuario !== process.env.USUARIO_ADMIN ||
     senha !== process.env.SENHA_ADMIN
   ) {
-    // 📉 registra tentativa
     if (!tentativas[ip]) tentativas[ip] = { count: 0 };
 
     tentativas[ip].count++;
 
-    // 🚫 bloqueia IP
+    registrarLog("LOGIN_ERRO", `IP: ${ip} tentativa inválida`);
+
+    // 🚫 bloqueio automático
     if (tentativas[ip].count >= LIMITE_TENTATIVAS) {
       tentativas[ip].bloqueadoAte = agora + BLOQUEIO_MS;
       tentativas[ip].count = 0;
+
+      registrarLog("IP_BLOQUEADO", `IP: ${ip} bloqueado por força bruta`);
     }
 
     return res.status(401).json({ erro: "Credenciais inválidas" });
   }
 
-  // ✅ login ok → limpa tentativas
+  // ✅ sucesso
   delete tentativas[ip];
+
+  registrarLog("LOGIN_OK", `IP: ${ip} autenticado com sucesso`);
 
   const token = jwt.sign(
     { usuario, role: "admin" },
@@ -58,22 +92,44 @@ app.post("/login", (req, res) => {
   res.json({ token });
 });
 
-// ================= 🚪 GUARDIÃO DOS FUNDOS (ROTAS PROTEGIDAS) =================
+// ================= 🔐 VERIFICAÇÃO DE TOKEN (CRÍTICO) =================
+function verificarToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader) {
+    registrarLog("TOKEN_ERRO", "Token não fornecido");
+    return res.status(401).json({ erro: "Token não fornecido" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      registrarLog("TOKEN_INVALIDO", `IP: ${getIP(req)}`);
+      return res.status(403).json({ erro: "Token inválido" });
+    }
+
+    req.usuario = decoded;
+    next();
+  });
+}
+
+// ================= 🚪 GUARDIÃO DOS FUNDOS =================
 function guardiaoFundos(req, res, next) {
   const ip = getIP(req);
 
-  // 🚫 bloqueio manual + automático
   if (
     sistema.ipsBloqueados.includes(ip) ||
     (tentativas[ip] && tentativas[ip].bloqueadoAte > Date.now())
   ) {
+    registrarLog("ACESSO_NEGADO", `IP: ${ip}`);
     return res.status(403).json({ erro: "Acesso bloqueado 🚫" });
   }
 
   next();
 }
 
-// 🔒 aplica nos caminhos sensíveis
-app.use("/admin", guardiaoFundos);
-app.use("/ia", guardiaoFundos);
-app.use("/api", guardiaoFundos);
+// ================= 🔒 PROTEÇÃO DE ROTAS =================
+app.use("/admin", verificarToken, guardiaoFundos);
+app.use("/ia", verificarToken, guardiaoFundos);
+app.use("/api", verificarToken, guardiaoFundos);
