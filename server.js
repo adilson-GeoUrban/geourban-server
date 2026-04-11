@@ -1,12 +1,22 @@
+const express = require("express");
+const path = require("path");
+
+const app = express();
 const PORT = process.env.PORT || 3000;
-node server.js
-process.on("uncaughtException", (err) => {
-  console.error("ERRO CRÍTICO:", err);
+
+// servir arquivos da pasta public
+app.use(express.static(path.join(__dirname, "public")));
+
+// rota principal
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-process.on("unhandledRejection", (err) => {
-  console.error("PROMISE NÃO TRATADA:", err);
+// rota login
+app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "login.html"));
 });
+
 app.listen(PORT, () => {
-  console.log("SERVIDOR RODANDO NA PORTA " + PORT);
+    console.log("SERVIDOR RODANDO NA PORTA " + PORT);
 });
