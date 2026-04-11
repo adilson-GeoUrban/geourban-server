@@ -1,184 +1,22 @@
-<script>
-// ================= 🔒 CONFIG =================
-const LUIZA_CONFIG = {
-    versao: "3.0",
-    modo: "PERICIAL_PRO",
-    api: "/api/log"
-};
-
-// ================= 🔐 SESSÃO =================
-function iniciarSessao() {
-    let sessao = localStorage.getItem("sessao");
-
-    if (!sessao) {
-        sessao = "sess_" + Math.random().toString(36).substring(2);
-        localStorage.setItem("sessao", sessao);
-    }
-
-    return sessao;
-}
-
-// ================= 📡 LOG (SERVER + LOCAL FALLBACK) =================
-async function registrarLog(tipo, detalhe) {
-    const log = {
-        data: new Date().toISOString(),
-        tipo,
-        detalhe,
-        sessao: iniciarSessao()
-    };
-
-    // 🔵 tenta enviar pro servidor
-    try {
-        await fetch(LUIZA_CONFIG.api, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(log)
-        });
-    } catch (e) {
-        // 🔴 fallback local
-        let logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
-        logs.push(log);
-        localStorage.setItem("logs_luiza", JSON.stringify(logs));
-    }
-}
-
-// ================= 🚀 LGPD =================
 function aceitarLGPD() {
     localStorage.setItem("lgpd", "true");
-    document.getElementById("lgpd-box").style.display = "none";
-    document.getElementById("luiza").style.display = "block";
+
+    const lgpd = document.getElementById("lgpd-box");
+    const luiza = document.getElementById("luiza");
+
+    lgpd.style.display = "none";
+
+    // 🔥 FORÇA RESET VISUAL
+    luiza.style.display = "block";
+    luiza.style.opacity = "1";
+    luiza.style.visibility = "visible";
+
+    iniciarSessao();
+
+    // 🔥 LIMPA CHAT ANTES DE INICIAR
+    document.getElementById("chat-area").innerHTML = "";
 
     iniciarLuiza();
+
     registrarLog("LGPD", "Aceito");
 }
-
-// ================= 🤖 INICIAR =================
-function iniciarLuiza() {
-    const area = document.getElementById("chat-area");
-
-    area.innerHTML += `
-    <div><b>Luiza:</b> 🔒 Sistema Profissional Ativo</div>
-    <div><b>Luiza:</b> 📊 Auditoria Técnica em tempo real</div>
-    <div><b>Luiza:</b> 🧾 Logs protegidos e rastreáveis</div>
-    <div><b>Luiza:</b> 🤖 Modo Pericial habilitado</div>
-    `;
-}
-
-// ================= 💬 CHAT =================
-function enviar() {
-    const input = document.getElementById("chat-input");
-    const area = document.getElementById("chat-area");
-
-    const msgOriginal = input.value;
-    const msg = msgOriginal.toLowerCase();
-
-    if (!msg) return;
-
-    area.innerHTML += "<div><b>Você:</b> " + msgOriginal + "</div>";
-
-    registrarLog("INPUT", msgOriginal);
-
-    let resposta = "";
-    let nivel = "INFO";
-
-    // 🔐 SEGURANÇA
-    if (msg.includes("senha") || msg.includes("login")) {
-        resposta = `
-        🔐 ALERTA:
-        Nunca compartilhe credenciais.
-        Utilize ambiente seguro e separado para autenticação.
-        `;
-        nivel = "ALERTA";
-    }
-
-    // 🚫 INVASÃO
-    else if (msg.includes("invad") || msg.includes("hack")) {
-        resposta = `
-        🚫 LAUDO:
-        Nenhuma evidência de invasão detectada.
-        Sistema íntegro com base nos logs atuais.
-        `;
-        nivel = "PERICIAL";
-    }
-
-    // 📊 VAZAMENTO
-    else if (msg.includes("vazamento") || msg.includes("dados")) {
-        resposta = `
-        🔒 LGPD:
-        Nenhum vazamento identificado.
-        Dados protegidos conforme política ativa.
-        `;
-        nivel = "PERICIAL";
-    }
-
-    // ⚠️ ERRO
-    else if (msg.includes("erro") || msg.includes("bug")) {
-        resposta = `
-        ⚠️ DIAGNÓSTICO:
-        Possível falha de deploy ou ambiente.
-        Verificar servidor e logs.
-        `;
-        nivel = "DIAGNOSTICO";
-    }
-
-    // 📄 RELATÓRIO
-    else if (msg.includes("relatorio")) {
-        gerarRelatorio();
-        return;
-    }
-
-    // PADRÃO
-    else {
-        resposta = `
-        📊 ANÁLISE:
-        Solicitação processada com monitoramento ativo.
-        `;
-    }
-
-    area.innerHTML += "<div><b>Luiza:</b> " + resposta + "</div>";
-
-    registrarLog("RESPOSTA", nivel);
-
-    input.value = "";
-    area.scrollTop = area.scrollHeight;
-}
-
-// ================= 📄 RELATÓRIO =================
-async function gerarRelatorio() {
-    let conteudo = "";
-
-    try {
-        const res = await fetch("/api/relatorio");
-        const dados = await res.json();
-
-        conteudo = `
-🧾 RELATÓRIO PROFISSIONAL
--------------------------
-Sessão: ${iniciarSessao()}
-Logs servidor: ${dados.length}
-Status: MONITORADO
-        `;
-    } catch (e) {
-        const local = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
-
-        conteudo = `
-🧾 RELATÓRIO LOCAL
--------------------------
-Sessão: ${iniciarSessao()}
-Logs locais: ${local.length}
-Status: OFFLINE
-        `;
-    }
-
-    const area = document.getElementById("chat-area");
-    area.innerHTML += "<div><b>Luiza:</b><pre>" + conteudo + "</pre></div>";
-
-    registrarLog("RELATORIO", "Gerado");
-}
-
-// ================= 🔑 LOGIN =================
-function abrirLogin() {
-    registrarLog("LOGIN", "Solicitado");
-    window.open("/login", "_blank", "noopener,noreferrer");
-}
-</script>
