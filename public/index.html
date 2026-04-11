@@ -1,8 +1,91 @@
-<!-- 🟦 FRONTEND (HTML dentro de /public) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoUrban</title>
 
 <style>
 body {
-  background: url("/bg.jpg") no-repeat center center fixed;
-  background-size: cover;
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: url("bg.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+/* LGPD BOX */
+#lgpd-box {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 300px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    animation: aparecer 0.5s ease;
+    z-index: 999;
+}
+
+#lgpd-box button {
+    width: 100%;
+    padding: 10px;
+    background: #4caf50;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* LUIZA CHAT */
+#luiza {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 300px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: none;
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
+</head>
+
+<body>
+
+<!-- LGPD -->
+<div id="lgpd-box">
+    <h3>🔒 Segurança Total</h3>
+    <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
+    <button onclick="aceitarLGPD()">Aceito e continuar</button>
+</div>
+
+<!-- LUIZA -->
+<div id="luiza">
+    <p>👩‍💻 Olá, sou a IA Luiza.</p>
+    <button onclick="abrirLogin()">Acessar sistema</button>
+</div>
+
+<script>
+function aceitarLGPD() {
+    localStorage.setItem("lgpd", "true");
+    document.getElementById("lgpd-box").style.display = "none";
+    document.getElementById("luiza").style.display = "block";
+}
+
+function abrirLogin() {
+    window.open("/login", "_blank");
+}
+</script>
+
+</body>
+</html>
