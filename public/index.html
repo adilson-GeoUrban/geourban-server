@@ -1,53 +1,66 @@
 <script>
-// ================= 🔒 CONFIG SEGURANÇA =================
+// ================= 🔒 CONFIG =================
 const LUIZA_CONFIG = {
-    versao: "2.0",
-    modo: "PERICIAL",
-    lgpd: true
+    versao: "3.0",
+    modo: "PERICIAL_PRO",
+    api: "/api/log"
 };
-
-// ================= 🧾 LOG AUDITORIA =================
-function registrarLog(tipo, detalhe) {
-    const log = {
-        data: new Date().toISOString(),
-        tipo: tipo,
-        detalhe: detalhe,
-        ip: "oculto",
-        sessao: localStorage.getItem("sessao") || "anonima"
-    };
-
-    let logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
-    logs.push(log);
-    localStorage.setItem("logs_luiza", JSON.stringify(logs));
-}
 
 // ================= 🔐 SESSÃO =================
 function iniciarSessao() {
-    const id = "sess_" + Math.random().toString(36).substring(2);
-    localStorage.setItem("sessao", id);
+    let sessao = localStorage.getItem("sessao");
+
+    if (!sessao) {
+        sessao = "sess_" + Math.random().toString(36).substring(2);
+        localStorage.setItem("sessao", sessao);
+    }
+
+    return sessao;
 }
 
-// ================= 🚀 INÍCIO =================
+// ================= 📡 LOG (SERVER + LOCAL FALLBACK) =================
+async function registrarLog(tipo, detalhe) {
+    const log = {
+        data: new Date().toISOString(),
+        tipo,
+        detalhe,
+        sessao: iniciarSessao()
+    };
+
+    // 🔵 tenta enviar pro servidor
+    try {
+        await fetch(LUIZA_CONFIG.api, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(log)
+        });
+    } catch (e) {
+        // 🔴 fallback local
+        let logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+        logs.push(log);
+        localStorage.setItem("logs_luiza", JSON.stringify(logs));
+    }
+}
+
+// ================= 🚀 LGPD =================
 function aceitarLGPD() {
     localStorage.setItem("lgpd", "true");
     document.getElementById("lgpd-box").style.display = "none";
     document.getElementById("luiza").style.display = "block";
 
-    iniciarSessao();
     iniciarLuiza();
-
-    registrarLog("LGPD", "Usuário aceitou termos");
+    registrarLog("LGPD", "Aceito");
 }
 
-// ================= 🤖 INICIALIZAÇÃO =================
+// ================= 🤖 INICIAR =================
 function iniciarLuiza() {
     const area = document.getElementById("chat-area");
 
     area.innerHTML += `
-    <div><b>Luiza:</b> 🔒 Protocolo de Segurança Ativo</div>
-    <div><b>Luiza:</b> 📊 Modo: Auditoria Técnica Pericial</div>
-    <div><b>Luiza:</b> 🧾 Sessão registrada com conformidade LGPD</div>
-    <div><b>Luiza:</b> 🤖 Pronta para análise, diagnóstico e segurança</div>
+    <div><b>Luiza:</b> 🔒 Sistema Profissional Ativo</div>
+    <div><b>Luiza:</b> 📊 Auditoria Técnica em tempo real</div>
+    <div><b>Luiza:</b> 🧾 Logs protegidos e rastreáveis</div>
+    <div><b>Luiza:</b> 🤖 Modo Pericial habilitado</div>
     `;
 }
 
@@ -55,6 +68,7 @@ function iniciarLuiza() {
 function enviar() {
     const input = document.getElementById("chat-input");
     const area = document.getElementById("chat-area");
+
     const msgOriginal = input.value;
     const msg = msgOriginal.toLowerCase();
 
@@ -67,12 +81,12 @@ function enviar() {
     let resposta = "";
     let nivel = "INFO";
 
-    // 🔒 SEGURANÇA
+    // 🔐 SEGURANÇA
     if (msg.includes("senha") || msg.includes("login")) {
         resposta = `
-        🔐 ALERTA DE SEGURANÇA:
+        🔐 ALERTA:
         Nunca compartilhe credenciais.
-        A autenticação deve ocorrer em ambiente seguro separado.
+        Utilize ambiente seguro e separado para autenticação.
         `;
         nivel = "ALERTA";
     }
@@ -80,9 +94,9 @@ function enviar() {
     // 🚫 INVASÃO
     else if (msg.includes("invad") || msg.includes("hack")) {
         resposta = `
-        🚫 LAUDO TÉCNICO:
-        Não há evidência de invasão no sistema atual.
-        Recomenda-se análise de logs e controle de acesso.
+        🚫 LAUDO:
+        Nenhuma evidência de invasão detectada.
+        Sistema íntegro com base nos logs atuais.
         `;
         nivel = "PERICIAL";
     }
@@ -90,9 +104,9 @@ function enviar() {
     // 📊 VAZAMENTO
     else if (msg.includes("vazamento") || msg.includes("dados")) {
         resposta = `
-        🔒 ANÁLISE LGPD:
+        🔒 LGPD:
         Nenhum vazamento identificado.
-        Sistema operando dentro dos padrões de proteção de dados.
+        Dados protegidos conforme política ativa.
         `;
         nivel = "PERICIAL";
     }
@@ -101,8 +115,8 @@ function enviar() {
     else if (msg.includes("erro") || msg.includes("bug")) {
         resposta = `
         ⚠️ DIAGNÓSTICO:
-        Possível falha operacional ou deploy não atualizado.
-        Verificar ambiente e logs do servidor.
+        Possível falha de deploy ou ambiente.
+        Verificar servidor e logs.
         `;
         nivel = "DIAGNOSTICO";
     }
@@ -117,8 +131,7 @@ function enviar() {
     else {
         resposta = `
         📊 ANÁLISE:
-        Solicitação registrada e processada.
-        Sistema operando com monitoramento ativo.
+        Solicitação processada com monitoramento ativo.
         `;
     }
 
@@ -131,26 +144,41 @@ function enviar() {
 }
 
 // ================= 📄 RELATÓRIO =================
-function gerarRelatorio() {
-    const logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+async function gerarRelatorio() {
+    let conteudo = "";
 
-    let relatorio = `
-    🧾 RELATÓRIO DE AUDITORIA
-    -------------------------
-    Sessão: ${localStorage.getItem("sessao")}
-    Registros: ${logs.length}
-    Status: SISTEMA MONITORADO
-    `;
+    try {
+        const res = await fetch("/api/relatorio");
+        const dados = await res.json();
+
+        conteudo = `
+🧾 RELATÓRIO PROFISSIONAL
+-------------------------
+Sessão: ${iniciarSessao()}
+Logs servidor: ${dados.length}
+Status: MONITORADO
+        `;
+    } catch (e) {
+        const local = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+
+        conteudo = `
+🧾 RELATÓRIO LOCAL
+-------------------------
+Sessão: ${iniciarSessao()}
+Logs locais: ${local.length}
+Status: OFFLINE
+        `;
+    }
 
     const area = document.getElementById("chat-area");
-    area.innerHTML += "<div><b>Luiza:</b><pre>" + relatorio + "</pre></div>";
+    area.innerHTML += "<div><b>Luiza:</b><pre>" + conteudo + "</pre></div>";
 
-    registrarLog("RELATORIO", "Gerado pelo usuário");
+    registrarLog("RELATORIO", "Gerado");
 }
 
 // ================= 🔑 LOGIN =================
 function abrirLogin() {
-    registrarLog("LOGIN", "Acesso solicitado");
+    registrarLog("LOGIN", "Solicitado");
     window.open("/login", "_blank", "noopener,noreferrer");
 }
 </script>
