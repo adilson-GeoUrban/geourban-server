@@ -1,33 +1,127 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:Arial;padding:20px;">
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Seguro - GeoUrban</title>
 
-<h3>🔐 Login Seguro</h3>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0d1117;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-<input id="user" placeholder="Usuário"><br><br>
-<input id="pass" type="password" placeholder="Senha"><br><br>
+#box {
+    background: #161b22;
+    padding: 25px;
+    border-radius: 10px;
+    width: 280px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
 
-<button onclick="login()">Entrar</button>
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #238636;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#msg {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div id="box">
+    <h3>🔐 Login Seguro</h3>
+
+    <input id="user" placeholder="Usuário">
+    <input id="pass" type="password" placeholder="Senha">
+
+    <button onclick="login()">Entrar</button>
+
+    <div id="msg"></div>
+</div>
 
 <script>
+// ================= LOG (INTEGRADO COM LUIZA) =================
+function registrarLog(tipo, detalhe) {
+    const log = {
+        data: new Date().toISOString(),
+        tipo,
+        detalhe,
+        sessao: localStorage.getItem("sessao") || "anonima"
+    };
+
+    let logs = JSON.parse(localStorage.getItem("logs_luiza") || "[]");
+    logs.push(log);
+    localStorage.setItem("logs_luiza", JSON.stringify(logs));
+}
+
+// ================= LOGIN =================
 async function login() {
-    const user = document.getElementById("user").value;
-    const pass = document.getElementById("pass").value;
+    const user = document.getElementById("user").value.trim();
+    const pass = document.getElementById("pass").value.trim();
+    const msg = document.getElementById("msg");
 
-    const res = await fetch('/api/login', {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ user, pass })
-    });
+    if (!user || !pass) {
+        msg.innerText = "⚠️ Preencha todos os campos";
+        return;
+    }
 
-    const data = await res.json();
+    registrarLog("LOGIN_TENTATIVA", user);
 
-    if (data.token) {
-        localStorage.setItem("token", data.token);
-        alert("Login OK");
-        window.close();
-    } else {
-        alert("Erro login");
+    try {
+        const res = await fetch('/api/login', {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ user, pass })
+        });
+
+        if (!res.ok) {
+            throw new Error("Falha servidor");
+        }
+
+        const data = await res.json();
+
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            registrarLog("LOGIN_SUCESSO", user);
+
+            msg.innerText = "✅ Login realizado";
+
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+
+        } else {
+            registrarLog("LOGIN_ERRO", user);
+            msg.innerText = "❌ Credenciais inválidas";
+        }
+
+    } catch (e) {
+        registrarLog("LOGIN_FALHA", e.message);
+        msg.innerText = "🚫 Erro de conexão com servidor";
     }
 }
 </script>
