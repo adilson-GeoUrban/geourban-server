@@ -1,4 +1,4 @@
-// ================= 🔐 IMPORTS =================
+// IMPORTS
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -7,15 +7,9 @@ const path = require("path");
 
 const app = express();
 
-// ================= 🔐 SEGURANÇA =================
+// SEGURANÇA
 app.disable("x-powered-by");
 app.use(helmet());
-
-app.use((req, res, next) => {
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  next();
-});
 
 app.use(cors({
   origin: ["https://geourban-oficial.onrender.com"],
@@ -31,22 +25,20 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ================= 🌐 FRONTEND =================
+// FRONTEND
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= 🏠 HOME =================
+// HOME
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ================= 🧠 LOGIN =================
+// LOGIN
 app.post("/login", (req, res) => {
   const { comando } = req.body;
 
   if (!comando) {
-    return res.status(400).json({
-      mensagem: "Dados inválidos"
-    });
+    return res.status(400).json({ mensagem: "Dados inválidos" });
   }
 
   const cmd = comando.toLowerCase();
@@ -68,13 +60,12 @@ app.post("/login", (req, res) => {
   }
 
   return res.json({
-    mensagem: "Comando não reconhecido. Digite LOGIN ou CADASTRO."
+    mensagem: "Digite LOGIN ou CADASTRO."
   });
 });
 
-// ================= 🚀 START =================
+// START
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log("Servidor rodando");
 });
