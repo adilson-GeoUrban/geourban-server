@@ -1,22 +1,39 @@
+function adicionarMensagemNaTela(msg) {
+  const chat = document.getElementById("chat");
+  chat.innerHTML += `<p>${msg}</p>`;
+  chat.scrollTop = chat.scrollHeight;
+}
+
 async function enviar() {
-  const input = document.getElementById("input").value;
+  const inputEl = document.getElementById("input");
+  const input = inputEl.value.trim();
 
-  const res = await fetch("/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ comando: input })
-  });
+  if (!input) return;
 
-  const data = await res.json();
+  adicionarMensagemNaTela("Você: " + input);
 
-  console.log("RESPOSTA BACKEND:", data); // 👈 ADICIONA ISSO
+  try {
+    const res = await fetch("/ia", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ mensagem: input })
+    });
 
-  adicionarMensagemNaTela("Luiza: " + data.mensagem);
+    const data = await res.json();
 
-  if (data.acao === "REDIRECT") {
-    console.log("REDIRECIONANDO PARA:", data.destino); // 👈 DEBUG
-    window.location.href = data.destino;
+    adicionarMensagemNaTela("Luiza: " + data.mensagem);
+
+    if (data.acao === "REDIRECT") {
+      setTimeout(() => {
+        window.location.href = data.destino;
+      }, 800);
+    }
+
+  } catch (erro) {
+    adicionarMensagemNaTela("Erro ao conectar com servidor");
   }
+
+  inputEl.value = "";
 }
