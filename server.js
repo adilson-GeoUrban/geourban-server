@@ -46,7 +46,7 @@ app.post("/ia", (req, res) => {
   // 🔒 VALIDAÇÃO DE ENTRADA
   if (!mensagem || mensagem.length > 200) {
     return res.json({
-      resposta: "⚠️ Entrada inválida. Digite uma mensagem válida."
+      mensagem: "⚠️ Entrada inválida. Digite uma mensagem válida."
     });
   }
 
@@ -54,33 +54,31 @@ app.post("/ia", (req, res) => {
   const proibidos = ["fraude", "ilegal", "burlar", "sonegar"];
   if (proibidos.some(p => mensagem.includes(p))) {
     return res.json({
-      resposta: "🚫 Operação bloqueada por segurança jurídica."
+      mensagem: "🚫 Operação bloqueada por segurança jurídica."
     });
   }
 
   let resposta = "🤖 GeoUrban ativa. Informe sua necessidade.";
+  let acao = null;
+  let destino = null;
 
-// ================= 🔐 FLUXO DE SISTEMA =================
+  // ================= 🔐 FLUXO DE SISTEMA =================
 
-if (mensagem.includes("login")) {
-  return res.json({
-    mensagem: "🔐 Redirecionando para login...",
-    acao: "REDIRECT",
-    destino: "/login.html"
-  });
-}
+  if (mensagem.includes("login")) {
+    resposta = "🔐 Redirecionando para login...";
+    acao = "REDIRECT";
+    destino = "/login.html";
+  }
 
-if (mensagem.includes("cadastro")) {
-  return res.json({
-    mensagem: "📝 Iniciando cadastro...",
-    acao: "REDIRECT",
-    destino: "/login.html"
-  });
-}
+  else if (mensagem.includes("cadastro")) {
+    resposta = "📝 Iniciando cadastro...";
+    acao = "REDIRECT";
+    destino = "/login.html";
+  }
 
   // ================= ⚖️ IA ESPECIALIZADA =================
 
-  if (
+  else if (
     mensagem.includes("lei") ||
     mensagem.includes("direito") ||
     mensagem.includes("contrato")
@@ -110,7 +108,23 @@ if (mensagem.includes("cadastro")) {
     resposta = "🎨 IA Designer: ajustar layout e responsividade.";
   }
 
-  return res.json({ resposta });
+  // 📊 LOG (AUDITORIA LGPD)
+  console.log(JSON.stringify({
+    tipo: "IA_LOG",
+    mensagem: mensagem,
+    resposta: resposta,
+    acao: acao,
+    destino: destino,
+    ip: req.ip,
+    data: new Date().toISOString()
+  }));
+
+  // 🔁 RESPOSTA PADRÃO
+  return res.json({
+    mensagem: resposta,
+    acao: acao,
+    destino: destino
+  });
 
 });
 
