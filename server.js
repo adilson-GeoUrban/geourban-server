@@ -60,23 +60,23 @@ app.post("/ia", (req, res) => {
 
   let resposta = "🤖 GeoUrban ativa. Informe sua necessidade.";
 
-  // ================= 🔐 FLUXO DE SISTEMA =================
+// ================= 🔐 FLUXO DE SISTEMA =================
 
-  if (mensagem.includes("login")) {
-    return res.json({
-      resposta: "🔐 Redirecionando para login...",
-      acao: "REDIRECT",
-      destino: "/login.html"
-    });
-  }
+if (mensagem.includes("login")) {
+  return res.json({
+    mensagem: "🔐 Redirecionando para login...",
+    acao: "REDIRECT",
+    destino: "/login.html"
+  });
+}
 
-  if (mensagem.includes("cadastro")) {
-    return res.json({
-      resposta: "📝 Iniciando cadastro...",
-      acao: "REDIRECT",
-      destino: "/login.html"
-    });
-  }
+if (mensagem.includes("cadastro")) {
+  return res.json({
+    mensagem: "📝 Iniciando cadastro...",
+    acao: "REDIRECT",
+    destino: "/login.html"
+  });
+}
 
   // ================= ⚖️ IA ESPECIALIZADA =================
 
