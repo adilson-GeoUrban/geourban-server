@@ -1,13 +1,20 @@
-<body style="background: url('bg.jpg') no-repeat center center fixed; background-size: cover;">
- /public
-  ├── index.html
-  ├── login.html
-  ├── dashboard.html
-  ├── app.js
-  ├── bg.jpg 
-<div id="chat"></div>
+<body style="background: url('bg.jpg') no-repeat center center fixed; background-size: cover; color: white; font-family: Arial;">
 
-<input id="input" placeholder="Digite...">
-<button onclick="enviar()">Enviar</button>
+  <div id="chat" style="
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 20px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
+  "></div>
 
-<script src="app.js"></script>
+  <div style="text-align:center; margin-top: 10px;">
+    <input id="input" placeholder="Digite..." style="padding:10px; width:300px;">
+    <button onclick="enviar()" style="padding:10px;">Enviar</button>
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
