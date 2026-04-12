@@ -1,0 +1,8 @@
+BACKUP-ESTAVEL-01.txt
+Ponto estável antes de limpeza estrutural
+Data: hoje
+Status:
+- Backend OK
+- IA respondendo
+- Frontend parcialmente desalinhado
+backup: ponto estável antes de auditoria estrutural
