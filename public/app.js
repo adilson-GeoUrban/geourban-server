@@ -1,39 +1,70 @@
-function adicionarMensagemNaTela(msg) {
-  const chat = document.getElementById("chat");
-  chat.innerHTML += `<p>${msg}</p>`;
-  chat.scrollTop = chat.scrollHeight;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban IA</title>
+</head>
+<body style="background:black; color:white;">
 
-async function enviar() {
-  const inputEl = document.getElementById("input");
-  const input = inputEl.value.trim();
+  <h2>IA Luiza</h2>
 
-  if (!input) return;
+  <div id="chat" style="height:300px; overflow:auto; border:1px solid #555; padding:10px;"></div>
 
-  adicionarMensagemNaTela("Você: " + input);
+  <input id="input" type="text" placeholder="Digite..." />
+  <button onclick="enviar()">OK</button>
 
-  try {
-    const res = await fetch("/ia", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ mensagem: input })
-    });
+  <script>
+    function adicionarMensagemNaTela(msg) {
+      const chat = document.getElementById("chat");
 
-    const data = await res.json();
+      const p = document.createElement("p");
+      p.innerText = msg; // 🔒 seguro (ANTI HACK)
 
-    adicionarMensagemNaTela("Luiza: " + data.mensagem);
-
-    if (data.acao === "REDIRECT") {
-      setTimeout(() => {
-        window.location.href = data.destino;
-      }, 800);
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
     }
 
-  } catch (erro) {
-    adicionarMensagemNaTela("Erro ao conectar com servidor");
-  }
+    async function enviar() {
+      const inputEl = document.getElementById("input");
+      const input = inputEl.value.trim();
 
-  inputEl.value = "";
-}
+      if (!input) return;
+
+      adicionarMensagemNaTela("Você: " + input);
+
+      try {
+        const res = await fetch("/ia", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ mensagem: input })
+        });
+
+        const data = await res.json();
+
+        // 🔒 validação segura
+        if (!data || !data.mensagem) {
+          adicionarMensagemNaTela("Sistema: resposta inválida do servidor");
+          return;
+        }
+
+        adicionarMensagemNaTela("Luiza: " + data.mensagem);
+
+        // 🚀 ação automática
+        if (data.acao === "REDIRECT") {
+          setTimeout(() => {
+            window.location.href = data.destino;
+          }, 800);
+        }
+
+      } catch (erro) {
+        adicionarMensagemNaTela("Erro ao conectar com servidor");
+      }
+
+      inputEl.value = "";
+    }
+  </script>
+
+</body>
+</html>
