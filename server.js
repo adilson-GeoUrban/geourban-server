@@ -20,37 +20,47 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 // ================= 🚫 RATE LIMIT =================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: "⚠️ Muitas requisições. Tente novamente mais tarde."
+  standardHeaders: true,
+  legacyHeaders: false
 });
 app.use(limiter);
 
 // ================= 🌐 FRONTEND =================
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= 🏠 HOME =================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ================= 🧠 IA CENTRAL =================
+// ================= 🔐 SANITIZAÇÃO =================
+function limparEntrada(texto) {
+  return texto
+    .replace(/[<>]/g, "") // remove tags
+    .replace(/script/gi, "")
+    .replace(/javascript:/gi, "")
+    .trim();
+}
+
+// ================= 🔐 IA CENTRAL =================
 app.post("/ia", (req, res) => {
 
-  let mensagem = (req.body.mensagem || "").toLowerCase().trim();
+  let mensagem = (req.body.mensagem || "").toString().toLowerCase().trim();
+  mensagem = limparEntrada(mensagem);
 
-  // 🔒 VALIDAÇÃO DE ENTRADA
+  // 🔒 validação forte
   if (!mensagem || mensagem.length > 200) {
     return res.json({
-      mensagem: "⚠️ Entrada inválida. Digite uma mensagem válida."
+      mensagem: "⚠️ Entrada inválida."
     });
   }
 
-  // 🚫 BLOQUEIO LEGAL
+  // 🚫 bloqueio legal
   const proibidos = ["fraude", "ilegal", "burlar", "sonegar"];
   if (proibidos.some(p => mensagem.includes(p))) {
     return res.json({
@@ -62,8 +72,7 @@ app.post("/ia", (req, res) => {
   let acao = null;
   let destino = null;
 
-  // ================= 🔐 FLUXO DE SISTEMA =================
-
+  // ================= 🔐 FLUXO =================
   if (mensagem.includes("login")) {
     resposta = "🔐 Redirecionando para login...";
     acao = "REDIRECT";
@@ -76,39 +85,28 @@ app.post("/ia", (req, res) => {
     destino = "/login.html";
   }
 
-  // ================= ⚖️ IA ESPECIALIZADA =================
-
-  else if (
-    mensagem.includes("lei") ||
-    mensagem.includes("direito") ||
-    mensagem.includes("contrato")
-  ) {
-    resposta = "⚖️ IA Jurídica: verifique legislação e consulte profissional habilitado.";
+  // ================= ⚖️ ESPECIALIZAÇÃO =================
+  else if (mensagem.includes("lei") || mensagem.includes("direito")) {
+    resposta = "⚖️ IA Jurídica: consulte legislação atualizada.";
   }
 
   else if (mensagem.includes("imposto")) {
-    resposta = "📊 IA Contábil: avalie regime tributário adequado.";
+    resposta = "📊 IA Contábil: avalie regime tributário.";
   }
 
-  else if (
-    mensagem.includes("importar") ||
-    mensagem.includes("exportar")
-  ) {
-    resposta = "🌍 IA Internacional: verificar NCM, impostos e licenças.";
+  else if (mensagem.includes("importar") || mensagem.includes("exportar")) {
+    resposta = "🌍 IA Internacional: verificar NCM e taxas.";
   }
 
-  else if (
-    mensagem.includes("erro") ||
-    mensagem.includes("bug")
-  ) {
-    resposta = "🛠 IA Técnica: revisar backend, rotas e integração.";
+  else if (mensagem.includes("erro") || mensagem.includes("bug")) {
+    resposta = "🛠 IA Técnica: revisar backend e integração.";
   }
 
   else if (mensagem.includes("tela")) {
-    resposta = "🎨 IA Designer: ajustar layout e responsividade.";
+    resposta = "🎨 IA UI: revisar layout e responsividade.";
   }
 
-  // 📊 LOG (AUDITORIA LGPD)
+  // ================= 🔐 LOG LGPD =================
   console.log(JSON.stringify({
     tipo: "IA_LOG",
     mensagem: mensagem,
@@ -119,11 +117,11 @@ app.post("/ia", (req, res) => {
     data: new Date().toISOString()
   }));
 
-  // 🔁 RESPOSTA PADRÃO
+  // ================= 🔐 RESPOSTA FINAL =================
   return res.json({
     mensagem: resposta,
-    acao: acao,
-    destino: destino
+    acao,
+    destino
   });
 
 });
@@ -132,5 +130,5 @@ app.post("/ia", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("🚀 GeoUrban rodando com IA ativa");
+  console.log("🚀 GeoUrban IA BLINDADA rodando");
 });
