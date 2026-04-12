@@ -2,7 +2,7 @@ function adicionarMensagemNaTela(msg) {
   const chat = document.getElementById("chat");
 
   const p = document.createElement("p");
-  p.innerText = msg;
+  p.innerText = msg; // 🔒 seguro contra XSS
 
   chat.appendChild(p);
   chat.scrollTop = chat.scrollHeight;
@@ -17,7 +17,7 @@ async function enviar() {
   adicionarMensagemNaTela("Você: " + texto);
   inputEl.value = "";
 
-  // efeito digitando
+  // 🤖 efeito digitando
   adicionarMensagemNaTela("Luiza está digitando...");
 
   try {
@@ -38,17 +38,19 @@ async function enviar() {
     const data = await res.json();
     const chat = document.getElementById("chat");
 
-    // validação
-    if (!data || !data.mensagem) {
+    // 🔒 CORREÇÃO PRINCIPAL (compatível com backend antigo ou novo)
+    const mensagem = data?.mensagem || data?.resposta;
+
+    if (!mensagem) {
       chat.lastChild.innerText = "Sistema: resposta inválida";
       return;
     }
 
     // substitui "digitando..."
-    chat.lastChild.innerText = "Luiza: " + data.mensagem;
+    chat.lastChild.innerText = "Luiza: " + mensagem;
 
-    // redirecionamento automático
-    if (data.acao === "REDIRECT") {
+    // 🚀 REDIRECT GARANTIDO
+    if (data.acao === "REDIRECT" && data.destino) {
       setTimeout(() => {
         window.location.href = data.destino;
       }, 800);
@@ -60,7 +62,7 @@ async function enviar() {
   }
 }
 
-// ENTER envia mensagem
+// ⌨️ ENTER envia mensagem
 document.getElementById("input").addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
     enviar();
