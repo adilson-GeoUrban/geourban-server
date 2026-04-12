@@ -1,61 +1,68 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban IA</title>
+function adicionarMensagemNaTela(msg) {
+  const chat = document.getElementById("chat");
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: url('bg.jpg') no-repeat center center fixed;
-  background-size: cover;
-  color: white;
+  const p = document.createElement("p");
+  p.innerText = msg;
+
+  chat.appendChild(p);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-/* CHAT CENTRAL */
-#chat {
-  max-width: 600px;
-  margin: 80px auto 10px;
-  padding: 20px;
-  background: rgba(0,0,0,0.7);
-  border-radius: 10px;
-  height: 300px;
-  overflow-y: auto;
+async function enviar() {
+  const inputEl = document.getElementById("input");
+  const texto = inputEl.value.trim();
+
+  if (!texto) return;
+
+  adicionarMensagemNaTela("Você: " + texto);
+  inputEl.value = "";
+
+  // efeito digitando
+  adicionarMensagemNaTela("Luiza está digitando...");
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch("/ia", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ mensagem: texto }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    const data = await res.json();
+    const chat = document.getElementById("chat");
+
+    // validação
+    if (!data || !data.mensagem) {
+      chat.lastChild.innerText = "Sistema: resposta inválida";
+      return;
+    }
+
+    // substitui "digitando..."
+    chat.lastChild.innerText = "Luiza: " + data.mensagem;
+
+    // redirecionamento automático
+    if (data.acao === "REDIRECT") {
+      setTimeout(() => {
+        window.location.href = data.destino;
+      }, 800);
+    }
+
+  } catch (erro) {
+    const chat = document.getElementById("chat");
+    chat.lastChild.innerText = "Erro ao conectar com servidor";
+  }
 }
 
-/* INPUT */
-.input-area {
-  text-align: center;
-}
-
-#input {
-  padding: 12px;
-  width: 60%;
-  border: none;
-  outline: none;
-}
-
-button {
-  padding: 12px;
-  background: #00c3ff;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-</style>
-</head>
-
-<body>
-
-<div id="chat"></div>
-
-<div class="input-area">
-  <input id="input" placeholder="Digite LOGIN ou CADASTRO">
-  <button onclick="enviar()">Enviar</button>
-</div>
-
-<script src="app.js"></script>
-
-</body>
-</html>
+// ENTER envia mensagem
+document.getElementById("input").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    enviar();
+  }
+});
