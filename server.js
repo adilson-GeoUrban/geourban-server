@@ -1,4 +1,4 @@
-// ================= IMPORTS =================
+// ================= 🔐 IMPORTS =================
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -7,11 +7,10 @@ const path = require("path");
 
 const app = express();
 
-// ================= SEGURANÇA =================
+// ================= 🔒 SEGURANÇA =================
 app.disable("x-powered-by");
 app.use(helmet());
 
-// ⚠️ Permite produção + testes locais
 app.use(cors({
   origin: [
     "https://geourban-oficial.onrender.com",
@@ -23,112 +22,101 @@ app.use(cors({
 
 app.use(express.json());
 
-// ================= RATE LIMIT =================
+// ================= 🚫 RATE LIMIT =================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100
+  max: 100,
+  message: "⚠️ Muitas requisições. Tente novamente mais tarde."
 });
 app.use(limiter);
 
-// ================= FRONTEND =================
+// ================= 🌐 FRONTEND =================
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= HOME =================
+// ================= 🏠 HOME =================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ================= IA (UNIFICADA) =================
+// ================= 🧠 IA CENTRAL =================
 app.post("/ia", (req, res) => {
 
-  const mensagem = (req.body.mensagem || "").toLowerCase();
+  let mensagem = (req.body.mensagem || "").toLowerCase().trim();
 
-  // 🔒 BLOQUEIO LEGAL
-  const proibidos = ["ilegal", "fraude", "sonegar", "burlar"];
-  for (let p of proibidos) {
-    if (mensagem.includes(p)) {
-      return res.json({
-        resposta: "🚫 IA Jurídica: operação bloqueada por possível ilegalidade."
-      });
-    }
+  // 🔒 VALIDAÇÃO DE ENTRADA
+  if (!mensagem || mensagem.length > 200) {
+    return res.json({
+      resposta: "⚠️ Entrada inválida. Digite uma mensagem válida."
+    });
   }
 
-  let resposta = "🤖 IA GeoUrban pronta.";
+  // 🚫 BLOQUEIO LEGAL
+  const proibidos = ["fraude", "ilegal", "burlar", "sonegar"];
+  if (proibidos.some(p => mensagem.includes(p))) {
+    return res.json({
+      resposta: "🚫 Operação bloqueada por segurança jurídica."
+    });
+  }
 
-  // ⚖️ JURÍDICO
+  let resposta = "🤖 GeoUrban ativa. Informe sua necessidade.";
+
+  // ================= 🔐 FLUXO DE SISTEMA =================
+
+  if (mensagem.includes("login")) {
+    return res.json({
+      resposta: "🔐 Redirecionando para login...",
+      acao: "REDIRECT",
+      destino: "/login.html"
+    });
+  }
+
+  if (mensagem.includes("cadastro")) {
+    return res.json({
+      resposta: "📝 Iniciando cadastro...",
+      acao: "REDIRECT",
+      destino: "/login.html"
+    });
+  }
+
+  // ================= ⚖️ IA ESPECIALIZADA =================
+
   if (
     mensagem.includes("lei") ||
     mensagem.includes("direito") ||
-    mensagem.includes("contrato") ||
-    mensagem.includes("processo")
+    mensagem.includes("contrato")
   ) {
-    resposta = `⚖️ IA Jurídica:\n- Verificar legislação\n- Validar documentos\n- Consultar profissional`;
+    resposta = "⚖️ IA Jurídica: verifique legislação e consulte profissional habilitado.";
   }
 
-  // 🌍 INTERNACIONAL
+  else if (mensagem.includes("imposto")) {
+    resposta = "📊 IA Contábil: avalie regime tributário adequado.";
+  }
+
   else if (
     mensagem.includes("importar") ||
     mensagem.includes("exportar")
   ) {
-    resposta = `🌍 Operação Internacional:\n- NCM\n- Impostos\n- Licenciamento`;
+    resposta = "🌍 IA Internacional: verificar NCM, impostos e licenças.";
   }
 
-  // 📊 CONTÁBIL
-  else if (mensagem.includes("imposto")) {
-    resposta = `📊 IA Contábil:\n- Regime tributário\n- Simples / Presumido`;
-  }
-
-  // 🛠 TÉCNICO
   else if (
     mensagem.includes("erro") ||
     mensagem.includes("bug")
   ) {
-    resposta = "🛠 IA Técnica: verificar backend, rotas e integração.";
+    resposta = "🛠 IA Técnica: revisar backend, rotas e integração.";
   }
 
-  // 🎨 DESIGN
   else if (mensagem.includes("tela")) {
     resposta = "🎨 IA Designer: ajustar layout e responsividade.";
   }
 
   return res.json({ resposta });
+
 });
 
-// ================= LOGIN =================
-app.post("/login", (req, res) => {
-
-  const { comando } = req.body;
-
-  if (!comando) {
-    return res.status(400).json({ mensagem: "Dados inválidos" });
-  }
-
-  const cmd = comando.toLowerCase();
-
-  if (cmd === "login") {
-    return res.json({
-      mensagem: "Abrindo tela de login",
-      acao: "REDIRECT",
-      destino: "/login.html"
-    });
-  }
-
-  if (cmd === "cadastro") {
-    return res.json({
-      mensagem: "Redirecionando para cadastro",
-      acao: "REDIRECT",
-      destino: "/login.html"
-    });
-  }
-
-  return res.json({
-    mensagem: "Digite LOGIN ou CADASTRO."
-  });
-});
-
-// ================= START =================
+// ================= 🚀 START =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("🚀 Servidor GeoUrban rodando");
+  console.log("🚀 GeoUrban rodando com IA ativa");
 });
