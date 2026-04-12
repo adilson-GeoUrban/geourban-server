@@ -5,48 +5,41 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 
-// ================= 🚀 APP =================
 const app = express();
 
 // ================= 🔐 SEGURANÇA =================
-
-// Oculta tecnologia
 app.disable("x-powered-by");
-
-// Headers de segurança
 app.use(helmet());
 
-// CORS controlado (produção)
+app.use((req, res, next) => {
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  next();
+});
+
 app.use(cors({
   origin: ["https://geourban-oficial.onrender.com"],
   methods: ["GET", "POST"],
   credentials: true
 }));
 
-// JSON
 app.use(express.json());
 
-// Anti ataque (rate limit)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Muitas requisições, tente novamente mais tarde."
+  max: 100
 });
 app.use(limiter);
 
 // ================= 🌐 FRONTEND =================
-
-// Servir arquivos do /public
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= 🧪 ROTA TESTE =================
-
+// ================= 🏠 HOME =================
 app.get("/", (req, res) => {
-  res.send("GeoUrban API ONLINE ✅");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ================= 🧠 LOGIN INTELIGENTE =================
-
+// ================= 🧠 LOGIN =================
 app.post("/login", (req, res) => {
   const { comando } = req.body;
 
@@ -58,16 +51,14 @@ app.post("/login", (req, res) => {
 
   const cmd = comando.toLowerCase();
 
-  // 🔐 LOGIN
   if (cmd === "login") {
     return res.json({
-      mensagem: "Login executado",
+      mensagem: "Abrindo tela de login",
       acao: "REDIRECT",
-      destino: "/dashboard.html"
+      destino: "/login.html"
     });
   }
 
-  // 📝 CADASTRO
   if (cmd === "cadastro") {
     return res.json({
       mensagem: "Redirecionando para cadastro",
@@ -76,14 +67,12 @@ app.post("/login", (req, res) => {
     });
   }
 
-  // 🤖 RESPOSTA PADRÃO
   return res.json({
     mensagem: "Comando não reconhecido. Digite LOGIN ou CADASTRO."
   });
 });
 
 // ================= 🚀 START =================
-
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
