@@ -1,73 +1,16 @@
-// ================= 🔐 IMPORTS =================
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GeoUrban</title>
+</head>
+<body>
 
-// ================= 🚀 APP =================
-const app = express();
+<h1>GeoUrban 🚀</h1>
 
-// ================= 🔐 SEGURANÇA BASE =================
+<input id="input" placeholder="Digite..." />
+<button onclick="enviar()">Enviar</button>
 
-// Oculta tecnologia (boa prática)
-app.disable("x-powered-by");
+<script src="app.js"></script>
 
-// Headers de segurança
-app.use(helmet());
-
-// CORS restrito (ajuste depois se precisar app/web)
-app.use(cors({
-  origin: ["https://geourban-oficial.onrender.com"],
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-
-// Aceitar JSON
-app.use(express.json());
-
-// ================= 🔐 ANTI-ATAQUE =================
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100,
-  message: "Muitas requisições, tente novamente mais tarde."
-});
-
-app.use(limiter);
-
-// ================= 🧪 ROTA BASE =================
-app.get("/", (req, res) => {
-  res.status(200).send("GeoUrban API ONLINE ✅");
-});
-
-// ================= 🔐 LOGIN (BASE SEGURA) =================
-app.post("/login", (req, res) => {
-  const { email } = req.body;
-
-  // validação básica
-  if (!email || typeof email !== "string") {
-    return res.status(400).json({ error: "Dados inválidos" });
-  }
-
-  // resposta controlada
-  res.status(200).json({
-    message: "Login OK",
-    user: email
-  });
-});
-
-// ================= 🚀 PORTA (OBRIGATÓRIO RENDER) =================
-const PORT = process.env.PORT || 3000;
-
-// ================= 🚨 TRATAMENTO DE ERRO GLOBAL =================
-process.on("uncaughtException", (err) => {
-  console.error("Erro não tratado:", err);
-});
-
-process.on("unhandledRejection", (err) => {
-  console.error("Promessa rejeitada:", err);
-});
-
-// ================= 🚀 START =================
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-});
+</body>
+</html>
