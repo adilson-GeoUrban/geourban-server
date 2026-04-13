@@ -91,9 +91,18 @@ app.post('/login', (req, res) => {
   res.json({ token, user });
 });
 
-// 🧪 TESTE
+// 🧪 TESTE PROTEGIDO
 app.get('/protegido', (req, res) => {
   res.json({ status: "Acesso autorizado ✅" });
+});
+
+// 🔁 GARANTE ROTAS HTML
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/login.html'));
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/login.html'));
 });
 
 // 🚀 START
