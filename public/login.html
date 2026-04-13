@@ -1,46 +1,52 @@
 <script>
-  // 🎯 acessibilidade automática
-  const acc = localStorage.getItem("acessibilidade");
+  document.addEventListener("DOMContentLoaded", () => {
 
-  if (acc && acc.includes("visual")) {
-    document.body.style.fontSize = "22px";
-    document.body.style.background = "black";
-    document.body.style.color = "yellow";
-  }
+    // 🎯 ACESSIBILIDADE AUTOMÁTICA
+    const acc = localStorage.getItem("acessibilidade");
 
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const user = document.getElementById('user').value;
-    const pass = document.getElementById('pass').value;
-
-    try {
-      const res = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user, pass })
-      });
-
-      const data = await res.json();
-
-      // ✅ LOGIN OK
-      if (data.token) {
-
-        // salva sessão
-        localStorage.setItem("usuario", data.user);
-        localStorage.setItem("token", data.token);
-
-        // 🚀 abre painel em nova aba
-        window.open("index.html", "_blank");
-
-      } else {
-        alert(data.message || "Login inválido");
-      }
-
-    } catch (err) {
-      alert("Erro ao conectar com servidor");
+    if (acc && acc.includes("visual")) {
+      document.body.style.fontSize = "22px";
+      document.body.style.background = "black";
+      document.body.style.color = "yellow";
     }
+
+    // 🔐 LOGIN
+    const form = document.getElementById('loginForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const user = document.getElementById('user').value;
+      const pass = document.getElementById('pass').value;
+
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ user, pass })
+        });
+
+        const data = await res.json();
+
+        if (data.token) {
+          localStorage.setItem("usuario", data.user);
+          localStorage.setItem("token", data.token);
+
+          // 🚀 redirecionamento correto
+          window.location.href = "index.html";
+
+        } else {
+          alert(data.message || "Login inválido");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao conectar com servidor");
+      }
+    });
+
   });
 </script>
-admin
-123456
