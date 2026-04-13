@@ -68,3 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+const user = localStorage.getItem("usuario");
+
+if (!user) {
+  const params = new URLSearchParams(window.location.search);
+  const tokenURL = params.get("token");
+  const tokenLocal = localStorage.getItem("token");
+
+  if (!tokenURL || tokenURL !== tokenLocal) {
+    window.location.href = "login.html";
+  }
+}
+const token = btoa(user + "|" + Date.now());
+
+localStorage.setItem("usuario", user);
+localStorage.setItem("token", token);
+
+window.open("index.html?token=" + token, "_blank");
