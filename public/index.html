@@ -1,46 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Login - GeoUrban</title>
-</head>
-<body>
+<button onclick="forcarLogin()">Aceito e continuar</button>
 
-  <h2>Login</h2>
+<script>
+function forcarLogin() {
+  // Mata qualquer execução da Luiza
+  try {
+    window.stop();
+  } catch(e) {}
 
-  <form id="loginForm">
-    <input type="text" id="user" placeholder="Usuário" required>
-    <br><br>
-    <input type="password" id="pass" placeholder="Senha" required>
-    <br><br>
-    <button type="submit">Entrar</button>
-  </form>
-
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const user = document.getElementById('user').value;
-      const pass = document.getElementById('pass').value;
-
-      try {
-        const res = await fetch('/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ user, pass })
-        });
-
-        const data = await res.json();
-        alert(data.message);
-
-      } catch (err) {
-        alert('Erro de conexão com servidor');
-      }
-    });
-  </script>
-
-</body>
-</html>
-http://localhost:8080/login.html
+  // Força redirecionamento
+  window.location.replace("/login.html");
+}
+</script>
