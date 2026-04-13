@@ -1,105 +1,21 @@
-// 🔐 VERIFICAÇÃO DE ACESSO (NÃO REMOVE O QUE JÁ TEM)
-const params = new URLSearchParams(window.location.search);
-const tokenURL = params.get("token");
-const tokenLocal = localStorage.getItem("token");
-
-if (!tokenURL || tokenURL !== tokenLocal) {
-  alert("Acesso não autorizado");
-  window.location.href = "login.html";
-}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Painel GeoUrban</title>
-
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <style>
-    body {
-      margin:0;
-      font-family: Arial;
-      color: white;
-      text-align: center;
-      background: url("bg.jpg") no-repeat center center fixed;
-      background-size: cover;
-    }
-
-    .overlay {
-      background: rgba(0,0,0,0.75);
-      min-height: 100vh;
-      padding: 30px;
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-top: 30px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.08);
-      padding: 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-      backdrop-filter: blur(4px);
-    }
-
-    .card:hover {
-      background: rgba(255,255,255,0.2);
-      transform: scale(1.05);
-    }
-
-    #map {
-      height: 400px;
-      margin-top: 20px;
-      border-radius: 10px;
-      display: none;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #00c853;
-      color: white;
-      font-weight: bold;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="overlay">
-
-  <h1>GeoUrban</h1>
-  <div id="usuario"></div>
-
-  <div class="grid" id="painel"></div>
-
-  <!-- BOTÃO MAPA -->
-  <button onclick="carregarMapa()">🌍 Ativar Mapa</button>
-
-  <!-- MAPA -->
-  <div id="map"></div>
-
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <script>
+
+// 🔐 VERIFICAÇÃO CORRETA (DENTRO DO SCRIPT)
+const user = localStorage.getItem("usuario");
+
+if (!user) {
+  const params = new URLSearchParams(window.location.search);
+  const tokenURL = params.get("token");
+  const tokenLocal = localStorage.getItem("token");
+
+  if (!tokenURL || tokenURL !== tokenLocal) {
+    alert("Acesso não autorizado");
+    window.location.href = "login.html";
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  const user = localStorage.getItem("usuario");
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
   if (!user) {
@@ -151,28 +67,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
-
-// 🌍 LAZY LOAD MAPA
-let mapaCarregado = false;
-
-function carregarMapa() {
-  if (mapaCarregado) return;
-
-  document.getElementById("map").style.display = "block";
-
-  const map = L.map('map').setView([-15, -55], 4);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'GeoUrban © OpenStreetMap'
-  }).addTo(map);
-
-  L.marker([-14.2350, -51.9253])
-    .addTo(map)
-    .bindPopup("Brasil - GeoUrban Ativo");
-
-  mapaCarregado = true;
-}
 </script>
-
-</body>
-</html>
