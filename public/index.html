@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <title>Painel GeoUrban</title>
 
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
   <style>
     body {
       margin:0;
       font-family: Arial;
       color: white;
       text-align: center;
-
-      /* 🌆🌱 imagem conceito cidade + rural */
       background: url("bg.jpg") no-repeat center center fixed;
       background-size: cover;
     }
@@ -46,6 +47,24 @@
       background: rgba(255,255,255,0.2);
       transform: scale(1.05);
     }
+
+    #map {
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #00c853;
+      color: white;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -53,23 +72,32 @@
 
 <div class="overlay">
 
-<h1>GeoUrban</h1>
-<div id="usuario"></div>
+  <h1>GeoUrban</h1>
+  <div id="usuario"></div>
 
-<div class="grid" id="painel"></div>
+  <div class="grid" id="painel"></div>
+
+  <!-- BOTÃO MAPA -->
+  <button onclick="carregarMapa()">🌍 Ativar Mapa</button>
+
+  <!-- MAPA -->
+  <div id="map"></div>
 
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
   const user = localStorage.getItem("usuario");
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
-  // 🔐 segurança
   if (!user) {
     window.location.href = "/login.html";
+    return;
   }
 
-  // 🧠 fallback inteligente
   if (!camadas || camadas.length === 0) {
     camadas = ["educacao"];
     localStorage.setItem("camadas", JSON.stringify(camadas));
@@ -93,12 +121,10 @@
     controle: "⚙️ Controle"
   };
 
-  // 🔥 AUTO ABRIR PRIMEIRO MÓDULO
   function abrirModulo(nome) {
     alert("Abrindo módulo: " + nome);
   }
 
-  // 🔥 monta painel
   camadas.forEach((c, i) => {
     const div = document.createElement("div");
     div.className = "card";
@@ -108,13 +134,35 @@
 
     painel.appendChild(div);
 
-    // 🚀 abre automaticamente o primeiro
     if (i === 0) {
       setTimeout(() => {
         abrirModulo(mapa[c] || c);
       }, 800);
     }
   });
+
+});
+
+// 🌍 LAZY LOAD MAPA
+let mapaCarregado = false;
+
+function carregarMapa() {
+  if (mapaCarregado) return;
+
+  document.getElementById("map").style.display = "block";
+
+  const map = L.map('map').setView([-15, -55], 4);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'GeoUrban © OpenStreetMap'
+  }).addTo(map);
+
+  L.marker([-14.2350, -51.9253])
+    .addTo(map)
+    .bindPopup("Brasil - GeoUrban Ativo");
+
+  mapaCarregado = true;
+}
 </script>
 
 </body>
