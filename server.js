@@ -1,89 +1,100 @@
+npm install express sequelize sqlite3 bcrypt jsonwebtoken
 const express = require('express');
 const path = require('path');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const app = express();
 
-// 🔐 segurança básica
+// 🔐 config
 app.disable('x-powered-by');
-
-// 📦 middlewares
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🧪 health check
+const SECRET = process.env.SECRET_KEY || 'geourban_master';
+
+// 🗄️ banco (SQLite inicial)
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './database.sqlite'
+});
+
+// 👤 modelo usuário
+const User = sequelize.define('User', {
+  user: { type: DataTypes.STRING, unique: true },
+  pass: DataTypes.STRING,
+  role: DataTypes.STRING
+});
+
+// 🔄 cria banco
+sequelize.sync();
+
+// 🧪 health
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// 👤 base de usuários (teste)
-const USERS = [
-  { user: 'admin', pass: '123456', role: 'admin' },
-  { user: 'luiza', pass: '123', role: 'user' }
-];
+// 🔐 cadastro (admin inicial)
+app.post('/register', async (req, res) => {
+  const { user, pass, role } = req.body;
 
-// 🧠 armazenamento de tokens ativos (memória)
-const TOKENS = {};
+  const hash = await bcrypt.hash(pass, 10);
 
-// 🔐 login com geração de token
-app.post('/login', (req, res) => {
-  const { user, pass } = req.body;
-
-  const u = USERS.find(u => u.user === user && u.pass === pass);
-
-  if (!u) {
-    return res.status(401).json({ message: 'Login inválido' });
+  try {
+    await User.create({ user, pass: hash, role: role || 'user' });
+    res.json({ message: 'Usuário criado' });
+  } catch {
+    res.status(400).json({ message: 'Usuário já existe' });
   }
-
-  // 🔑 gera token
-  const token = crypto.randomBytes(32).toString('hex');
-
-  // 💾 salva token com usuário e expiração (2h)
-  TOKENS[token] = {
-    user: u.user,
-    role: u.role,
-    exp: Date.now() + (2 * 60 * 60 * 1000)
-  };
-
-  res.json({
-    message: 'Login OK',
-    user: u.user,
-    token: token
-  });
 });
 
-// 🔒 middleware de autenticação real
+// 🔐 login JWT
+app.post('/login', async (req, res) => {
+  const { user, pass } = req.body;
+
+  const u = await User.findOne({ where: { user } });
+  if (!u) return res.status(401).json({ message: 'Login inválido' });
+
+  const ok = await bcrypt.compare(pass, u.pass);
+  if (!ok) return res.status(401).json({ message: 'Senha inválida' });
+
+  const token = jwt.sign(
+    { id: u.id, user: u.user, role: u.role },
+    SECRET,
+    { expiresIn: '2h' }
+  );
+
+  res.json({ token });
+});
+
+// 🔒 middleware
 function auth(req, res, next) {
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(403).json({ error: 'Sem token' });
 
-  if (!authHeader) {
-    return res.status(403).json({ error: 'Sem token' });
-  }
+  const token = authHeader.split(' ')[1];
 
-  const token = authHeader.replace('Bearer ', '');
-
-  const session = TOKENS[token];
-
-  if (!session) {
+  try {
+    req.user = jwt.verify(token, SECRET);
+    next();
+  } catch {
     return res.status(403).json({ error: 'Token inválido' });
   }
+}
 
-  // ⏳ verifica expiração
-  if (Date.now() > session.exp) {
-    delete TOKENS[token];
-    return res.status(403).json({ error: 'Token expirado' });
+// 🛡️ admin only
+function admin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Apenas admin' });
   }
-
-  req.user = session;
   next();
 }
 
-// 🔒 rota protegida real
-app.get('/secure', auth, (req, res) => {
-  res.json({
-    message: 'Acesso autorizado',
-    user: req.user
-  });
+// 📊 painel admin
+app.get('/admin', auth, admin, async (req, res) => {
+  const users = await User.findAll({ attributes: ['id', 'user', 'role'] });
+  res.json(users);
 });
 
 // 🌐 rota principal
@@ -91,11 +102,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// 🚀 porta (Render compatível)
+// 🚀 start
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`GeoUrban rodando na porta ${PORT}`);
+  console.log('GeoUrban empresarial rodando 🚀');
 });
-GET /secure
-Authorization: Bearer SEU_TOKEN
