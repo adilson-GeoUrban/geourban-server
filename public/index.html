@@ -1,3 +1,12 @@
+// 🔐 VERIFICAÇÃO DE ACESSO (NÃO REMOVE O QUE JÁ TEM)
+const params = new URLSearchParams(window.location.search);
+const tokenURL = params.get("token");
+const tokenLocal = localStorage.getItem("token");
+
+if (!tokenURL || tokenURL !== tokenLocal) {
+  alert("Acesso não autorizado");
+  window.location.href = "login.html";
+}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
