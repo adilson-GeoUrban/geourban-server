@@ -1,66 +1,39 @@
 function definirCamadas() {
   const perfil = localStorage.getItem("perfil_usuario");
-  const objetivo = localStorage.getItem("objetivo");
+  const objetivo = (localStorage.getItem("objetivo") || "").toLowerCase();
 
-  let camadas = [];
+  let camadasBase = [];
+  let extras = [];
 
   // 🎓 ESTUDANTES
   if (perfil === "estudantes") {
-    camadas = ["educacao", "cursos", "simulacoes"];
+    camadasBase = ["educacao", "cursos", "simulacoes"];
   }
 
   // 👷 PROFISSIONAIS
   if (perfil === "profissional") {
-    camadas = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
+    camadasBase = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
   }
 
   // 🏛️ GOVERNO
   if (perfil === "governo") {
-    camadas = ["gestao", "auditoria", "relatorios", "controle"];
+    camadasBase = ["gestao", "auditoria", "relatorios", "controle"];
   }
 
-  // 🎯 OBJETIVO ESPECÍFICO (refina)
-  if (objetivo) {
-    if (objetivo.includes("consultoria")) camadas.push("consultoria");
-    if (objetivo.includes("curso")) camadas.push("cursos");
-    if (objetivo.includes("loja")) camadas.push("loja");
-  }
+  // 🎯 OBJETIVO refina sem duplicar
+  if (objetivo.includes("consultoria")) extras.push("consultoria");
+  if (objetivo.includes("curso")) extras.push("cursos");
+  if (objetivo.includes("loja")) extras.push("loja");
+
+  // 🔥 remove duplicados automaticamente
+  const camadas = [...new Set([...camadasBase, ...extras])];
 
   localStorage.setItem("camadas", JSON.stringify(camadas));
 
   escrever("Luiza: Estrutura personalizada ativada. 🧠");
   escrever("Luiza: Camadas liberadas: " + camadas.join(", "));
 }
-function definirCamadas() {
-  const perfil = localStorage.getItem("perfil_usuario");
-  const objetivo = localStorage.getItem("objetivo");
-
-  let camadas = [];
-
-  // 🎓 ESTUDANTES
-  if (perfil === "estudantes") {
-    camadas = ["educacao", "cursos", "simulacoes"];
-  }
-
-  // 👷 PROFISSIONAIS
-  if (perfil === "profissional") {
-    camadas = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
-  }
-
-  // 🏛️ GOVERNO
-  if (perfil === "governo") {
-    camadas = ["gestao", "auditoria", "relatorios", "controle"];
-  }
-
-  // 🎯 OBJETIVO ESPECÍFICO (refina)
-  if (objetivo) {
-    if (objetivo.includes("consultoria")) camadas.push("consultoria");
-    if (objetivo.includes("curso")) camadas.push("cursos");
-    if (objetivo.includes("loja")) camadas.push("loja");
-  }
-
-  localStorage.setItem("camadas", JSON.stringify(camadas));
-
-  escrever("Luiza: Estrutura personalizada ativada. 🧠");
-  escrever("Luiza: Camadas liberadas: " + camadas.join(", "));
-}
+profissional
+engenheiro
+consultoria
+consultoria, clientes, cadastro_tecnico, loja
