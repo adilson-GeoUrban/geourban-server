@@ -1,21 +1,51 @@
+<script>
 // 🔐 INÍCIO CONTROLADO
 document.addEventListener("DOMContentLoaded", () => {
 
   const user = localStorage.getItem("usuario");
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
+  // 🚫 BLOQUEIO
   if (!user) {
     window.location.href = "/login.html";
     return;
   }
 
+  // 📦 PADRÃO CAMADAS
   if (!camadas || camadas.length === 0) {
     camadas = ["educacao"];
     localStorage.setItem("camadas", JSON.stringify(camadas));
   }
 
-  document.getElementById("usuario").innerText = "Usuário: " + user;
+  // 🤖 ROBÔ (substitui alert)
+  function mostrarMensagem(msg) {
+    let box = document.getElementById("robo-msg");
 
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "robo-msg";
+      box.style.position = "fixed";
+      box.style.bottom = "20px";
+      box.style.right = "20px";
+      box.style.background = "#111";
+      box.style.color = "#0f0";
+      box.style.padding = "10px";
+      box.style.borderRadius = "8px";
+      box.style.zIndex = "9999";
+      document.body.appendChild(box);
+    }
+
+    box.innerText = msg;
+    box.style.display = "block";
+  }
+
+  // 👤 USUÁRIO
+  const userEl = document.getElementById("usuario");
+  if (userEl) {
+    userEl.innerText = "Usuário: " + user;
+  }
+
+  // 🎯 PAINEL
   const painel = document.getElementById("painel");
 
   const mapaModulos = {
@@ -33,34 +63,43 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function abrirModulo(nome) {
-    alert("Abrindo módulo: " + nome);
+    mostrarMensagem("Abrindo módulo: " + nome);
   }
 
-  camadas.forEach((c, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerText = mapaModulos[c] || c;
+  // 🔒 PROTEÇÃO PAINEL
+  if (painel) {
+    camadas.forEach((c, i) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerText = mapaModulos[c] || c;
 
-    div.onclick = () => abrirModulo(mapaModulos[c] || c);
+      div.onclick = () => abrirModulo(mapaModulos[c] || c);
 
-    painel.appendChild(div);
+      painel.appendChild(div);
 
-    if (i === 0) {
-      setTimeout(() => {
-        abrirModulo(mapaModulos[c] || c);
-      }, 800);
-    }
-  });
+      if (i === 0) {
+        setTimeout(() => {
+          abrirModulo(mapaModulos[c] || c);
+        }, 800);
+      }
+    });
+  }
 
 });
 
-// 🌍 LAZY LOAD DO MAPA
+// 🌍 LAZY LOAD DO MAPA (SEGURO)
 let mapaCarregado = false;
 
 function carregarMapa() {
   if (mapaCarregado) return;
 
-  document.getElementById("map").style.display = "block";
+  const mapEl = document.getElementById("map");
+  if (!mapEl || typeof L === "undefined") {
+    console.warn("Mapa não disponível ainda");
+    return;
+  }
+
+  mapEl.style.display = "block";
 
   const map = L.map('map').setView([-15, -55], 4);
 
@@ -74,3 +113,4 @@ function carregarMapa() {
 
   mapaCarregado = true;
 }
+</script>
