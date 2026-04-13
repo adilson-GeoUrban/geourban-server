@@ -26,6 +26,7 @@ app.use((req, res, next) => {
   if (
     req.path === '/' ||
     req.path.startsWith('/login') ||
+    req.path.startsWith('/admin-access') || // 👈 LIBERA ACESSO INTERNO
     req.path.endsWith('.html') ||
     req.path.endsWith('.js') ||
     req.path.endsWith('.css') ||
@@ -86,7 +87,23 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   }
 })();
 
-// 🚪 LOGIN (gera token)
+// 🔐 ACESSO INTERNO (SÓ VOCÊ)
+app.get('/admin-access', (req, res) => {
+
+  const key = req.query.key;
+
+  if (!key || key !== process.env.API_KEY) {
+    return res.status(404).json({ error: "Not Found" });
+  }
+
+  const user = "admin";
+  const token = Buffer.from(user + "|" + Date.now()).toString('base64');
+
+  // redireciona já autenticado
+  res.redirect(`/login.html?token=${token}`);
+});
+
+// 🚪 LOGIN (gera token manual)
 app.post('/login', (req, res) => {
   const { user } = req.body;
 
