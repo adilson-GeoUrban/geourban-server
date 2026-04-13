@@ -5,24 +5,81 @@
   <title>GeoUrban</title>
 </head>
 
-<body style="background:black; color:white; text-align:center; margin-top:100px;">
+<body style="background:black; color:white; text-align:center; margin-top:80px; font-family:Arial;">
 
   <h1>GeoUrban</h1>
   <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
 
-  <button onclick="forcarLogin()">Aceito e continuar</button>
+  <!-- 🤖 LUÍZA -->
+  <div id="chat" style="margin-top:40px;"></div>
+
+  <input id="input" placeholder="Digite aqui..." style="padding:10px; width:250px;">
+  <button onclick="enviar()">Enviar</button>
+
+  <br><br>
+
+  <!-- 🔐 BOTÃO DIRETO -->
+  <button onclick="irLogin()" style="padding:10px 20px;">Aceito e continuar</button>
 
   <script>
-    function forcarLogin() {
-      // trava qualquer script (Luiza)
-      try {
-        window.stop();
-      } catch(e) {}
+    const chat = document.getElementById("chat");
 
-      // força saída da tela
+    function escrever(texto) {
+      const p = document.createElement("p");
+      p.innerText = texto;
+      chat.appendChild(p);
+    }
+
+    // 👇 INÍCIO
+    escrever("Luiza: Sistema iniciado.");
+    escrever("Luiza: Você possui limitação visual, auditiva ou motora?");
+
+    function enviar() {
+      const input = document.getElementById("input");
+      const msg = input.value;
+      const comando = msg.toLowerCase().trim();
+
+      escrever("Você: " + msg);
+
+      // 🔐 COMANDO DIRETO LOGIN
+      if (comando === "login") {
+        localStorage.setItem("fluxo", "login");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      // 🎯 CAPTURA ACESSIBILIDADE
+      if (
+        comando.includes("visual") ||
+        comando.includes("auditiva") ||
+        comando.includes("motora")
+      ) {
+        localStorage.setItem("acessibilidade", comando);
+        escrever("Luiza: Perfil registrado.");
+        escrever("Luiza: Digite LOGIN ou CADASTRO.");
+        input.value = "";
+        return;
+      }
+
+      // 🔁 FLUXO PADRÃO
+      escrever("Luiza: Digite LOGIN ou CADASTRO.");
+      input.value = "";
+    }
+
+    // 🔘 BOTÃO DIRETO
+    function irLogin() {
       window.location.href = "/login.html";
     }
   </script>
 
 </body>
 </html>
+const acessibilidade = localStorage.getItem("acessibilidade");
+
+if (acessibilidade) {
+  if (acessibilidade.includes("visual")) {
+    document.body.style.fontSize = "22px";
+    document.body.style.background = "black";
+    document.body.style.color = "yellow";
+  }
+}
