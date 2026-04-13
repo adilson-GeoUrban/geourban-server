@@ -1,148 +1,66 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>GeoUrban</title>
+function definirCamadas() {
+  const perfil = localStorage.getItem("perfil_usuario");
+  const objetivo = localStorage.getItem("objetivo");
 
-  <style>
-    body {
-      background: black;
-      color: white;
-      text-align: center;
-      margin-top: 80px;
-      font-family: Arial;
-      transition: all 0.5s ease;
-    }
+  let camadas = [];
 
-    .fade-out {
-      opacity: 0;
-      transform: scale(0.98);
-    }
-  </style>
-</head>
+  // 🎓 ESTUDANTES
+  if (perfil === "estudantes") {
+    camadas = ["educacao", "cursos", "simulacoes"];
+  }
 
-<body id="body">
+  // 👷 PROFISSIONAIS
+  if (perfil === "profissional") {
+    camadas = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
+  }
 
-  <h1>GeoUrban</h1>
-  <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
+  // 🏛️ GOVERNO
+  if (perfil === "governo") {
+    camadas = ["gestao", "auditoria", "relatorios", "controle"];
+  }
 
-  <div id="chat"></div>
+  // 🎯 OBJETIVO ESPECÍFICO (refina)
+  if (objetivo) {
+    if (objetivo.includes("consultoria")) camadas.push("consultoria");
+    if (objetivo.includes("curso")) camadas.push("cursos");
+    if (objetivo.includes("loja")) camadas.push("loja");
+  }
 
-  <input id="input" placeholder="Digite aqui..." style="padding:10px;">
-  <button onclick="enviar()">Enviar</button>
+  localStorage.setItem("camadas", JSON.stringify(camadas));
 
-  <br><br>
-  <button onclick="irLogin()">Entrar</button>
+  escrever("Luiza: Estrutura personalizada ativada. 🧠");
+  escrever("Luiza: Camadas liberadas: " + camadas.join(", "));
+}
+function definirCamadas() {
+  const perfil = localStorage.getItem("perfil_usuario");
+  const objetivo = localStorage.getItem("objetivo");
 
-  <script>
-    const chat = document.getElementById("chat");
-    const body = document.getElementById("body");
+  let camadas = [];
 
-    function escrever(t) {
-      const p = document.createElement("p");
-      p.innerText = t;
-      chat.appendChild(p);
-    }
+  // 🎓 ESTUDANTES
+  if (perfil === "estudantes") {
+    camadas = ["educacao", "cursos", "simulacoes"];
+  }
 
-    // 🚀 INÍCIO
-    escrever("Luiza: Bom dia! Seja bem-vindo ao GeoUrban. 🌐");
-    escrever("Luiza: Para atendermos melhor, você possui alguma limitação?");
-    escrever("Luiza: (visual, auditiva, motora ou nenhuma)");
+  // 👷 PROFISSIONAIS
+  if (perfil === "profissional") {
+    camadas = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
+  }
 
-    function transicao(destino) {
-      body.classList.add("fade-out");
+  // 🏛️ GOVERNO
+  if (perfil === "governo") {
+    camadas = ["gestao", "auditoria", "relatorios", "controle"];
+  }
 
-      setTimeout(() => {
-        window.location.href = destino;
-      }, 800);
-    }
+  // 🎯 OBJETIVO ESPECÍFICO (refina)
+  if (objetivo) {
+    if (objetivo.includes("consultoria")) camadas.push("consultoria");
+    if (objetivo.includes("curso")) camadas.push("cursos");
+    if (objetivo.includes("loja")) camadas.push("loja");
+  }
 
-    function etapaLGPD() {
-      escrever("Luiza: Antes de continuar, preciso da sua confirmação. 📄");
-      escrever("Luiza: Você declara que as informações prestadas são verdadeiras?");
-      escrever("Luiza: Seus dados serão utilizados exclusivamente para execução do serviço contratado, conforme a LGPD. 🔒");
-      escrever("Luiza: Digite ACEITO para confirmar.");
-    }
+  localStorage.setItem("camadas", JSON.stringify(camadas));
 
-    function enviar() {
-      const input = document.getElementById("input");
-      const msg = input.value;
-      const cmd = msg.toLowerCase().trim();
-
-      escrever("Você: " + msg);
-
-      // 🎯 ACESSIBILIDADE
-      if (
-        cmd.includes("visual") ||
-        cmd.includes("auditiva") ||
-        cmd.includes("motora") ||
-        cmd.includes("nenhuma")
-      ) {
-        localStorage.setItem("acessibilidade", cmd);
-
-        escrever("Luiza: Perfil registrado com segurança. 🔒");
-        escrever("Luiza: Você é alfabetizado?");
-        input.value = "";
-        return;
-      }
-
-      // 🎯 ALFABETIZAÇÃO
-      if (cmd === "sim" || cmd === "não" || cmd === "nao") {
-        localStorage.setItem("alfabetizacao", cmd);
-
-        escrever("Luiza: Perfeito.");
-        escrever("Luiza: Vamos iniciar seu cadastro profissional.");
-        escrever("Luiza: Você poderá registrar ART, TRT ou RRT.");
-        escrever("Luiza: Agora precisamos validar os termos.");
-        etapaLGPD();
-
-        input.value = "";
-        return;
-      }
-
-      // 🔐 ACEITE LGPD
-      if (cmd === "aceito") {
-        localStorage.setItem("lgpd_aceite", "true");
-        localStorage.setItem("lgpd_data", new Date().toISOString());
-
-        escrever("Luiza: Declaração registrada com sucesso. ✅");
-        escrever("Luiza: Digite LOGIN para continuar.");
-
-        input.value = "";
-        return;
-      }
-
-      // 🔐 LOGIN (BLOQUEADO SE NÃO ACEITAR)
-      if (cmd === "login") {
-        const aceito = localStorage.getItem("lgpd_aceite");
-
-        if (!aceito) {
-          escrever("Luiza: Para sua segurança, é necessário aceitar os termos.");
-          etapaLGPD();
-          return;
-        }
-
-        escrever("Luiza: Redirecionando com segurança...");
-        transicao("/login.html");
-        return;
-      }
-
-      escrever("Luiza: Por favor, siga as instruções para continuarmos.");
-      input.value = "";
-    }
-
-    function irLogin() {
-      const aceito = localStorage.getItem("lgpd_aceite");
-
-      if (!aceito) {
-        escrever("Luiza: É necessário aceitar os termos antes de continuar.");
-        etapaLGPD();
-        return;
-      }
-
-      transicao("/login.html");
-    }
-  </script>
-
-</body>
-</html>
+  escrever("Luiza: Estrutura personalizada ativada. 🧠");
+  escrever("Luiza: Camadas liberadas: " + camadas.join(", "));
+}
