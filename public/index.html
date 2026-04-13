@@ -3,9 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>GeoUrban</title>
+
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      margin-top: 80px;
+      font-family: Arial;
+      transition: all 0.5s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  </style>
 </head>
 
-<body style="background:black; color:white; text-align:center; margin-top:80px; font-family:Arial;">
+<body id="body">
 
   <h1>GeoUrban</h1>
   <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
@@ -16,11 +32,11 @@
   <button onclick="enviar()">Enviar</button>
 
   <br><br>
-
-  <button onclick="irLogin()">Entrar direto</button>
+  <button onclick="irLogin()">Entrar</button>
 
   <script>
     const chat = document.getElementById("chat");
+    const body = document.getElementById("body");
 
     function escrever(t) {
       const p = document.createElement("p");
@@ -31,6 +47,14 @@
     escrever("Luiza: Sistema iniciado.");
     escrever("Luiza: Você possui limitação visual, auditiva ou motora?");
 
+    function transicao(destino) {
+      body.classList.add("fade-out");
+
+      setTimeout(() => {
+        window.location.href = destino;
+      }, 500);
+    }
+
     function enviar() {
       const input = document.getElementById("input");
       const msg = input.value;
@@ -38,17 +62,19 @@
 
       escrever("Você: " + msg);
 
-      // 🔐 comando direto login
+      // 🔐 LOGIN DIRETO
       if (cmd === "login") {
-        window.location.href = "/login.html";
+        transicao("/login.html");
         return;
       }
 
-      // 🎯 acessibilidade
+      // 🎯 ACESSIBILIDADE
       if (cmd.includes("visual") || cmd.includes("auditiva") || cmd.includes("motora")) {
         localStorage.setItem("acessibilidade", cmd);
+
         escrever("Luiza: Perfil registrado.");
         escrever("Luiza: Digite LOGIN ou CADASTRO.");
+
         input.value = "";
         return;
       }
@@ -58,7 +84,7 @@
     }
 
     function irLogin() {
-      window.location.href = "/login.html";
+      transicao("/login.html");
     }
   </script>
 
