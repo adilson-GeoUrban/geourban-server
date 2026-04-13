@@ -44,15 +44,24 @@
       chat.appendChild(p);
     }
 
-    escrever("Luiza: Sistema iniciado.");
-    escrever("Luiza: Você possui limitação visual, auditiva ou motora?");
+    // 🚀 INÍCIO
+    escrever("Luiza: Bom dia! Seja bem-vindo ao GeoUrban. 🌐");
+    escrever("Luiza: Para atendermos melhor, você possui alguma limitação?");
+    escrever("Luiza: (visual, auditiva, motora ou nenhuma)");
 
     function transicao(destino) {
       body.classList.add("fade-out");
 
       setTimeout(() => {
         window.location.href = destino;
-      }, 500);
+      }, 800);
+    }
+
+    function etapaLGPD() {
+      escrever("Luiza: Antes de continuar, preciso da sua confirmação. 📄");
+      escrever("Luiza: Você declara que as informações prestadas são verdadeiras?");
+      escrever("Luiza: Seus dados serão utilizados exclusivamente para execução do serviço contratado, conforme a LGPD. 🔒");
+      escrever("Luiza: Digite ACEITO para confirmar.");
     }
 
     function enviar() {
@@ -62,28 +71,75 @@
 
       escrever("Você: " + msg);
 
-      // 🔐 LOGIN DIRETO
-      if (cmd === "login") {
-        transicao("/login.html");
+      // 🎯 ACESSIBILIDADE
+      if (
+        cmd.includes("visual") ||
+        cmd.includes("auditiva") ||
+        cmd.includes("motora") ||
+        cmd.includes("nenhuma")
+      ) {
+        localStorage.setItem("acessibilidade", cmd);
+
+        escrever("Luiza: Perfil registrado com segurança. 🔒");
+        escrever("Luiza: Você é alfabetizado?");
+        input.value = "";
         return;
       }
 
-      // 🎯 ACESSIBILIDADE
-      if (cmd.includes("visual") || cmd.includes("auditiva") || cmd.includes("motora")) {
-        localStorage.setItem("acessibilidade", cmd);
+      // 🎯 ALFABETIZAÇÃO
+      if (cmd === "sim" || cmd === "não" || cmd === "nao") {
+        localStorage.setItem("alfabetizacao", cmd);
 
-        escrever("Luiza: Perfil registrado.");
-        escrever("Luiza: Digite LOGIN ou CADASTRO.");
+        escrever("Luiza: Perfeito.");
+        escrever("Luiza: Vamos iniciar seu cadastro profissional.");
+        escrever("Luiza: Você poderá registrar ART, TRT ou RRT.");
+        escrever("Luiza: Agora precisamos validar os termos.");
+        etapaLGPD();
 
         input.value = "";
         return;
       }
 
-      escrever("Luiza: Digite LOGIN ou CADASTRO.");
+      // 🔐 ACEITE LGPD
+      if (cmd === "aceito") {
+        localStorage.setItem("lgpd_aceite", "true");
+        localStorage.setItem("lgpd_data", new Date().toISOString());
+
+        escrever("Luiza: Declaração registrada com sucesso. ✅");
+        escrever("Luiza: Digite LOGIN para continuar.");
+
+        input.value = "";
+        return;
+      }
+
+      // 🔐 LOGIN (BLOQUEADO SE NÃO ACEITAR)
+      if (cmd === "login") {
+        const aceito = localStorage.getItem("lgpd_aceite");
+
+        if (!aceito) {
+          escrever("Luiza: Para sua segurança, é necessário aceitar os termos.");
+          etapaLGPD();
+          return;
+        }
+
+        escrever("Luiza: Redirecionando com segurança...");
+        transicao("/login.html");
+        return;
+      }
+
+      escrever("Luiza: Por favor, siga as instruções para continuarmos.");
       input.value = "";
     }
 
     function irLogin() {
+      const aceito = localStorage.getItem("lgpd_aceite");
+
+      if (!aceito) {
+        escrever("Luiza: É necessário aceitar os termos antes de continuar.");
+        etapaLGPD();
+        return;
+      }
+
       transicao("/login.html");
     }
   </script>
