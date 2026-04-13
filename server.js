@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-// 🛡️ SEGURANÇA
+// 🛡️ SEGURANÇA BÁSICA
 app.use(helmet());
 
 app.use(rateLimit({
@@ -16,13 +16,13 @@ app.use(rateLimit({
   max: 100
 }));
 
-// 🔥 FRONTEND PRIMEIRO (CRÍTICO)
+// 🔥 FRONTEND (LIBERADO)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔐 BLOQUEIO (DEPOIS DO STATIC)
+// 🔐 BLOQUEIO DUPLO (API KEY + TOKEN)
 app.use((req, res, next) => {
 
-  // libera tudo que é frontend
+  // ✅ LIBERA FRONTEND
   if (
     req.path === '/' ||
     req.path.startsWith('/login') ||
@@ -34,8 +34,15 @@ app.use((req, res, next) => {
     return next();
   }
 
+  const apiKey = req.headers['x-api-key'];
   const token = req.headers['authorization'];
 
+  // 🔐 CAMADA 1 — API KEY
+  if (!apiKey || apiKey !== process.env.API_KEY) {
+    return res.status(403).json({ error: "API KEY inválida 🔒" });
+  }
+
+  // 🔐 CAMADA 2 — TOKEN
   if (!token) {
     return res.status(401).json({ error: "Token ausente 🔒" });
   }
@@ -79,7 +86,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   }
 })();
 
-// 🚪 LOGIN
+// 🚪 LOGIN (gera token)
 app.post('/login', (req, res) => {
   const { user } = req.body;
 
@@ -92,12 +99,12 @@ app.post('/login', (req, res) => {
   res.json({ token, user });
 });
 
-// 🧪 TESTE
+// 🧪 TESTE PROTEGIDO
 app.get('/protegido', (req, res) => {
   res.json({ status: "Acesso autorizado ✅" });
 });
 
-// 🔁 FALLBACK GLOBAL (GARANTE HTML)
+// 🔁 FALLBACK (sempre responde frontend)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 });
