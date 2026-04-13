@@ -3,21 +3,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const user = localStorage.getItem("usuario");
+  const token = localStorage.getItem("token");
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
-  // 🚫 BLOQUEIO
-  if (!user) {
+  // 🚫 BLOQUEIO TOTAL
+  function bloquearAcesso() {
+    localStorage.clear();
     window.location.href = "/login.html";
-    return;
   }
 
-  // 📦 PADRÃO CAMADAS
-  if (!camadas || camadas.length === 0) {
-    camadas = ["educacao"];
-    localStorage.setItem("camadas", JSON.stringify(camadas));
-  }
-
-  // 🤖 ROBÔ (substitui alert)
+  // 🤖 ROBÔ (mensagem inteligente)
   function mostrarMensagem(msg) {
     let box = document.getElementById("robo-msg");
 
@@ -37,6 +32,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     box.innerText = msg;
     box.style.display = "block";
+
+    // 🔥 auto esconder
+    setTimeout(() => {
+      box.style.display = "none";
+    }, 3000);
+  }
+
+  // 🔐 VALIDAÇÃO REAL (ANTI BYPASS)
+  function validarSessao() {
+    if (!token || !user) {
+      mostrarMensagem("Acesso não autorizado 🔒");
+      bloquearAcesso();
+      return;
+    }
+
+    fetch("/protegido", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+    .then(res => {
+      if (res.status !== 200) {
+        mostrarMensagem("Sessão inválida ⚠️");
+        bloquearAcesso();
+      }
+    })
+    .catch(() => {
+      mostrarMensagem("Erro de conexão 🚫");
+      bloquearAcesso();
+    });
+  }
+
+  validarSessao();
+
+  // 📦 PADRÃO CAMADAS
+  if (!camadas || camadas.length === 0) {
+    camadas = ["educacao"];
+    localStorage.setItem("camadas", JSON.stringify(camadas));
   }
 
   // 👤 USUÁRIO
@@ -47,6 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🎯 PAINEL
   const painel = document.getElementById("painel");
+
+  if (!painel) {
+    console.warn("Painel não encontrado");
+    return;
+  }
 
   const mapaModulos = {
     educacao: "📚 Educação",
@@ -66,34 +104,33 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarMensagem("Abrindo módulo: " + nome);
   }
 
-  // 🔒 PROTEÇÃO PAINEL
-  if (painel) {
-    camadas.forEach((c, i) => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerText = mapaModulos[c] || c;
+  camadas.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerText = mapaModulos[c] || c;
 
-      div.onclick = () => abrirModulo(mapaModulos[c] || c);
+    div.onclick = () => abrirModulo(mapaModulos[c] || c);
 
-      painel.appendChild(div);
+    painel.appendChild(div);
 
-      if (i === 0) {
-        setTimeout(() => {
-          abrirModulo(mapaModulos[c] || c);
-        }, 800);
-      }
-    });
-  }
+    if (i === 0) {
+      setTimeout(() => {
+        abrirModulo(mapaModulos[c] || c);
+      }, 800);
+    }
+  });
 
 });
 
-// 🌍 LAZY LOAD DO MAPA (SEGURO)
+
+// 🌍 MAPA (LAZY LOAD SEGURO)
 let mapaCarregado = false;
 
 function carregarMapa() {
   if (mapaCarregado) return;
 
   const mapEl = document.getElementById("map");
+
   if (!mapEl || typeof L === "undefined") {
     console.warn("Mapa não disponível ainda");
     return;
