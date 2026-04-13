@@ -1,16 +1,17 @@
 <script>
-// 🔐 VERIFICAÇÃO INICIAL
+
+// 🔐 VERIFICAÇÃO INICIAL (FRONT)
 const token = localStorage.getItem("token");
 const user = localStorage.getItem("usuario");
 
-// 🚫 BLOQUEIA ACESSO SEM LOGIN
+// 🚫 BLOQUEIO SEM LOGIN
 if (!token || !user) {
   alert("Acesso não autorizado 🔒");
   window.location.href = "login.html";
 }
 
 // 🔎 VALIDA TOKEN NO BACKEND (SEGURANÇA REAL)
-fetch("https://SEU-LINK-RAILWAY/protegido", {
+fetch("https://geourban-server-production.up.railway.app/protegido", {
   headers: {
     "Authorization": token
   }
@@ -20,6 +21,10 @@ fetch("https://SEU-LINK-RAILWAY/protegido", {
     localStorage.clear();
     window.location.href = "login.html";
   }
+})
+.catch(() => {
+  localStorage.clear();
+  window.location.href = "login.html";
 });
 
 // 🚀 INICIALIZAÇÃO DO SISTEMA
@@ -65,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     painel.appendChild(div);
 
+    // abre automaticamente o primeiro
     if (i === 0) {
       setTimeout(() => {
         abrirModulo(mapa[c] || c);
@@ -73,4 +79,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
 </script>
