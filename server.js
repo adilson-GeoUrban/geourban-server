@@ -97,3 +97,5 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`GeoUrban rodando na porta ${PORT}`);
 });
+GET /secure
+Authorization: Bearer SEU_TOKEN
