@@ -8,32 +8,33 @@ const app = express();
 
 app.use(express.json());
 
-// 🛡️ SEGURANÇA HTTP
+// 🛡️ SEGURANÇA
 app.use(helmet());
 
-// 🛡️ RATE LIMIT (anti ataque)
 app.use(rateLimit({
   windowMs: 60 * 1000,
-  max: 100,
-  message: { error: "Muitas requisições" }
+  max: 100
 }));
 
-// 🔥 SERVIR FRONTEND (ESSENCIAL)
+// 🔥 FRONTEND PRIMEIRO (CRÍTICO)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔐 BLOQUEIO GLOBAL COM TOKEN (AJUSTADO)
+// 🔐 BLOQUEIO (DEPOIS DO STATIC)
 app.use((req, res, next) => {
-  const token = req.headers['authorization'];
 
-  // libera arquivos estáticos e login
+  // libera tudo que é frontend
   if (
+    req.path === '/' ||
     req.path.startsWith('/login') ||
     req.path.endsWith('.html') ||
     req.path.endsWith('.js') ||
-    req.path.endsWith('.css')
+    req.path.endsWith('.css') ||
+    req.path.startsWith('/public')
   ) {
     return next();
   }
+
+  const token = req.headers['authorization'];
 
   if (!token) {
     return res.status(401).json({ error: "Token ausente 🔒" });
@@ -55,7 +56,7 @@ app.use((req, res, next) => {
   }
 });
 
-// 🗄️ BANCO (PostgreSQL seguro)
+// 🗄️ BANCO
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   protocol: 'postgres',
@@ -91,17 +92,13 @@ app.post('/login', (req, res) => {
   res.json({ token, user });
 });
 
-// 🧪 TESTE PROTEGIDO
+// 🧪 TESTE
 app.get('/protegido', (req, res) => {
   res.json({ status: "Acesso autorizado ✅" });
 });
 
-// 🔁 GARANTE ROTAS HTML
-app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/login.html'));
-});
-
-app.get('/', (req, res) => {
+// 🔁 FALLBACK GLOBAL (GARANTE HTML)
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 });
 
