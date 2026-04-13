@@ -2,8 +2,10 @@ const express = require('express');
 const { Sequelize } = require('sequelize');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const app = express();
+
 app.use(express.json());
 
 // 🛡️ SEGURANÇA HTTP
@@ -16,12 +18,22 @@ app.use(rateLimit({
   message: { error: "Muitas requisições" }
 }));
 
-// 🔐 BLOQUEIO GLOBAL COM TOKEN TEMPORÁRIO
+// 🔥 SERVIR FRONTEND (ESSENCIAL)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 🔐 BLOQUEIO GLOBAL COM TOKEN (AJUSTADO)
 app.use((req, res, next) => {
   const token = req.headers['authorization'];
 
-  // libera rota de login
-  if (req.path === '/login') return next();
+  // libera arquivos estáticos e login
+  if (
+    req.path.startsWith('/login') ||
+    req.path.endsWith('.html') ||
+    req.path.endsWith('.js') ||
+    req.path.endsWith('.css')
+  ) {
+    return next();
+  }
 
   if (!token) {
     return res.status(401).json({ error: "Token ausente 🔒" });
@@ -31,7 +43,6 @@ app.use((req, res, next) => {
     const decoded = Buffer.from(token, 'base64').toString();
     const [user, timestamp] = decoded.split("|");
 
-    // validade: 2 horas
     const expirado = (Date.now() - parseInt(timestamp)) > (2 * 60 * 60 * 1000);
 
     if (!user || expirado) {
@@ -57,7 +68,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   }
 });
 
-// 🔗 CONEXÃO SEGURA
+// 🔗 CONEXÃO
 (async () => {
   try {
     await sequelize.authenticate();
@@ -67,7 +78,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   }
 })();
 
-// 🚪 ROTA LOGIN (gera token)
+// 🚪 LOGIN
 app.post('/login', (req, res) => {
   const { user } = req.body;
 
@@ -77,10 +88,10 @@ app.post('/login', (req, res) => {
 
   const token = Buffer.from(user + "|" + Date.now()).toString('base64');
 
-  res.json({ token });
+  res.json({ token, user });
 });
 
-// 🧪 ROTA TESTE PROTEGIDA
+// 🧪 TESTE
 app.get('/protegido', (req, res) => {
   res.json({ status: "Acesso autorizado ✅" });
 });
