@@ -1,103 +1,76 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>GeoUrban IA</title>
+// 🔐 INÍCIO CONTROLADO
+document.addEventListener("DOMContentLoaded", () => {
 
-  <!-- 🔒 Segurança -->
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  const user = localStorage.getItem("usuario");
+  let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
-</head>
+  if (!user) {
+    window.location.href = "/login.html";
+    return;
+  }
 
-<body style="background:black; color:white; font-family: Arial; text-align:center;">
+  if (!camadas || camadas.length === 0) {
+    camadas = ["educacao"];
+    localStorage.setItem("camadas", JSON.stringify(camadas));
+  }
 
-  <h2>🤖 IA Luiza</h2>
+  document.getElementById("usuario").innerText = "Usuário: " + user;
 
-  <div id="chat" style="
-    height:300px;
-    max-width:600px;
-    margin:20px auto;
-    overflow:auto;
-    border:1px solid #555;
-    padding:10px;
-    text-align:left;
-  "></div>
+  const painel = document.getElementById("painel");
 
-  <input id="input" type="text" placeholder="Digite..." style="padding:10px; width:60%;">
-  <button onclick="enviar()" style="padding:10px;">OK</button>
+  const mapaModulos = {
+    educacao: "📚 Educação",
+    cursos: "🎓 Cursos",
+    simulacoes: "🧪 Simulações",
+    consultoria: "🧠 Consultoria",
+    clientes: "👥 Clientes",
+    cadastro_tecnico: "📄 Cadastro Técnico",
+    loja: "🛒 Loja",
+    gestao: "🏛️ Gestão",
+    auditoria: "🔍 Auditoria",
+    relatorios: "📊 Relatórios",
+    controle: "⚙️ Controle"
+  };
 
-  <script>
-    function adicionarMensagemNaTela(msg) {
-      const chat = document.getElementById("chat");
+  function abrirModulo(nome) {
+    alert("Abrindo módulo: " + nome);
+  }
 
-      const p = document.createElement("p");
-      p.innerText = msg; // 🔒 seguro
+  camadas.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerText = mapaModulos[c] || c;
 
-      chat.appendChild(p);
-      chat.scrollTop = chat.scrollHeight;
+    div.onclick = () => abrirModulo(mapaModulos[c] || c);
+
+    painel.appendChild(div);
+
+    if (i === 0) {
+      setTimeout(() => {
+        abrirModulo(mapaModulos[c] || c);
+      }, 800);
     }
+  });
 
-    async function enviar() {
-      const inputEl = document.getElementById("input");
-      const input = inputEl.value.trim();
+});
 
-      if (!input) return;
+// 🌍 LAZY LOAD DO MAPA
+let mapaCarregado = false;
 
-      adicionarMensagemNaTela("Você: " + input);
-      inputEl.value = "";
+function carregarMapa() {
+  if (mapaCarregado) return;
 
-      // 🤖 efeito digitando
-      adicionarMensagemNaTela("Luiza está digitando...");
+  document.getElementById("map").style.display = "block";
 
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
+  const map = L.map('map').setView([-15, -55], 4);
 
-        const res = await fetch("/ia", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ mensagem: input }),
-          signal: controller.signal
-        });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'GeoUrban © OpenStreetMap'
+  }).addTo(map);
 
-        clearTimeout(timeout);
+  L.marker([-14.2350, -51.9253])
+    .addTo(map)
+    .bindPopup("Brasil - GeoUrban Ativo");
 
-        const data = await res.json();
-
-        const chat = document.getElementById("chat");
-
-        // 🔒 validação
-        if (!data || !data.mensagem) {
-          chat.lastChild.innerText = "Sistema: resposta inválida";
-          return;
-        }
-
-        // atualiza mensagem digitando
-        chat.lastChild.innerText = "Luiza: " + data.mensagem;
-
-        // 🚀 redirecionamento
-        if (data.acao === "REDIRECT") {
-          setTimeout(() => {
-            window.location.href = data.destino;
-          }, 800);
-        }
-
-      } catch (erro) {
-        const chat = document.getElementById("chat");
-        chat.lastChild.innerText = "Erro ao conectar com servidor";
-      }
-    }
-
-    // ⌨️ enviar com ENTER
-    document.getElementById("input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        enviar();
-      }
-    });
-  </script>
-
-</body>
-</html>
+  mapaCarregado = true;
+}
