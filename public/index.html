@@ -1,33 +1,39 @@
 <script>
-
-// 🔐 VERIFICAÇÃO CORRETA (DENTRO DO SCRIPT)
+// 🔐 VERIFICAÇÃO INICIAL
+const token = localStorage.getItem("token");
 const user = localStorage.getItem("usuario");
 
-if (!user) {
-  const params = new URLSearchParams(window.location.search);
-  const tokenURL = params.get("token");
-  const tokenLocal = localStorage.getItem("token");
-
-  if (!tokenURL || tokenURL !== tokenLocal) {
-    alert("Acesso não autorizado");
-    window.location.href = "login.html";
-  }
+// 🚫 BLOQUEIA ACESSO SEM LOGIN
+if (!token || !user) {
+  alert("Acesso não autorizado 🔒");
+  window.location.href = "login.html";
 }
 
+// 🔎 VALIDA TOKEN NO BACKEND (SEGURANÇA REAL)
+fetch("https://SEU-LINK-RAILWAY/protegido", {
+  headers: {
+    "Authorization": token
+  }
+})
+.then(res => {
+  if (res.status !== 200) {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+});
+
+// 🚀 INICIALIZAÇÃO DO SISTEMA
 document.addEventListener("DOMContentLoaded", () => {
 
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
-  if (!user) {
-    window.location.href = "/login.html";
-    return;
-  }
-
+  // padrão inicial
   if (!camadas || camadas.length === 0) {
     camadas = ["educacao"];
     localStorage.setItem("camadas", JSON.stringify(camadas));
   }
 
+  // usuário na tela
   document.getElementById("usuario").innerText = "Usuário: " + user;
 
   const painel = document.getElementById("painel");
@@ -36,17 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     educacao: "📚 Educação",
     cursos: "🎓 Cursos",
     simulacoes: "🧪 Simulações",
-    POST /register
-{
-  "user": "admin",
-  "pass": "123456",
-  "role": "admin"
-}
-    const token = localStorage.getItem("token");
-
-if (!token) {
-  window.location.href = "login.html";
-}
     consultoria: "🧠 Consultoria",
     clientes: "👥 Clientes",
     cadastro_tecnico: "📄 Cadastro Técnico",
@@ -79,20 +74,3 @@ if (!token) {
 
 });
 </script>
-const user = localStorage.getItem("usuario");
-
-if (!user) {
-  const params = new URLSearchParams(window.location.search);
-  const tokenURL = params.get("token");
-  const tokenLocal = localStorage.getItem("token");
-
-  if (!tokenURL || tokenURL !== tokenLocal) {
-    window.location.href = "login.html";
-  }
-}
-const token = btoa(user + "|" + Date.now());
-
-localStorage.setItem("usuario", user);
-localStorage.setItem("token", token);
-
-window.open("index.html?token=" + token, "_blank");
