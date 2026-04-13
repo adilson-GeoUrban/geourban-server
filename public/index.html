@@ -1,46 +1,77 @@
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-// 🔐 VERIFICAÇÃO INICIAL (FRONT)
-const token = localStorage.getItem("token");
-const user = localStorage.getItem("usuario");
+  // 🔐 DADOS
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("usuario");
 
-// 🚫 BLOQUEIO SEM LOGIN
-if (!token || !user) {
-  alert("Acesso não autorizado 🔒");
-  window.location.href = "login.html";
-}
-
-// 🔎 VALIDA TOKEN NO BACKEND (SEGURANÇA REAL)
-fetch("https://geourban-server-production.up.railway.app/protegido", {
-  headers: {
-    "Authorization": token
-  }
-})
-.then(res => {
-  if (res.status !== 200) {
+  // 🚫 BLOQUEIO
+  function bloquearAcesso() {
     localStorage.clear();
     window.location.href = "login.html";
   }
-})
-.catch(() => {
-  localStorage.clear();
-  window.location.href = "login.html";
-});
 
-// 🚀 INICIALIZAÇÃO DO SISTEMA
-document.addEventListener("DOMContentLoaded", () => {
+  // 🤖 MENSAGEM (ROBÔ)
+  function mostrarMensagem(msg) {
+    let box = document.getElementById("robo-msg");
 
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "robo-msg";
+      box.style.position = "fixed";
+      box.style.bottom = "20px";
+      box.style.right = "20px";
+      box.style.background = "#111";
+      box.style.color = "#0f0";
+      box.style.padding = "10px";
+      box.style.borderRadius = "8px";
+      box.style.zIndex = "9999";
+      document.body.appendChild(box);
+    }
+
+    box.innerText = msg;
+    box.style.display = "block";
+  }
+
+  // 🔎 VALIDA ACESSO
+  function validarAcesso() {
+    if (!token || !user) {
+      mostrarMensagem("Acesso não autorizado 🔒");
+      bloquearAcesso();
+      return;
+    }
+
+    fetch("https://geourban-server-production.up.railway.app/protegido", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+    .then(res => {
+      if (res.status !== 200) {
+        bloquearAcesso();
+      }
+    })
+    .catch(() => bloquearAcesso());
+  }
+
+  // 🔐 EXECUTA VALIDAÇÃO
+  validarAcesso();
+
+  // 👤 MOSTRA USUÁRIO
+  const userEl = document.getElementById("usuario");
+  if (userEl) {
+    userEl.innerText = "Usuário: " + user;
+  }
+
+  // 📦 CAMADAS
   let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
-  // padrão inicial
   if (!camadas || camadas.length === 0) {
     camadas = ["educacao"];
     localStorage.setItem("camadas", JSON.stringify(camadas));
   }
 
-  // usuário na tela
-  document.getElementById("usuario").innerText = "Usuário: " + user;
-
+  // 🎯 PAINEL
   const painel = document.getElementById("painel");
 
   const mapa = {
@@ -58,26 +89,24 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function abrirModulo(nome) {
-    alert("Abrindo módulo: " + nome);
+    mostrarMensagem("Abrindo módulo: " + nome);
   }
 
-  camadas.forEach((c, i) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerText = mapa[c] || c;
+  if (painel) {
+    camadas.forEach((c, i) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerText = mapa[c] || c;
 
-    div.onclick = () => abrirModulo(mapa[c] || c);
+      div.onclick = () => abrirModulo(mapa[c] || c);
 
-    painel.appendChild(div);
+      painel.appendChild(div);
 
-    // abre automaticamente o primeiro
-    if (i === 0) {
-      setTimeout(() => {
-        abrirModulo(mapa[c] || c);
-      }, 800);
-    }
-  });
+      if (i === 0) {
+        setTimeout(() => abrirModulo(mapa[c] || c), 800);
+      }
+    });
+  }
 
 });
-
 </script>
