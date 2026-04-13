@@ -1,13 +1,28 @@
-<button onclick="forcarLogin()">Aceito e continuar</button>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban</title>
+</head>
 
-<script>
-function forcarLogin() {
-  // Mata qualquer execução da Luiza
-  try {
-    window.stop();
-  } catch(e) {}
+<body style="background:black; color:white; text-align:center; margin-top:100px;">
 
-  // Força redirecionamento
-  window.location.replace("/login.html");
-}
-</script>
+  <h1>GeoUrban</h1>
+  <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
+
+  <button onclick="forcarLogin()">Aceito e continuar</button>
+
+  <script>
+    function forcarLogin() {
+      // trava qualquer script (Luiza)
+      try {
+        window.stop();
+      } catch(e) {}
+
+      // força saída da tela
+      window.location.href = "/login.html";
+    }
+  </script>
+
+</body>
+</html>
