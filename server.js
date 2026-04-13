@@ -26,3 +26,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+git add . git commit -m "deploy final railway" git push
