@@ -37,3 +37,6 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     console.error("Erro no banco ❌", err);
   }
 })();
+Refactor server.js for security and database connection
+Security update: implement HTTP protection, rate limiting, and secure PostgreSQL connection
+Security hardening: add helmet, rate limit, and secure DB connection (LGPD compliance step)
