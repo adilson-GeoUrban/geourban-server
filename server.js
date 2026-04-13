@@ -22,6 +22,9 @@ const USERS = [
   { user: 'luiza', pass: '123', role: 'user' }
 ];
 
+// 🧠 armazenamento de tokens ativos (memória)
+const TOKENS = {};
+
 // 🔐 login com geração de token
 app.post('/login', (req, res) => {
   const { user, pass } = req.body;
@@ -32,8 +35,15 @@ app.post('/login', (req, res) => {
     return res.status(401).json({ message: 'Login inválido' });
   }
 
-  // 🔑 gera token simples
-  const token = crypto.randomBytes(16).toString('hex');
+  // 🔑 gera token
+  const token = crypto.randomBytes(32).toString('hex');
+
+  // 💾 salva token com usuário e expiração (2h)
+  TOKENS[token] = {
+    user: u.user,
+    role: u.role,
+    exp: Date.now() + (2 * 60 * 60 * 1000)
+  };
 
   res.json({
     message: 'Login OK',
@@ -42,15 +52,38 @@ app.post('/login', (req, res) => {
   });
 });
 
-// 🔒 rota protegida (teste de segurança)
-app.get('/secure', (req, res) => {
-  const token = req.headers['authorization'];
+// 🔒 middleware de autenticação real
+function auth(req, res, next) {
+  const authHeader = req.headers['authorization'];
 
-  if (!token) {
+  if (!authHeader) {
     return res.status(403).json({ error: 'Sem token' });
   }
 
-  res.json({ message: 'Acesso autorizado' });
+  const token = authHeader.replace('Bearer ', '');
+
+  const session = TOKENS[token];
+
+  if (!session) {
+    return res.status(403).json({ error: 'Token inválido' });
+  }
+
+  // ⏳ verifica expiração
+  if (Date.now() > session.exp) {
+    delete TOKENS[token];
+    return res.status(403).json({ error: 'Token expirado' });
+  }
+
+  req.user = session;
+  next();
+}
+
+// 🔒 rota protegida real
+app.get('/secure', auth, (req, res) => {
+  res.json({
+    message: 'Acesso autorizado',
+    user: req.user
+  });
 });
 
 // 🌐 rota principal
