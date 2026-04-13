@@ -19,7 +19,7 @@ app.use(rateLimit({
 // 🔥 FRONTEND (LIBERADO)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔐 BLOQUEIO DUPLO (API KEY + TOKEN)
+// 🔐 BLOQUEIO DUPLO + MODO INVISÍVEL
 app.use((req, res, next) => {
 
   // ✅ LIBERA FRONTEND
@@ -37,14 +37,14 @@ app.use((req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   const token = req.headers['authorization'];
 
-  // 🔐 CAMADA 1 — API KEY
+  // 🔒 CAMADA 1 — API KEY
   if (!apiKey || apiKey !== process.env.API_KEY) {
-    return res.status(403).json({ error: "API KEY inválida 🔒" });
+    return res.status(404).json({ error: "Not Found" });
   }
 
-  // 🔐 CAMADA 2 — TOKEN
+  // 🔒 CAMADA 2 — TOKEN
   if (!token) {
-    return res.status(401).json({ error: "Token ausente 🔒" });
+    return res.status(404).json({ error: "Not Found" });
   }
 
   try {
@@ -54,12 +54,12 @@ app.use((req, res, next) => {
     const expirado = (Date.now() - parseInt(timestamp)) > (2 * 60 * 60 * 1000);
 
     if (!user || expirado) {
-      return res.status(403).json({ error: "Token inválido ou expirado 🔒" });
+      return res.status(404).json({ error: "Not Found" });
     }
 
     next();
   } catch {
-    return res.status(403).json({ error: "Token inválido 🔒" });
+    return res.status(404).json({ error: "Not Found" });
   }
 });
 
