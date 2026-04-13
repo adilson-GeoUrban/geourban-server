@@ -6,15 +6,24 @@
 
   <style>
     body {
-      background: #111;
-      color: white;
+      margin:0;
       font-family: Arial;
+      color: white;
       text-align: center;
+
+      /* 🌆🌱 imagem conceito cidade + rural */
+      background: url("bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .overlay {
+      background: rgba(0,0,0,0.75);
+      min-height: 100vh;
       padding: 30px;
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .grid {
@@ -25,41 +34,45 @@
     }
 
     .card {
-      background: #222;
+      background: rgba(255,255,255,0.08);
       padding: 20px;
       border-radius: 10px;
       cursor: pointer;
       transition: 0.3s;
+      backdrop-filter: blur(4px);
     }
 
     .card:hover {
-      background: #333;
+      background: rgba(255,255,255,0.2);
       transform: scale(1.05);
     }
-    estudantes
-visual
-sim
-aceito
-engenheiro
-consultoria
-login
   </style>
 </head>
 
 <body>
 
-<h1>GeoUrban - Painel Inteligente</h1>
+<div class="overlay">
 
+<h1>GeoUrban</h1>
 <div id="usuario"></div>
 
 <div class="grid" id="painel"></div>
 
+</div>
+
 <script>
   const user = localStorage.getItem("usuario");
-  const camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
+  let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
 
+  // 🔐 segurança
   if (!user) {
     window.location.href = "/login.html";
+  }
+
+  // 🧠 fallback inteligente
+  if (!camadas || camadas.length === 0) {
+    camadas = ["educacao"];
+    localStorage.setItem("camadas", JSON.stringify(camadas));
   }
 
   document.getElementById("usuario").innerText = "Usuário: " + user;
@@ -72,7 +85,7 @@ login
     simulacoes: "🧪 Simulações",
     consultoria: "🧠 Consultoria",
     clientes: "👥 Clientes",
-    cadastro_tecnico: "📄 Cadastro Técnico (ART/TRT/RRT)",
+    cadastro_tecnico: "📄 Cadastro Técnico",
     loja: "🛒 Loja",
     gestao: "🏛️ Gestão",
     auditoria: "🔍 Auditoria",
@@ -80,22 +93,28 @@ login
     controle: "⚙️ Controle"
   };
 
-  camadas.forEach(c => {
+  // 🔥 AUTO ABRIR PRIMEIRO MÓDULO
+  function abrirModulo(nome) {
+    alert("Abrindo módulo: " + nome);
+  }
+
+  // 🔥 monta painel
+  camadas.forEach((c, i) => {
     const div = document.createElement("div");
     div.className = "card";
     div.innerText = mapa[c] || c;
 
-    div.onclick = () => {
-      alert("Abrindo módulo: " + (mapa[c] || c));
-    };
+    div.onclick = () => abrirModulo(mapa[c] || c);
 
     painel.appendChild(div);
-  });
 
-  // 🧠 fallback se não tiver camadas
-  if (camadas.length === 0) {
-    painel.innerHTML = "<p>Nenhuma camada liberada ainda.</p>";
-  }
+    // 🚀 abre automaticamente o primeiro
+    if (i === 0) {
+      setTimeout(() => {
+        abrirModulo(mapa[c] || c);
+      }, 800);
+    }
+  });
 </script>
 
 </body>
