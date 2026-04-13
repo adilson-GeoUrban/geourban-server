@@ -1,6 +1,67 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 🔐 CONTROLE DE AVISO LEGAL
+  function criarAvisoLegal() {
+    let aviso = document.getElementById("aviso-legal");
+
+    if (!aviso) {
+      aviso = document.createElement("div");
+      aviso.id = "aviso-legal";
+
+      aviso.style.position = "fixed";
+      aviso.style.top = "0";
+      aviso.style.left = "0";
+      aviso.style.width = "100%";
+      aviso.style.height = "100%";
+      aviso.style.background = "#000000ee";
+      aviso.style.color = "white";
+      aviso.style.display = "flex";
+      aviso.style.alignItems = "center";
+      aviso.style.justifyContent = "center";
+      aviso.style.zIndex = "10000";
+      aviso.style.textAlign = "center";
+      aviso.style.padding = "20px";
+
+      aviso.innerHTML = `
+        <div style="max-width:600px;">
+          <h2>🔐 GeoUrban — Aviso Legal</h2>
+          <p style="margin-top:15px;">
+            Sistema em desenvolvimento. Seus dados são protegidos conforme a LGPD.
+          </p>
+          <p style="margin-top:10px; font-size:14px; color:#ccc;">
+            É proibida qualquer cópia, reprodução, engenharia reversa ou tentativa de acesso indevido.
+            Sujeito à legislação vigente.
+          </p>
+          <button id="btn-aceitar" style="
+            margin-top:20px;
+            padding:10px 20px;
+            background:#0f0;
+            border:none;
+            cursor:pointer;
+            font-weight:bold;
+          ">
+            Aceito e continuar
+          </button>
+        </div>
+      `;
+
+      document.body.appendChild(aviso);
+
+      document.getElementById("btn-aceitar").onclick = () => {
+        localStorage.setItem("aviso_aceito", "true");
+        aviso.style.display = "none";
+      };
+    }
+  }
+
+  // 🔎 VERIFICA SE JÁ ACEITOU
+  const aceito = localStorage.getItem("aviso_aceito");
+  if (aceito !== "true") {
+    criarAvisoLegal();
+    return; // 🚫 bloqueia execução até aceitar
+  }
+
   // 🔐 DADOS
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("usuario");
@@ -11,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "login.html";
   }
 
-  // 🤖 MENSAGEM (ROBÔ)
+  // 🤖 ROBÔ
   function mostrarMensagem(msg) {
     let box = document.getElementById("robo-msg");
 
@@ -54,10 +115,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(() => bloquearAcesso());
   }
 
-  // 🔐 EXECUTA VALIDAÇÃO
+  // 🔐 EXECUTA
   validarAcesso();
 
-  // 👤 MOSTRA USUÁRIO
+  // 👤 USUÁRIO
   const userEl = document.getElementById("usuario");
   if (userEl) {
     userEl.innerText = "Usuário: " + user;
