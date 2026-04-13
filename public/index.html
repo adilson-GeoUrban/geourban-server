@@ -10,63 +10,53 @@
   <h1>GeoUrban</h1>
   <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
 
-  <!-- 🤖 LUÍZA -->
-  <div id="chat" style="margin-top:40px;"></div>
+  <div id="chat"></div>
 
-  <input id="input" placeholder="Digite aqui..." style="padding:10px; width:250px;">
+  <input id="input" placeholder="Digite aqui..." style="padding:10px;">
   <button onclick="enviar()">Enviar</button>
 
   <br><br>
 
-  <!-- 🔐 BOTÃO DIRETO -->
-  <button onclick="irLogin()" style="padding:10px 20px;">Aceito e continuar</button>
+  <button onclick="irLogin()">Entrar direto</button>
 
   <script>
     const chat = document.getElementById("chat");
 
-    function escrever(texto) {
+    function escrever(t) {
       const p = document.createElement("p");
-      p.innerText = texto;
+      p.innerText = t;
       chat.appendChild(p);
     }
 
-    // 👇 INÍCIO
     escrever("Luiza: Sistema iniciado.");
     escrever("Luiza: Você possui limitação visual, auditiva ou motora?");
 
     function enviar() {
       const input = document.getElementById("input");
       const msg = input.value;
-      const comando = msg.toLowerCase().trim();
+      const cmd = msg.toLowerCase().trim();
 
       escrever("Você: " + msg);
 
-      // 🔐 COMANDO DIRETO LOGIN
-      if (comando === "login") {
-        localStorage.setItem("fluxo", "login");
+      // 🔐 comando direto login
+      if (cmd === "login") {
         window.location.href = "/login.html";
         return;
       }
 
-      // 🎯 CAPTURA ACESSIBILIDADE
-      if (
-        comando.includes("visual") ||
-        comando.includes("auditiva") ||
-        comando.includes("motora")
-      ) {
-        localStorage.setItem("acessibilidade", comando);
+      // 🎯 acessibilidade
+      if (cmd.includes("visual") || cmd.includes("auditiva") || cmd.includes("motora")) {
+        localStorage.setItem("acessibilidade", cmd);
         escrever("Luiza: Perfil registrado.");
         escrever("Luiza: Digite LOGIN ou CADASTRO.");
         input.value = "";
         return;
       }
 
-      // 🔁 FLUXO PADRÃO
       escrever("Luiza: Digite LOGIN ou CADASTRO.");
       input.value = "";
     }
 
-    // 🔘 BOTÃO DIRETO
     function irLogin() {
       window.location.href = "/login.html";
     }
@@ -74,14 +64,3 @@
 
 </body>
 </html>
-const acessibilidade = localStorage.getItem("acessibilidade");
-
-if (acessibilidade) {
-  if (acessibilidade.includes("visual")) {
-    document.body.style.fontSize = "22px";
-    document.body.style.background = "black";
-    document.body.style.color = "yellow";
-  }
-}
-visual
-login
