@@ -36,6 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
     educacao: "📚 Educação",
     cursos: "🎓 Cursos",
     simulacoes: "🧪 Simulações",
+    const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
     consultoria: "🧠 Consultoria",
     clientes: "👥 Clientes",
     cadastro_tecnico: "📄 Cadastro Técnico",
