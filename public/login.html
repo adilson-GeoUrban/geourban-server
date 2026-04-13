@@ -3,31 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - GeoUrban</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 100px;
+      background: #111;
+      color: white;
+    }
+
+    input {
+      padding: 10px;
+      width: 250px;
+      margin: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-  <h2>Login GeoUrban</h2>
+  <h2>🌐 Login GeoUrban</h2>
+
+  <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
 
   <form id="loginForm">
-    <input type="text" id="user" placeholder="Usuário" required><br><br>
-    <input type="password" id="pass" placeholder="Senha" required><br><br>
+    <input type="text" id="user" placeholder="Usuário" required>
+    <input type="password" id="pass" placeholder="Senha" required>
     <button type="submit">Entrar</button>
   </form>
 
   <script>
-    // 🎯 acessibilidade automática
-    const acc = localStorage.getItem("acessibilidade");
+    document.addEventListener("DOMContentLoaded", () => {
 
-    if (acc && acc.includes("visual")) {
-      document.body.style.fontSize = "22px";
-      document.body.style.background = "black";
-      document.body.style.color = "yellow";
-    }
+      // 🎯 ACESSIBILIDADE (Luiza)
+      const acc = localStorage.getItem("acessibilidade");
 
-    const form = document.getElementById('loginForm');
+      if (acc && acc.includes("visual")) {
+        document.body.style.fontSize = "22px";
+        document.body.style.background = "black";
+        document.body.style.color = "yellow";
+      }
 
-    if (form) {
+      const form = document.getElementById('loginForm');
+
+      if (!form) {
+        console.error("Formulário não encontrado");
+        return;
+      }
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -47,17 +79,20 @@
             localStorage.setItem("usuario", data.user);
             localStorage.setItem("token", data.token);
 
-            // 🔁 redireciona corretamente (mesma aba)
-            window.location.href = "index.html";
+            // 🚀 redirecionamento seguro (Render)
+            window.location.href = "/index.html";
+
           } else {
             alert(data.message || "Login inválido");
           }
 
         } catch (err) {
+          console.error(err);
           alert("Erro ao conectar com servidor");
         }
       });
-    }
+
+    });
   </script>
 
 </body>
