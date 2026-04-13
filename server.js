@@ -6,16 +6,45 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 app.use(express.json());
 
-// 🛡️ SEGURANÇA GLOBAL
+// 🛡️ SEGURANÇA HTTP
 app.use(helmet());
 
+// 🛡️ RATE LIMIT (anti ataque)
 app.use(rateLimit({
   windowMs: 60 * 1000,
   max: 100,
   message: { error: "Muitas requisições" }
 }));
 
-// 🗄️ BANCO
+// 🔐 BLOQUEIO GLOBAL COM TOKEN TEMPORÁRIO
+app.use((req, res, next) => {
+  const token = req.headers['authorization'];
+
+  // libera rota de login
+  if (req.path === '/login') return next();
+
+  if (!token) {
+    return res.status(401).json({ error: "Token ausente 🔒" });
+  }
+
+  try {
+    const decoded = Buffer.from(token, 'base64').toString();
+    const [user, timestamp] = decoded.split("|");
+
+    // validade: 2 horas
+    const expirado = (Date.now() - parseInt(timestamp)) > (2 * 60 * 60 * 1000);
+
+    if (!user || expirado) {
+      return res.status(403).json({ error: "Token inválido ou expirado 🔒" });
+    }
+
+    next();
+  } catch {
+    return res.status(403).json({ error: "Token inválido 🔒" });
+  }
+});
+
+// 🗄️ BANCO (PostgreSQL seguro)
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   protocol: 'postgres',
@@ -37,6 +66,27 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     console.error("Erro no banco ❌", err);
   }
 })();
-Refactor server.js for security and database connection
-Security update: implement HTTP protection, rate limiting, and secure PostgreSQL connection
-Security hardening: add helmet, rate limit, and secure DB connection (LGPD compliance step)
+
+// 🚪 ROTA LOGIN (gera token)
+app.post('/login', (req, res) => {
+  const { user } = req.body;
+
+  if (!user) {
+    return res.status(400).json({ error: "Usuário obrigatório" });
+  }
+
+  const token = Buffer.from(user + "|" + Date.now()).toString('base64');
+
+  res.json({ token });
+});
+
+// 🧪 ROTA TESTE PROTEGIDA
+app.get('/protegido', (req, res) => {
+  res.json({ status: "Acesso autorizado ✅" });
+});
+
+// 🚀 START
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
