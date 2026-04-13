@@ -1,39 +1,95 @@
-function definirCamadas() {
-  const perfil = localStorage.getItem("perfil_usuario");
-  const objetivo = (localStorage.getItem("objetivo") || "").toLowerCase();
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel GeoUrban</title>
 
-  let camadasBase = [];
-  let extras = [];
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 30px;
+    }
 
-  // 🎓 ESTUDANTES
-  if (perfil === "estudantes") {
-    camadasBase = ["educacao", "cursos", "simulacoes"];
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      background: #333;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>GeoUrban - Painel Inteligente</h1>
+
+<div id="usuario"></div>
+
+<div class="grid" id="painel"></div>
+
+<script>
+  const user = localStorage.getItem("usuario");
+  const camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
+
+  if (!user) {
+    window.location.href = "/login.html";
   }
 
-  // 👷 PROFISSIONAIS
-  if (perfil === "profissional") {
-    camadasBase = ["consultoria", "clientes", "cadastro_tecnico", "loja"];
+  document.getElementById("usuario").innerText = "Usuário: " + user;
+
+  const painel = document.getElementById("painel");
+
+  const mapa = {
+    educacao: "📚 Educação",
+    cursos: "🎓 Cursos",
+    simulacoes: "🧪 Simulações",
+    consultoria: "🧠 Consultoria",
+    clientes: "👥 Clientes",
+    cadastro_tecnico: "📄 Cadastro Técnico (ART/TRT/RRT)",
+    loja: "🛒 Loja",
+    gestao: "🏛️ Gestão",
+    auditoria: "🔍 Auditoria",
+    relatorios: "📊 Relatórios",
+    controle: "⚙️ Controle"
+  };
+
+  camadas.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerText = mapa[c] || c;
+
+    div.onclick = () => {
+      alert("Abrindo módulo: " + (mapa[c] || c));
+    };
+
+    painel.appendChild(div);
+  });
+
+  // 🧠 fallback se não tiver camadas
+  if (camadas.length === 0) {
+    painel.innerHTML = "<p>Nenhuma camada liberada ainda.</p>";
   }
+</script>
 
-  // 🏛️ GOVERNO
-  if (perfil === "governo") {
-    camadasBase = ["gestao", "auditoria", "relatorios", "controle"];
-  }
-
-  // 🎯 OBJETIVO refina sem duplicar
-  if (objetivo.includes("consultoria")) extras.push("consultoria");
-  if (objetivo.includes("curso")) extras.push("cursos");
-  if (objetivo.includes("loja")) extras.push("loja");
-
-  // 🔥 remove duplicados automaticamente
-  const camadas = [...new Set([...camadasBase, ...extras])];
-
-  localStorage.setItem("camadas", JSON.stringify(camadas));
-
-  escrever("Luiza: Estrutura personalizada ativada. 🧠");
-  escrever("Luiza: Camadas liberadas: " + camadas.join(", "));
-}
-profissional
-engenheiro
-consultoria
-consultoria, clientes, cadastro_tecnico, loja
+</body>
+</html>
