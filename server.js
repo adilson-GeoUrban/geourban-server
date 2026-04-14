@@ -1,7 +1,11 @@
-// 🧾 LOG DE ACESSO + SEGURANÇA UNIFICADO
+```javascript
+// 🧾 LOG DE ACESSO + SEGURANÇA UNIFICADO (VERSÃO AJUSTADA)
+
 app.use((req, res, next) => {
 
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  // 🔍 IP REAL (tratando proxy corretamente)
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
+
   const path = req.originalUrl;
   const method = req.method;
   const time = new Date().toISOString();
@@ -43,15 +47,16 @@ app.use((req, res, next) => {
 
     const expirado = (Date.now() - parseInt(timestamp)) > (2 * 60 * 60 * 1000);
 
-    if (!user || expirado) {
+    if (!user || !timestamp || expirado) {
       console.warn(`[BLOCKED] Token inválido/expirado | IP: ${ip}`);
       return res.status(404).json({ error: "Not Found" });
     }
 
     next();
 
-  } catch {
+  } catch (err) {
     console.warn(`[BLOCKED] Token corrompido | IP: ${ip}`);
     return res.status(404).json({ error: "Not Found" });
   }
 });
+```
