@@ -1,105 +1,31 @@
+<h2>Login</h2>
+
+<input id="user" placeholder="Usuário">
+<input id="pass" type="password" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+
 <script>
-// 🎨 IA DESIGN — AMBIENTE ESTILO NASA (SEM AFETAR BACKEND)
+function login() {
+  const user = document.getElementById("user").value;
+  const pass = document.getElementById("pass").value;
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  // 🌌 FUNDO ESPACIAL
-  document.body.style.background = "radial-gradient(circle at top, #020617, #000000)";
-  document.body.style.color = "#00ffcc";
-  document.body.style.fontFamily = "Orbitron, Arial, sans-serif";
-
-  // 🔲 CONTAINER PRINCIPAL
-  const container = document.createElement("div");
-  container.style.position = "fixed";
-  container.style.top = "0";
-  container.style.left = "0";
-  container.style.width = "100%";
-  container.style.height = "100%";
-  container.style.pointerEvents = "none";
-  document.body.appendChild(container);
-
-  // ✨ ESTRELAS
-  for (let i = 0; i < 80; i++) {
-    const star = document.createElement("div");
-    star.style.position = "absolute";
-    star.style.width = "2px";
-    star.style.height = "2px";
-    star.style.background = "#00ffcc";
-    star.style.top = Math.random() * 100 + "%";
-    star.style.left = Math.random() * 100 + "%";
-    star.style.opacity = Math.random();
-    container.appendChild(star);
-  }
-
-  // 🧠 HEADER
-  const header = document.createElement("div");
-  header.innerText = "🌐 GEOURBAN INTELLIGENCE SYSTEM";
-  header.style.position = "fixed";
-  header.style.top = "10px";
-  header.style.left = "20px";
-  header.style.fontSize = "18px";
-  header.style.color = "#00ffcc";
-  header.style.letterSpacing = "2px";
-  document.body.appendChild(header);
-
-  // 🤖 STATUS IA
-  const status = document.createElement("div");
-  status.innerText = "🤖 IA DESIGN: ATIVO";
-  status.style.position = "fixed";
-  status.style.bottom = "10px";
-  status.style.left = "20px";
-  status.style.fontSize = "12px";
-  status.style.color = "#00ff88";
-  document.body.appendChild(status);
-
-});
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ user, pass })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      alert("Login OK");
+      window.location.href = "/";
+    } else {
+      alert(data.message);
+    }
+  });
+}
 </script>
-// 🔐 ALTERAR SENHA (PROTEGIDO)
-app.post('/change-password', (req, res) => {
-
-  const token = req.headers['authorization'];
-  const { currentPass, newPass } = req.body;
-
-  if (!token) {
-    return res.status(401).json({ message: "Não autorizado" });
-  }
-
-  try {
-    const decoded = Buffer.from(token, 'base64').toString();
-    const [user, timestamp] = decoded.split("|");
-
-    if (!user) {
-      return res.status(401).json({ message: "Token inválido" });
-    }
-
-    if (!global.users) global.users = {};
-
-    const storedPass = global.users[user];
-
-    if (!storedPass) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
-    }
-
-    if (storedPass !== currentPass) {
-      return res.status(400).json({ message: "Senha atual incorreta" });
-    }
-
-    if (currentPass === newPass) {
-      return res.status(400).json({ message: "Nova senha não pode ser igual à atual" });
-    }
-
-    if (!newPass || newPass.length < 6) {
-      return res.status(400).json({ message: "Nova senha muito fraca" });
-    }
-
-    global.users[user] = newPass;
-
-    console.log(`[SECURITY] ${user} alterou senha em ${new Date().toISOString()}`);
-
-    res.json({ message: "Senha alterada com sucesso" });
-
-  } catch (err) {
-    console.error("[ERRO CHANGE PASSWORD]", err);
-    res.status(500).json({ message: "Erro interno" });
-  }
-});
