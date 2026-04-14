@@ -1,103 +1,49 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Login - GeoUrban</title>
+// 🔐 ALTERAR SENHA (PROTEGIDO)
+app.post('/change-password', (req, res) => {
 
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      margin-top: 100px;
-      background: #111;
-      color: white;
+  const token = req.headers['authorization'];
+  const { currentPass, newPass } = req.body;
+
+  if (!token) {
+    return res.status(401).json({ message: "Não autorizado" });
+  }
+
+  try {
+    const decoded = Buffer.from(token, 'base64').toString();
+    const [user, timestamp] = decoded.split("|");
+
+    if (!user) {
+      return res.status(401).json({ message: "Token inválido" });
     }
 
-    input {
-      padding: 10px;
-      width: 250px;
-      margin: 10px auto;
-      display: block;
+    if (!global.users) global.users = {};
+
+    const storedPass = global.users[user];
+
+    if (!storedPass) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    button {
-      padding: 10px 20px;
-      cursor: pointer;
+    if (storedPass !== currentPass) {
+      return res.status(400).json({ message: "Senha atual incorreta" });
     }
-  </style>
-</head>
 
-<body>
+    if (currentPass === newPass) {
+      return res.status(400).json({ message: "Nova senha não pode ser igual à atual" });
+    }
 
-  <h2>🌐 Login GeoUrban</h2>
-  <p>⚠️ LGPD: seus dados são protegidos e usados apenas na plataforma.</p>
+    if (!newPass || newPass.length < 6) {
+      return res.status(400).json({ message: "Nova senha muito fraca" });
+    }
 
-  <form id="loginForm">
-    <input type="text" id="user" placeholder="Usuário" required>
-    <input type="password" id="pass" placeholder="Senha" required>
-    <button type="submit">Entrar</button>
-  </form>
+    global.users[user] = newPass;
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    console.log(`[SECURITY] ${user} alterou senha em ${new Date().toISOString()}`);
 
-      // 🎯 ACESSIBILIDADE
-      const acc = localStorage.getItem("acessibilidade");
+    res.json({ message: "Senha alterada com sucesso" });
 
-      if (acc && acc.includes("visual")) {
-        document.body.style.fontSize = "22px";
-        document.body.style.background = "black";
-        document.body.style.color = "yellow";
-      }
-
-      const form = document.getElementById('loginForm');
-
-      if (!form) {
-        console.error("Formulário não encontrado");
-        return;
-      }
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const user = document.getElementById('user').value;
-        const pass = document.getElementById('pass').value;
-
-        try {
-          const res = await fetch('https://geourban-server-production.up.railway.app/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': 'SUA_API_KEY_AQUI'
-            },
-            body: JSON.stringify({
-              user: user,
-              pass: pass
-            })
-          });
-
-          const data = await res.json();
-
-          if (data.token) {
-            localStorage.setItem("usuario", data.user);
-            localStorage.setItem("token", data.token);
-
-            console.log("[AUTH OK]", data.user);
-
-            window.location.href = "/index.html";
-
-          } else {
-            alert(data.message || "Login inválido");
-          }
-
-        } catch (err) {
-          console.error("[ERRO LOGIN]", err);
-          alert("Erro ao conectar com servidor");
-        }
-      });
-
-    });
-  </script>
-
-</body>
-</html>
+  } catch (err) {
+    console.error("[ERRO CHANGE PASSWORD]", err);
+    res.status(500).json({ message: "Erro interno" });
+  }
+});
