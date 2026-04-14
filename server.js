@@ -1,9 +1,10 @@
-```javascript
-// 🧾 LOG DE ACESSO + SEGURANÇA UNIFICADO (VERSÃO AJUSTADA)
+// 🧾 LOG DE ACESSO + SEGURANÇA UNIFICADO (VERSÃO HARDENED)
+
+app.set('trust proxy', true);
 
 app.use((req, res, next) => {
 
-  // 🔍 IP REAL (tratando proxy corretamente)
+  // 🔍 IP REAL (proxy seguro)
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
 
   const path = req.originalUrl;
@@ -27,7 +28,7 @@ app.use((req, res, next) => {
   }
 
   const apiKey = req.headers['x-api-key'];
-  const token = req.headers['authorization'];
+  const authHeader = req.headers['authorization'];
 
   // 🔒 BLOQUEIO API KEY
   if (!apiKey || apiKey !== process.env.API_KEY) {
@@ -36,10 +37,12 @@ app.use((req, res, next) => {
   }
 
   // 🔒 BLOQUEIO TOKEN AUSENTE
-  if (!token) {
-    console.warn(`[BLOCKED] Token ausente | IP: ${ip}`);
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    console.warn(`[BLOCKED] Token ausente/mal formatado | IP: ${ip}`);
     return res.status(404).json({ error: "Not Found" });
   }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = Buffer.from(token, 'base64').toString();
@@ -52,6 +55,9 @@ app.use((req, res, next) => {
       return res.status(404).json({ error: "Not Found" });
     }
 
+    // ✅ LOG DE SUCESSO (AUDITORIA)
+    console.log(`[AUTH OK] ${user} | IP: ${ip}`);
+
     next();
 
   } catch (err) {
@@ -59,4 +65,3 @@ app.use((req, res, next) => {
     return res.status(404).json({ error: "Not Found" });
   }
 });
-```
