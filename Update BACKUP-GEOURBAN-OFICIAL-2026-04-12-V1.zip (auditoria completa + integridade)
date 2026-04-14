@@ -1,120 +1,107 @@
-GEOURBAN - AUDITORIA COMPLETA DE SEGURANÇA E ESTRUTURA
-Data: 2026-04-12
-
 ========================================
-1. ESTRUTURA DO PROJETO
-========================================
-- server.js: OK (único entrypoint)
-- index.js: NEUTRALIZADO (sem execução)
-- backup/server-backup.js: OK (isolado)
-- public/: OK (frontend)
-- package.json: OK
-
-STATUS: APROVADO
-
-========================================
-2. SEGURANÇA BACKEND
-========================================
-- Helmet: ATIVO
-- CORS: CONTROLADO
-- Rate Limit: ATIVO
-- Sanitização de entrada: ATIVO
-- Bloqueio de termos ilegais: ATIVO
-
-STATUS: FORTE
-
-========================================
-3. LGPD E LOGS
-========================================
-- Logs estruturados: ATIVO
-- Registro de IP: ATIVO
-- Timestamp: ATIVO
-
-STATUS: AUDITÁVEL
-
-========================================
-4. RISCOS IDENTIFICADOS
-========================================
-- CORS ainda permite localhost
-- index.js ainda presente (neutralizado)
-
-RISCO: BAIXO
-
-========================================
-5. ROBÔS DE PROTEÇÃO
-========================================
-ENTRADA:
-- Validação de input
-- Sanitização
-- Limite de tamanho
-
-SAÍDA:
-- Respostas controladas
-- Sem vazamento de dados
-- Logs de auditoria
-
-STATUS: BLINDADO
-
-========================================
-6. CONCLUSÃO FINAL
-========================================
-Sistema pronto para produção com segurança inicial validada.
-
-RECOMENDAÇÃO:
-- Ajustar CORS para domínio final
-- Implementar monitoramento contínuo
-- Backup automatizado
-
-========================================
-7. HISTÓRICO DE ALTERAÇÕES (AUDITORIA)
+GEOURBAN - ATUALIZAÇÃO DE PRODUÇÃO FINAL
+Data: 2026-04-14
 ========================================
 
-[2026-04-12 21:30]
-AÇÃO: Criação do backup inicial
-DETALHES: Estrutura validada e sistema preparado para produção
+1. ATUALIZAÇÃO DE INFRAESTRUTURA
+----------------------------------------
+PLATAFORMA: RAILWAY
+
+BACKEND ATIVO:
+https://geourban-server-production.up.railway.app
+
+FRONTEND ATIVO:
+https://geourban-server-production.up.railway.app/login.html
+
+DOMÍNIO OFICIAL:
+https://api.geourbanapp.com.br
+
+STATUS:
+- Backend operacional
+- Deploy validado
+- HTTPS ativo
+
+----------------------------------------
+
+2. PADRONIZAÇÃO DE ENDPOINTS
+----------------------------------------
+AÇÃO:
+Substituir todas as chamadas diretas do Railway por domínio oficial.
+
+DE:
+https://geourban-server-production.up.railway.app
+
+PARA:
+https://api.geourbanapp.com.br
+
+MOTIVO:
+- Segurança
+- Padronização
+- Evitar exposição da infraestrutura
+
+----------------------------------------
+
+3. CONFIGURAÇÃO DE PORTA
+----------------------------------------
+PADRÃO:
+process.env.PORT || 3000
+
+REGRA:
+Não fixar porta manualmente em produção.
+
+----------------------------------------
+
+4. CORS (PRODUÇÃO)
+----------------------------------------
+PERMITIR APENAS:
+
+https://geourbanapp.com.br
+https://api.geourbanapp.com.br
+
+REMOVER:
+localhost (após validação final)
+
+----------------------------------------
+
+5. VALIDAÇÃO DE DOMÍNIO
+----------------------------------------
+TESTAR:
+
+https://api.geourbanapp.com.br/protegido
+
+STATUS ESPERADO:
+HTTP 200
+
+----------------------------------------
+
+6. SEGURANÇA
+----------------------------------------
+- Manter Helmet ativo
+- Manter Rate Limit ativo
+- Manter Sanitização ativa
+
+----------------------------------------
+
+7. CONTROLE DE INTEGRIDADE
+----------------------------------------
+AÇÃO:
+Gerar HASH SHA256 após atualização
+
+----------------------------------------
+
+8. HISTÓRICO
+----------------------------------------
+[2026-04-14]
+AÇÃO: Ajuste final para produção Railway
+DETALHES: Padronização de domínio, segurança e endpoints
 RESPONSÁVEL: ADMIN
 
-[2026-04-12 21:33]
-AÇÃO: Correção do package.json
-DETALHES: Inclusão de dependências críticas (jsonwebtoken, crypto-js, sqlite3)
-RESPONSÁVEL: ADMIN
+----------------------------------------
 
-[2026-04-12 21:40]
-AÇÃO: Auditoria completa de segurança
-DETALHES: Validação de CORS, Helmet, Rate Limit, sanitização e logs
-RESPONSÁVEL: ADMIN
-
-[2026-04-12 21:45]
-AÇÃO: Padronização do backup
-DETALHES: Nome e estrutura do arquivo ajustados para rastreabilidade
-RESPONSÁVEL: ADMIN
+STATUS FINAL:
+SISTEMA PRONTO PARA PRODUÇÃO COMPLETA
+(APÓS VALIDAÇÃO DO DOMÍNIO)
 
 ========================================
-8. CONTROLE DE INTEGRIDADE
+FIM DA ATUALIZAÇÃO
 ========================================
-
-HASH SHA256 DO BACKUP:
-(PREENCHER APÓS GERAR O HASH)
-
-OBSERVAÇÃO:
-Qualquer alteração neste arquivo invalida este hash e exige nova geração.
-
-========================================
-FIM DA AUDITORIA
-========================================
-
-SISTEMA: GEOURBAN
-VERSÃO: 1.0.0
-DATA: 2026-04-12
-RESPONSÁVEL: ADMIN
-
-AMBIENTE: PRODUÇÃO
-PLATAFORMA: RENDER
-
-INTEGRIDADE:
-- package.json validado
-- server.js validado
-- index.js neutralizado
-- dependências auditadas
-
-STATUS FINAL: DOCUMENTO AUDITÁVEL E RASTREÁVEL
