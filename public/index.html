@@ -1,67 +1,24 @@
-// 🔐 ALTERAR SENHA (PROTEGIDO + PERSISTENTE)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel GeoUrban</title>
+</head>
+<body style="background:#0b0f1a; color:#00ffcc; font-family:Arial; text-align:center; padding-top:50px;">
 
-const fs = require('fs');
-const path = require('path');
+  <h1>🚀 Login realizado com sucesso</h1>
+  <p>Bem-vindo ao sistema GeoUrban</p>
 
-const USERS_FILE = path.join(__dirname, 'users.json');
+  <button onclick="logout()" style="padding:10px 20px; cursor:pointer;">
+    Sair
+  </button>
 
-// 📦 CARREGAR USUÁRIOS
-function loadUsers() {
-  if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
-  }
-  return JSON.parse(fs.readFileSync(USERS_FILE));
-}
-
-// 💾 SALVAR USUÁRIOS
-function saveUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-app.post('/change-password', (req, res) => {
-
-  const token = req.headers['authorization'];
-  const { currentPass, newPass } = req.body;
-
-  if (!token) {
-    return res.status(401).json({ message: "Não autorizado" });
-  }
-
-  try {
-    const decoded = Buffer.from(token, 'base64').toString();
-    const [user] = decoded.split("|");
-
-    if (!user) {
-      return res.status(401).json({ message: "Token inválido" });
+  <script>
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = "/login.html";
     }
+  </script>
 
-    const users = loadUsers();
-
-    if (!users[user]) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
-    }
-
-    if (users[user] !== currentPass) {
-      return res.status(400).json({ message: "Senha atual incorreta" });
-    }
-
-    if (currentPass === newPass) {
-      return res.status(400).json({ message: "Nova senha igual à atual" });
-    }
-
-    if (!newPass || newPass.length < 6) {
-      return res.status(400).json({ message: "Senha muito fraca" });
-    }
-
-    users[user] = newPass;
-    saveUsers(users);
-
-    console.log(`[SECURITY] ${user} alterou senha`);
-
-    res.json({ message: "Senha alterada com sucesso" });
-
-  } catch (err) {
-    console.error("[ERRO CHANGE PASSWORD]", err);
-    res.status(500).json({ message: "Erro interno" });
-  }
-});
+</body>
+</html>
