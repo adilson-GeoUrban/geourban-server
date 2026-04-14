@@ -1,28 +1,22 @@
-// 🔐 BASE ÚNICA (NÃO DUPLICAR EM OUTRO LUGAR)
-if (!global.users) {
-  global.users = {
-    admin: "123456"
-  };
+// 🔐 ALTERAR SENHA (SEGURO + PERSISTENTE)
+const fs = require('fs');
+const path = require('path');
+
+const USERS_FILE = path.join(__dirname, 'users.json');
+
+// 📂 Carregar usuários
+function loadUsers() {
+  if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
+  }
+  return JSON.parse(fs.readFileSync(USERS_FILE));
 }
 
-// 🔐 LOGIN
-app.post('/login', (req, res) => {
-  const { user, pass } = req.body;
+// 💾 Salvar usuários
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
 
-  if (!global.users[user]) {
-    return res.status(401).json({ message: "Usuário não encontrado" });
-  }
-
-  if (global.users[user] !== pass) {
-    return res.status(401).json({ message: "Senha incorreta" });
-  }
-
-  const token = Buffer.from(user + "|" + Date.now()).toString('base64');
-
-  res.json({ token, user });
-});
-
-// 🔐 ALTERAR SENHA
 app.post('/change-password', (req, res) => {
   const token = req.headers['authorization'];
   const { currentPass, newPass } = req.body;
@@ -35,25 +29,37 @@ app.post('/change-password', (req, res) => {
     const decoded = Buffer.from(token, 'base64').toString();
     const [user] = decoded.split("|");
 
-    const storedPass = global.users[user];
+    if (!user) {
+      return res.status(401).json({ message: "Token inválido" });
+    }
 
-    if (!storedPass) {
+    const users = loadUsers();
+
+    if (!users[user]) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    if (storedPass !== currentPass) {
+    if (users[user] !== currentPass) {
       return res.status(400).json({ message: "Senha atual incorreta" });
     }
 
-    if (!newPass || newPass.length < 6) {
-      return res.status(400).json({ message: "Nova senha muito fraca" });
+    if (currentPass === newPass) {
+      return res.status(400).json({ message: "Nova senha igual à atual" });
     }
 
-    global.users[user] = newPass;
+    if (!newPass || newPass.length < 6) {
+      return res.status(400).json({ message: "Senha muito fraca" });
+    }
+
+    users[user] = newPass;
+    saveUsers(users);
+
+    console.log(`[SECURITY] ${user} alterou senha`);
 
     res.json({ message: "Senha alterada com sucesso" });
 
-  } catch {
+  } catch (err) {
+    console.error("[ERRO CHANGE PASSWORD]", err);
     res.status(500).json({ message: "Erro interno" });
   }
 });
