@@ -1,67 +1,43 @@
-// 🧾 LOG DE ACESSO + SEGURANÇA UNIFICADO (VERSÃO HARDENED)
+// 🔐 LOGIN (ATIVO + PERSISTENTE)
 
-app.set('trust proxy', true);
+const fs = require('fs');
+const path = require('path');
 
-app.use((req, res, next) => {
+const USERS_FILE = path.join(__dirname, 'users.json');
 
-  // 🔍 IP REAL (proxy seguro)
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
+// 📦 carregar usuários
+function loadUsers() {
+  if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify({
+      admin: "123456" // usuário inicial
+    }));
+  }
+  return JSON.parse(fs.readFileSync(USERS_FILE));
+}
 
-  const path = req.originalUrl;
-  const method = req.method;
-  const time = new Date().toISOString();
+app.post('/login', (req, res) => {
 
-  // 📊 LOG DE ENTRADA
-  console.log(`[LOG] ${time} | ${method} | ${path} | IP: ${ip}`);
+  const { user, pass } = req.body;
 
-  // ✅ LIBERA FRONTEND
-  if (
-    req.path === '/' ||
-    req.path.startsWith('/login') ||
-    req.path.startsWith('/admin-access') ||
-    req.path.endsWith('.html') ||
-    req.path.endsWith('.js') ||
-    req.path.endsWith('.css') ||
-    req.path.startsWith('/public')
-  ) {
-    return next();
+  const users = loadUsers();
+
+  // ❌ usuário não existe
+  if (!users[user]) {
+    return res.status(401).json({ message: "Usuário não encontrado" });
   }
 
-  const apiKey = req.headers['x-api-key'];
-  const authHeader = req.headers['authorization'];
-
-  // 🔒 BLOQUEIO API KEY
-  if (!apiKey || apiKey !== process.env.API_KEY) {
-    console.warn(`[BLOCKED] API_KEY inválida | IP: ${ip}`);
-    return res.status(404).json({ error: "Not Found" });
+  // ❌ senha incorreta
+  if (users[user] !== pass) {
+    return res.status(401).json({ message: "Senha incorreta" });
   }
 
-  // 🔒 BLOQUEIO TOKEN AUSENTE
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    console.warn(`[BLOCKED] Token ausente/mal formatado | IP: ${ip}`);
-    return res.status(404).json({ error: "Not Found" });
-  }
+  // 🔐 gera token simples
+  const token = Buffer.from(user + "|" + Date.now()).toString('base64');
 
-  const token = authHeader.split(" ")[1];
+  console.log(`[LOGIN] ${user} entrou`);
 
-  try {
-    const decoded = Buffer.from(token, 'base64').toString();
-    const [user, timestamp] = decoded.split("|");
-
-    const expirado = (Date.now() - parseInt(timestamp)) > (2 * 60 * 60 * 1000);
-
-    if (!user || !timestamp || expirado) {
-      console.warn(`[BLOCKED] Token inválido/expirado | IP: ${ip}`);
-      return res.status(404).json({ error: "Not Found" });
-    }
-
-    // ✅ LOG DE SUCESSO (AUDITORIA)
-    console.log(`[AUTH OK] ${user} | IP: ${ip}`);
-
-    next();
-
-  } catch (err) {
-    console.warn(`[BLOCKED] Token corrompido | IP: ${ip}`);
-    return res.status(404).json({ error: "Not Found" });
-  }
+  res.json({
+    token: token,
+    user: user
+  });
 });
