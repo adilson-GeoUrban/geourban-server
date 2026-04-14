@@ -1,11 +1,10 @@
-// 🔐 AUTH COMPLETO (LOGIN + ALTERAR SENHA + PERSISTÊNCIA)
+// 🔐 ALTERAR SENHA (PROTEGIDO + PERSISTENTE CORRETO)
 
 const fs = require('fs');
 const path = require('path');
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 
-// 📦 CARREGAR USUÁRIOS
 function loadUsers() {
   if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify({}));
@@ -13,34 +12,12 @@ function loadUsers() {
   return JSON.parse(fs.readFileSync(USERS_FILE));
 }
 
-// 💾 SALVAR USUÁRIOS
 function saveUsers(users) {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
 
-// 🔐 LOGIN
-app.post('/login', (req, res) => {
-  const { user, pass } = req.body;
-
-  const users = loadUsers();
-
-  if (!users[user]) {
-    return res.status(401).json({ message: "Usuário não encontrado" });
-  }
-
-  if (users[user] !== pass) {
-    return res.status(401).json({ message: "Senha incorreta" });
-  }
-
-  const token = Buffer.from(user + "|" + Date.now()).toString('base64');
-
-  console.log(`[LOGIN] ${user} autenticado`);
-
-  res.json({ token, user });
-});
-
-// 🔐 ALTERAR SENHA
 app.post('/change-password', (req, res) => {
+
   const token = req.headers['authorization'];
   const { currentPass, newPass } = req.body;
 
@@ -51,6 +28,10 @@ app.post('/change-password', (req, res) => {
   try {
     const decoded = Buffer.from(token, 'base64').toString();
     const [user] = decoded.split("|");
+
+    if (!user) {
+      return res.status(401).json({ message: "Token inválido" });
+    }
 
     const users = loadUsers();
 
@@ -82,6 +63,3 @@ app.post('/change-password', (req, res) => {
     res.status(500).json({ message: "Erro interno" });
   }
 });
-{
-  user-login:@appgeourbanadilson2026#
-}
