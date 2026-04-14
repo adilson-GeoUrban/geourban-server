@@ -1,23 +1,5 @@
-// 🔐 ALTERAR SENHA (PROTEGIDO + PERSISTENTE CORRETO)
-
-const fs = require('fs');
-const path = require('path');
-
-const USERS_FILE = path.join(__dirname, 'users.json');
-
-function loadUsers() {
-  if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
-  }
-  return JSON.parse(fs.readFileSync(USERS_FILE));
-}
-
-function saveUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
+// 🔐 ALTERAR SENHA (PROTEGIDO)
 app.post('/change-password', (req, res) => {
-
   const token = req.headers['authorization'];
   const { currentPass, newPass } = req.body;
 
@@ -33,28 +15,29 @@ app.post('/change-password', (req, res) => {
       return res.status(401).json({ message: "Token inválido" });
     }
 
-    const users = loadUsers();
+    if (!global.users) global.users = {};
 
-    if (!users[user]) {
+    const storedPass = global.users[user];
+
+    if (!storedPass) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    if (users[user] !== currentPass) {
+    if (storedPass !== currentPass) {
       return res.status(400).json({ message: "Senha atual incorreta" });
     }
 
     if (currentPass === newPass) {
-      return res.status(400).json({ message: "Nova senha igual à atual" });
+      return res.status(400).json({ message: "Nova senha não pode ser igual à atual" });
     }
 
     if (!newPass || newPass.length < 6) {
-      return res.status(400).json({ message: "Senha muito fraca" });
+      return res.status(400).json({ message: "Nova senha muito fraca" });
     }
 
-    users[user] = newPass;
-    saveUsers(users);
+    global.users[user] = newPass;
 
-    console.log(`[SECURITY] ${user} alterou senha`);
+    console.log(`[SECURITY] ${user} alterou senha em ${new Date().toISOString()}`);
 
     res.json({ message: "Senha alterada com sucesso" });
 
