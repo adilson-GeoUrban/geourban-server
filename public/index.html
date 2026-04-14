@@ -1,213 +1,73 @@
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  // ================================
-  // 🔐 AVISO LGPD
-  // ================================
-  function criarAvisoLegal() {
-    if (document.getElementById("aviso-legal")) return;
-
-    const aviso = document.createElement("div");
-    aviso.id = "aviso-legal";
-
-    Object.assign(aviso.style, {
-      position: "fixed",
-      top: "0",
-      left: "0",
-      width: "100%",
-      height: "100%",
-      background: "rgba(0,0,0,0.85)",
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: "10000",
-      textAlign: "center",
-      padding: "20px"
-    });
-
-    aviso.innerHTML = `
-      <div style="max-width:600px;">
-        <h2>🔐 GeoUrban — Aviso Legal</h2>
-
-        <p style="margin-top:15px;">
-          Sistema em desenvolvimento. Seus dados são protegidos conforme a LGPD.
-        </p>
-
-        <p style="margin-top:10px; font-size:14px; color:#ccc;">
-          É proibida qualquer cópia, reprodução ou acesso indevido.
-        </p>
-
-        <button id="btn-aceitar" style="
-          margin-top:20px;
-          padding:10px 20px;
-          background:#0f0;
-          border:none;
-          cursor:pointer;
-          font-weight:bold;
-        ">
-          Aceito e continuar
-        </button>
-      </div>
-    `;
-
-    document.body.appendChild(aviso);
-
-    document.getElementById("btn-aceitar").onclick = () => {
-      localStorage.setItem("aviso_aceito", "true");
-      aviso.remove();
-      iniciarSistema(); // ✅ continua execução
-    };
-  }
-
-  // ================================
-  // 🤖 ROBÔ UI
-  // ================================
-  function mostrarMensagem(msg) {
-    let box = document.getElementById("robo-msg");
-
-    if (!box) {
-      box = document.createElement("div");
-      box.id = "robo-msg";
-
-      Object.assign(box.style, {
-        position: "fixed",
-        bottom: "20px",
-        right: "20px",
-        background: "#111",
-        color: "#0f0",
-        padding: "10px",
-        borderRadius: "8px",
-        zIndex: "9999"
-      });
-
-      document.body.appendChild(box);
-    }
-
-    box.innerText = msg;
-  }
-
-  // ================================
-  // 🚫 BLOQUEIO
-  // ================================
-  function bloquearAcesso() {
-    localStorage.clear();
-    window.location.href = "login.html";
-  }
-
-  // ================================
-  // 🔎 VALIDAÇÃO BACKEND
-  // ================================
-  async function validarAcesso(token) {
-    try {
-      const res = await fetch("https://geourban-server-production.up.railway.app/protegido", {
-        headers: {
-          "Authorization": "Bearer " + token
-        }
-      });
-
-      return res.status === 200;
-
-    } catch (err) {
-      console.warn("Erro ao validar:", err);
-      return false;
-    }
-  }
-
-  // ================================
-  // 🚀 SISTEMA PRINCIPAL
-  // ================================
-  async function iniciarSistema() {
-
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("usuario");
-
-    if (!token || !user) {
-      mostrarMensagem("Acesso não autorizado 🔒");
-      bloquearAcesso();
-      return;
-    }
-
-    const autorizado = await validarAcesso(token);
-
-    if (!autorizado) {
-      mostrarMensagem("Sessão inválida 🔒");
-      bloquearAcesso();
-      return;
-    }
-
-    // 👤 USUÁRIO
-    const userEl = document.getElementById("usuario");
-    if (userEl) {
-      userEl.innerText = "Usuário: " + user;
-    }
-
-    // 📦 CAMADAS
-    let camadas = JSON.parse(localStorage.getItem("camadas") || "[]");
-
-    if (!camadas.length) {
-      camadas = ["educacao"];
-      localStorage.setItem("camadas", JSON.stringify(camadas));
-    }
-
-    // 🎯 PAINEL
-    const painel = document.getElementById("painel");
-
-    const mapa = {
-      educacao: "📚 Educação",
-      cursos: "🎓 Cursos",
-      simulacoes: "🧪 Simulações",
-      consultoria: "🧠 Consultoria",
-      clientes: "👥 Clientes",
-      cadastro_tecnico: "📄 Cadastro Técnico",
-      loja: "🛒 Loja",
-      gestao: "🏛️ Gestão",
-      auditoria: "🔍 Auditoria",
-      relatorios: "📊 Relatórios",
-      controle: "⚙️ Controle"
-    };
-
-    function abrirModulo(nome) {
-      mostrarMensagem("Abrindo módulo: " + nome);
-    }
-
-    if (painel) {
-      painel.innerHTML = ""; // limpa antes
-
-      camadas.forEach((c, i) => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerText = mapa[c] || c;
-
-        div.onclick = () => abrirModulo(mapa[c] || c);
-
-        painel.appendChild(div);
-
-        if (i === 0) {
-          setTimeout(() => abrirModulo(mapa[c] || c), 800);
-        }
-      });
-    }
-  }
-
-  // ================================
-  // 🔁 INÍCIO DO FLUXO
-  // ================================
-  const aceito = localStorage.getItem("aviso_aceito");
-
-  if (aceito !== "true") {
-    criarAvisoLegal();
-  } else {
-    iniciarSistema();
-  }
-
-});
-</script>
-<div style="margin-top:40px;">
+<div style="margin-top:20px;">
   <h3>🔐 Alterar Senha</h3>
 
-  <input type="password" id="currentPass" placeholder="Senha atual">
-  <input type="password" id="newPass" placeholder="Nova senha">
+  <input type="password" id="currentPass" placeholder="Senha atual" required>
+  <input type="password" id="newPass" placeholder="Nova senha" required>
 
-  <button onclick="alterarSenha()">Alterar</button>
+  <button onclick="alterarSenha()">Alterar Senha</button>
+
+  <p id="msgSenha" style="margin-top:10px;"></p>
 </div>
+
+<script>
+function alterarSenha() {
+  const currentPass = document.getElementById("currentPass").value;
+  const newPass = document.getElementById("newPass").value;
+  const msg = document.getElementById("msgSenha");
+
+  const token = localStorage.getItem("token");
+
+  // 🔒 validações básicas
+  if (!token) {
+    msg.innerText = "Usuário não autenticado";
+    msg.style.color = "red";
+    return;
+  }
+
+  if (!currentPass || !newPass) {
+    msg.innerText = "Preencha todos os campos";
+    msg.style.color = "orange";
+    return;
+  }
+
+  if (newPass.length < 6) {
+    msg.innerText = "Nova senha deve ter no mínimo 6 caracteres";
+    msg.style.color = "orange";
+    return;
+  }
+
+  fetch("https://geourban-server-production.up.railway.app/change-password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({
+      currentPass: currentPass,
+      newPass: newPass
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (data.message && data.message.includes("sucesso")) {
+      msg.innerText = data.message;
+      msg.style.color = "#00ff88";
+
+      // 🧠 limpa campos
+      document.getElementById("currentPass").value = "";
+      document.getElementById("newPass").value = "";
+
+    } else {
+      msg.innerText = data.message || "Erro ao alterar senha";
+      msg.style.color = "red";
+    }
+
+  })
+  .catch(err => {
+    console.error("[ERRO ALTERAR SENHA]", err);
+    msg.innerText = "Erro ao conectar com servidor";
+    msg.style.color = "red";
+  });
+}
+</script>
