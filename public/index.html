@@ -1,16 +1,33 @@
-// 🔐 ALTERAR SENHA (PROTEGIDO)
+// 🔐 ALTERAR SENHA (PROTEGIDO + PERSISTENTE)
+
+const fs = require('fs');
+const path = require('path');
+
+const USERS_FILE = path.join(__dirname, 'users.json');
+
+// 📦 CARREGA USUÁRIOS
+function loadUsers() {
+  if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
+  }
+  return JSON.parse(fs.readFileSync(USERS_FILE));
+}
+
+// 💾 SALVA USUÁRIOS
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
 app.post('/change-password', (req, res) => {
 
   const token = req.headers['authorization'];
   const { currentPass, newPass } = req.body;
 
-  // 🚫 valida token
   if (!token) {
     return res.status(401).json({ message: "Não autorizado" });
   }
 
   try {
-    // 🔐 decode token
     const decoded = Buffer.from(token, 'base64').toString();
     const [user, timestamp] = decoded.split("|");
 
@@ -18,40 +35,29 @@ app.post('/change-password', (req, res) => {
       return res.status(401).json({ message: "Token inválido" });
     }
 
-    // ⏳ valida expiração (ex: 24h)
-    const now = Date.now();
-    const tokenTime = parseInt(timestamp);
+    const users = loadUsers();
 
-    if (isNaN(tokenTime) || (now - tokenTime > 86400000)) {
-      return res.status(401).json({ message: "Token expirado" });
-    }
-
-    // 🧠 banco simulado
-    if (!global.users) global.users = {};
-
-    const storedPass = global.users[user];
+    const storedPass = users[user];
 
     if (!storedPass) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    // 🔒 valida senha atual
     if (storedPass !== currentPass) {
       return res.status(400).json({ message: "Senha atual incorreta" });
     }
 
-    // 🚫 evitar mesma senha
     if (currentPass === newPass) {
       return res.status(400).json({ message: "Nova senha não pode ser igual à atual" });
     }
 
-    // 🔐 força mínima
     if (!newPass || newPass.length < 6) {
       return res.status(400).json({ message: "Nova senha muito fraca" });
     }
 
-    // ✅ atualiza senha
-    global.users[user] = newPass;
+    // 🔐 ATUALIZA
+    users[user] = newPass;
+    saveUsers(users);
 
     console.log(`[SECURITY] ${user} alterou senha em ${new Date().toISOString()}`);
 
