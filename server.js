@@ -31,3 +31,6 @@ app.listen(PORT, () => {
 npm init -y
 npm install express cors
 node server.js
+npm init -y
+npm install express cors
+node server.js
