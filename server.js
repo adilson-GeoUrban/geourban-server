@@ -46,3 +46,6 @@ app.post('/change-password', (req, res) => {
     res.status(500).json({ message: "Erro interno" });
   }
 });
+app.get('/', (req, res) => {
+  res.send('GeoUrban Server Online 🚀');
+});
