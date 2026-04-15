@@ -1,5 +1,28 @@
+const express = require("express");
+const cors = require("cors");
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.json());
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === USER && password === PASS) {
+    return res.json({ success: true });
+  }
+
+  return res.status(401).json({ error: "Credenciais inválidas" });
+});
 const USER = process.env.USER_LOGIN;
 const PASS = process.env.ADMIN_PASS;
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor rodando");
+});
+git add .
+git commit -m "fix: configura CORS, JSON e rota de login no backend"
+git push
 // 🔐 ALTERAR SENHA (PROTEGIDO)
 app.post('/change-password', (req, res) => {
   const token = req.headers['authorization'];
@@ -51,3 +74,4 @@ app.post('/change-password', (req, res) => {
 app.get('/', (req, res) => {
   res.send('GeoUrban Server Online 🚀');
 });
+npm install cors
