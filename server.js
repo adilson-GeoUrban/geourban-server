@@ -1,3 +1,5 @@
+const USER = process.env.USER_LOGIN;
+const PASS = process.env.ADMIN_PASS;
 // 🔐 ALTERAR SENHA (PROTEGIDO)
 app.post('/change-password', (req, res) => {
   const token = req.headers['authorization'];
