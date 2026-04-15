@@ -1,9 +1,6 @@
-const path = require("path");
-
-// servir arquivos da pasta public
-app.use(express.static(path.join(__dirname, "public")));
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
@@ -11,14 +8,15 @@ app.use(cors());
 app.use(express.json());
 
 // 🔐 credenciais do Railway
-const API_KEY= @SPGeourbanX9a#kL2026.env.USER_LOGIN;
-const ADMIN_PASS = @Lvgeourb@2026#Segura!# .env.ADMIN_PASS;
+const USER = process.env.USER_LOGIN;
+const PASS = process.env.ADMIN_PASS;
+
+// 📂 servir arquivos HTML
+app.use(express.static(path.join(__dirname, "public")));
 
 // 🔑 rota de login
 app.post("/login", (req, res) => {
-  const {USER_LOGIN ,@appgeourbanadilson2026#  } = req.body;
-
-  console.log("Recebido:", username, password);
+  const { username, password } = req.body;
 
   if (username === USER && password === PASS) {
     return res.json({ success: true });
@@ -32,5 +30,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor rodando");
 });
-const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
