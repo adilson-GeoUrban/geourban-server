@@ -20,18 +20,17 @@
       const user = document.getElementById("user").value;
       const pass = document.getElementById("pass").value;
 
-      fetch("https://geourban-server-production.up.railway.app/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ user, pass })
-      })
-      .then(res => res.json())
-      .then(data => {
-
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+     fetch("/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    username: document.querySelector("#usuario").value,
+    password: document.querySelector("#senha").value
+  })
+})
+      
           alert("Login OK");
 
           // 🔥 redireciona
