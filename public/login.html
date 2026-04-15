@@ -2,17 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login - GeoUrban</title>
+  <style>
+    body { font-family: Arial; background: #f2f2f2; padding: 50px; }
+    input { margin: 5px 0; padding: 8px; width: 200px; }
+    button { padding: 8px 12px; }
+    #status { margin-top: 10px; color: green; }
+  </style>
 </head>
 <body>
 
-<h2>Login</h2>
+<h2>Login - Ambiente de Teste Local</h2>
 
-<form onsubmit="event.preventDefault(); login();">
-  <input type="text" id="username" placeholder="Usuário" required><br><br>
-  <input type="password" id="password" placeholder="Senha" required><br><br>
-  <button type="submit">Entrar</button>
-</form>
+<input type="text" id="username" placeholder="Usuário"><br>
+<input type="password" id="password" placeholder="Senha"><br>
+<button onclick="login()">Entrar</button>
+
+<div id="status"></div>
 
 <script>
 function login() {
@@ -21,23 +27,41 @@ function login() {
 
   fetch("/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password })
   })
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      alert("Entrou ✅");
+      document.getElementById("status").innerText = "✅ Login OK! Robôs iniciando tarefas...";
+      // Simula robôs trabalhando
+      startRobots();
     } else {
-      alert("Credenciais inválidas ❌");
+      document.getElementById("status").innerText = "❌ Credenciais inválidas";
     }
   })
-  .catch(err => {
-    console.error(err);
-    alert("Erro ao conectar ❌");
+  .catch(() => {
+    document.getElementById("status").innerText = "❌ Erro ao conectar";
   });
+}
+
+function startRobots() {
+  const status = document.getElementById("status");
+  const steps = [
+    "Robô 1: iniciando auditoria...",
+    "Robô 2: verificando links...",
+    "Robô 3: salvando backups...",
+    "Robô 1: limpando caches...",
+    "Robô 2: atualizando credenciais...",
+    "Todos os robôs concluíram as tarefas!"
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    status.innerText = steps[i];
+    i++;
+    if (i >= steps.length) clearInterval(interval);
+  }, 1000);
 }
 </script>
 
