@@ -1,52 +1,29 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-</head>
+const express = require("express");
+const cors = require("cors");
 
-<body>
+const app = express();
 
-  <h2>Login</h2>
+app.use(cors());
+app.use(express.json());
 
-  <input id="user" placeholder="Usuário">
-  <input id="pass" type="password" placeholder="Senha">
+// 🔐 credenciais vindas do Railway
+const USER = process.env.USER_LOGIN;
+const PASS = process.env.ADMIN_PASS;
 
-  <!-- 🔥 IMPORTANTE: onclick -->
-  <button onclick="login()">Entrar</button>
+// 🔑 rota de login
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
 
-  <script>
-    function login() {
-      const user = document.getElementById("user").value;
-      const pass = document.getElementById("pass").value;
+  console.log("Recebido:", username, password);
 
-     fetch("/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    username: document.querySelector("#usuario").value,
-    password: document.querySelector("#senha").value
-  })
-})
-      
-          alert("Login OK");
+  if (username === USER && password === PASS) {
+    return res.json({ success: true });
+  }
 
-          // 🔥 redireciona
-          window.location.href = "/index.html";
+  return res.status(401).json({ error: "Credenciais inválidas" });
+});
 
-        } else {
-          alert(data.message);
-        }
-
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Erro ao conectar");
-      });
-    }
-  </script>
-
-</body>
-</html>
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Servidor rodando");
+});
