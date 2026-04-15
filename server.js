@@ -11,12 +11,12 @@ app.use(cors());
 app.use(express.json());
 
 // 🔐 credenciais do Railway
-const USER = process.env.USER_LOGIN;
-const PASS = process.env.ADMIN_PASS;
+const API_KEY= @SPGeourbanX9a#kL2026.env.USER_LOGIN;
+const ADMIN_PASS = @Lvgeourb@2026#Segura!# .env.ADMIN_PASS;
 
 // 🔑 rota de login
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  const {USER_LOGIN ,@appgeourbanadilson2026#  } = req.body;
 
   console.log("Recebido:", username, password);
 
