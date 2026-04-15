@@ -1,20 +1,21 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// 🔐 credenciais do Railway
-const USER = process.env.USER_LOGIN;
-const PASS = process.env.ADMIN_PASS;
+// 🔐 credenciais teste
+const USER = "usuario_teste";
+const PASS = "senha_teste";
+
+// 📂 servir arquivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
 
 // 🔑 rota de login
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-
-  console.log("Tentativa:", username);
 
   if (username === USER && password === PASS) {
     return res.json({ success: true });
@@ -23,8 +24,7 @@ app.post("/login", (req, res) => {
   return res.status(401).json({ error: "Credenciais inválidas" });
 });
 
-const PORT = process.env.PORT || 3000;
-
+const PORT = 3000;
 app.listen(PORT, () => {
-  console.log("Servidor rodando na porta", PORT);
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
