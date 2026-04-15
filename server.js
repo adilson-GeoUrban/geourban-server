@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 
 const app = express();
 
@@ -11,12 +10,11 @@ app.use(express.json());
 const USER = process.env.USER_LOGIN;
 const PASS = process.env.ADMIN_PASS;
 
-// 📂 servir arquivos HTML
-app.use(express.static(path.join(__dirname, "public")));
-
 // 🔑 rota de login
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
+
+  console.log("Tentativa:", username);
 
   if (username === USER && password === PASS) {
     return res.json({ success: true });
@@ -28,5 +26,5 @@ app.post("/login", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Servidor rodando");
+  console.log("Servidor rodando na porta", PORT);
 });
