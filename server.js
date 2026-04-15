@@ -24,7 +24,7 @@ git add .
 git commit -m "fix: configura CORS, JSON e rota de login no backend"
 git push
 // 🔐 ALTERAR SENHA (PROTEGIDO)
-app.post('/change-password', (req, res) => {
+app.post("/api/login", (req, res) => {
   const token = req.headers['authorization'];
   const { currentPass, newPass } = req.body;
 
