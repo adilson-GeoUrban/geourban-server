@@ -1,3 +1,7 @@
+const path = require("path");
+
+// servir arquivos da pasta public
+app.use(express.static(path.join(__dirname, "public")));
 const express = require("express");
 const cors = require("cors");
 
@@ -28,3 +32,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor rodando");
 });
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
