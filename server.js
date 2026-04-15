@@ -8,7 +8,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.json());
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+ const { USER_LOGIN, ADMIN_PASS } = req.body;
+ if (USER_LOGIN === USER && ADMIN_PASS === PASS) {
+  return res.json({ success: true });
+}
+  app.post("/login", (req, res) => {
+  const { USER_LOGIN, ADMIN_PASS } = req.body;
+
+  if (USER_LOGIN === USER && ADMIN_PASS === PASS) {
+    return res.json({ success: true });
+  }
+
+  return res.status(401).json({ error: "Credenciais inválidas" });
+});
 
   if (username === USER && password === PASS) {
     return res.json({ success: true });
