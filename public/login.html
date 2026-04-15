@@ -1,30 +1,49 @@
-const express = require("express");
-const cors = require("cors");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
 
-const app = express();
+  <h2>Login</h2>
 
-app.use(cors());
-app.use(express.json());
+  <input id="usuario" type="text" placeholder="Usuário">
+  <br><br>
 
-// 🔐 credenciais vindas do Railway
-constAPI_KEY  =  @SPGeourbanX9a#kL2026.env.USER_LOGIN;
-const ADMIN_PASS =@Lvgeourb@2026#Segura!#  .env.ADMIN_PASS;
+  <input id="senha" type="password" placeholder="Senha">
+  <br><br>
 
-// 🔑 rota de login
-app.post("/login", (req, res) => {
-  const {USER_LOGIN, @appgeourbanadilson2026#  } = req.body;
+  <button onclick="login()">Entrar</button>
 
-  console.log("Recebido:", username, password);
+  <script>
+    function login() {
+      const username = document.getElementById(" API_KEY").@SPGeourbanX9a#kL2026;
+      const password = document.getElementById("ADMIN_PASS").@Lvgeourb@2026#Segura!#;
 
-  if (username === USER && password === PASS) {
-    return res.json({ success: true });
-  }
+      fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Login OK");
+        } else {
+          alert("Credenciais inválidas");
+        }
+      })
+      .catch(() => {
+        alert("Erro ao conectar");
+      });
+    }
+  </script>
 
-  return res.status(401).json({ error: "Credenciais inválidas" });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Servidor rodando");
-});
-console.log("Tentativa de login");
+</body>
+</html>
