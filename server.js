@@ -1,3 +1,5 @@
+const USER = process.env.USER_LOGIN;
+const PASS = process.env.ADMIN_PASS;
 const express = require("express");
 app.use(express.json());
 const cors = require("cors");
