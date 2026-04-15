@@ -2,35 +2,63 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel GeoUrban</title>
+  <title>Login + Robôs</title>
+  <style>
+    body { font-family: Arial; padding: 30px; background: #f0f0f0; }
+    input, button { padding: 8px; margin: 5px; width: 200px; }
+    #status { margin-top: 20px; font-weight: bold; color: green; }
+    .robot { margin: 5px 0; font-family: monospace; color: blue; }
+  </style>
 </head>
-<body style="background:#0b0f1a; color:#00ffcc; font-family:Arial; text-align:center; padding-top:50px;">
+<body>
 
-  <h1>🚀 Login realizado com sucesso</h1>
-  <p>Bem-vindo ao sistema GeoUrban</p>
+<h2>Login Teste com Robôs</h2>
 
-  <button onclick="logout()" style="padding:10px 20px; cursor:pointer;">
-    Sair
-  </button>
+<input type="text" id="user" placeholder="Usuário"><br>
+<input type="password" id="pass" placeholder="Senha"><br>
+<button onclick="login()">Entrar</button>
 
-  <script>
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = "/login.html";
-    }
-  </script>
+<div id="status"></div>
+<div id="robots"></div>
+
+<script>
+async function login() {
+  const username = document.getElementById("user").value;
+  const password = document.getElementById("pass").value;
+
+  // Simulação de login local
+  if(username === "usuario_teste" && password === "senha_teste") {
+    document.getElementById("status").innerText = "✅ Login OK! Robôs iniciando...";
+    startRobots();
+  } else {
+    document.getElementById("status").innerText = "❌ Credenciais inválidas";
+  }
+}
+
+// Função para simular robôs trabalhando
+function startRobots() {
+  const robotsDiv = document.getElementById("robots");
+  robotsDiv.innerHTML = ""; // limpa
+  const tasks = [
+    "🤖 Robô 1: iniciando auditoria...",
+    "🤖 Robô 2: verificando links...",
+    "🤖 Robô 3: salvando backups...",
+    "🤖 Robô 1: limpando caches...",
+    "🤖 Robô 2: atualizando credenciais...",
+    "✅ Todos os robôs concluíram as tarefas!"
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    const line = document.createElement("div");
+    line.className = "robot";
+    line.innerText = tasks[i];
+    robotsDiv.appendChild(line);
+    i++;
+    if(i >= tasks.length) clearInterval(interval);
+  }, 1000);
+}
+</script>
 
 </body>
 </html>
-const API_URL = window.location.origin;
-
-fetch(`${API_URL}/login`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    username: document.getElementById("usuario").value,
-    password: document.getElementById("senha").value
-  })
-})
