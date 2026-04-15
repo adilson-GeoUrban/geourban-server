@@ -6,44 +6,40 @@
 </head>
 <body>
 
-  <h2>Login</h2>
+<h2>Login</h2>
 
-  <input id="usuario" type="text" placeholder="Usuário">
-  <br><br>
+<form onsubmit="event.preventDefault(); login();">
+  <input type="text" id="username" placeholder="Usuário" required><br><br>
+  <input type="password" id="password" placeholder="Senha" required><br><br>
+  <button type="submit">Entrar</button>
+</form>
 
-  <input id="senha" type="password" placeholder="Senha">
-  <br><br>
+<script>
+function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-  <button onclick="login()">Entrar</button>
-
-  <script>
-    function login() {
-      const username = document.getElementById(" API_KEY").@SPGeourbanX9a#kL2026;
-      const password = document.getElementById("ADMIN_PASS").@Lvgeourb@2026#Segura!#;
-
-      fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("Login OK");
-        } else {
-          alert("Credenciais inválidas");
-        }
-      })
-      .catch(() => {
-        alert("Erro ao conectar");
-      });
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ username, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Entrou ✅");
+    } else {
+      alert("Credenciais inválidas ❌");
     }
-  </script>
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Erro ao conectar ❌");
+  });
+}
+</script>
 
 </body>
 </html>
