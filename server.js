@@ -10,11 +10,12 @@ app.use(express.json());
 // servir frontend
 app.use(express.static(path.join(__dirname, "public")));
 
+// rota raiz
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// health
+// health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
@@ -22,6 +23,13 @@ app.get("/health", (req, res) => {
 // login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Preencha email e senha"
+    });
+  }
 
   if (email === "admin@admin.com" && password === "123456") {
     return res.json({
@@ -31,7 +39,8 @@ app.post("/login", (req, res) => {
   }
 
   return res.status(401).json({
-    success: false
+    success: false,
+    message: "Credenciais inválidas"
   });
 });
 
