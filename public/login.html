@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>GeoUrban Login</title>
+<meta charset="UTF-8">
+<title>GeoUrban Login</title>
 
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: Arial;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .box {
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      width: 300px;
-      text-align: center;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #00ff88;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+<style>
+body {
+  background: #111;
+  color: white;
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.box {
+  background: #222;
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+button {
+  background: #00ff88;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
@@ -64,14 +59,16 @@ function login() {
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById('status').innerText =
-      '✅ Logado como: ' + data.user.nome;
 
-    console.log(data);
+    // salva usuário
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    // redireciona para painel
+    window.location.href = "painel.html";
+
   })
-  .catch(err => {
-    document.getElementById('status').innerText =
-      '❌ Erro ao conectar servidor';
+  .catch(() => {
+    document.getElementById('status').innerText = '❌ Erro ao conectar servidor';
   });
 }
 </script>
