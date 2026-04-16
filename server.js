@@ -31,3 +31,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
+https://geourban-server-production.up.railway.app/health
