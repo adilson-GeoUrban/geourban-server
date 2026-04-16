@@ -27,9 +27,16 @@ async function login() {
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(data.user));
+    // 🔥 AJUSTE IMPORTANTE
+    localStorage.setItem("usuario", data.user.email);
+    localStorage.setItem("user", data.user.email);
 
     status.innerText = "✅ Login OK";
+
+    // 🔥 REDIRECIONA PARA O SISTEMA
+    setTimeout(() => {
+      window.location.href = "/index.html";
+    }, 1000);
 
   } catch (err) {
     status.innerText = "❌ Erro ao conectar servidor";
