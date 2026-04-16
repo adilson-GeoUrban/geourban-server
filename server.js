@@ -1,33 +1,64 @@
-const express = require('express');
-const cors = require('cors');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GeoUrban Painel</title>
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #111;
+  color: white;
+}
 
-// 🔓 LOGIN ABERTO (TESTE)
-app.post('/login', (req, res) => {
-  const { email } = req.body;
+header {
+  background: #000;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
 
-  res.json({
-    status: 'ok',
-    user: {
-      nome: 'Admin Teste',
-      email: email || 'admin@teste.com'
-    }
-  });
-});
+button {
+  background: red;
+  border: none;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+}
 
-// 🔍 HEALTH CHECK
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    servidor: 'GeoUrban ONLINE',
-    time: new Date()
-  });
-});
+main {
+  padding: 20px;
+}
+</style>
+</head>
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log('Servidor rodando na porta', PORT);
-});
+<body>
+
+<header>
+  <h2>GeoUrban</h2>
+  <button onclick="logout()">Sair</button>
+</header>
+
+<main>
+  <h1 id="user"></h1>
+  <p>Sistema operacional</p>
+</main>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user'));
+
+if (!user) {
+  window.location.href = "login.html";
+}
+
+document.getElementById('user').innerText = "Logado como: " + user.email;
+
+function logout() {
+  localStorage.removeItem('user');
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
