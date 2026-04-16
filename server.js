@@ -108,38 +108,61 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// LOGIN API (CORRIGIDO)
+// LOGIN API (ROBUSTO)
 // =======================
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body || {};
 
-  if (!email || !password) {
-    return res.json({ success: false });
-  }
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "missing_data"
+      });
+    }
 
-  // 🔥 CREDENCIAIS ÚNICAS (UNIFICADAS)
-  if (email === "admin@admin.com" && password === "123456") {
-    return res.json({
-      success: true,
-      token: "geo-token-ok"
+    // credenciais fixas estáveis
+    if (email === "admin@admin.com" && password === "123456") {
+      return res.json({
+        success: true,
+        token: "geo-token-ok"
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "invalid_credentials"
+    });
+
+  } catch (err) {
+    console.error("[LOGIN ERROR]", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "internal_error"
     });
   }
-
-  return res.json({ success: false });
 });
 
 // =======================
-// HEALTH
+// HEALTH CHECK
 // =======================
 app.get("/health", (req, res) => {
-  res.status(200).send("OK");
+  res.json({
+    status: "ok",
+    service: "geourban"
+  });
 });
 
 // =======================
-// START
+// START SERVER (RAILWAY SAFE)
 // =======================
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log("[OK] rodando na porta " + PORT);
+});
+
+server.on("error", (err) => {
+  console.error("[SERVER ERROR]", err);
 });
