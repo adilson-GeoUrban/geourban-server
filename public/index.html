@@ -1,82 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban Login</title>
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
-<style>
-body {
-  background: #111;
-  color: white;
-  font-family: Arial;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.box {
-  background: #222;
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-  text-align: center;
-}
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-}
-button {
-  background: #00ff88;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-#status {
-  margin-top: 10px;
-}
-</style>
-</head>
+const app = express();
 
-<body>
+app.use(cors());
+app.use(express.json());
 
-<div class="box">
-  <h2>GeoUrban</h2>
+// servir frontend
+app.use(express.static(path.join(__dirname, "public")));
 
-  <input type="text" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Senha">
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-  <button onclick="login()">Entrar</button>
+// health
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok"
+  });
+});
 
-  <p id="status"></p>
-</div>
+// login
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
 
-<script>
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  try {
-    const res = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+  if (email === "admin@admin.com" && password === "123456") {
+    return res.json({
+      success: true,
+      user: { email }
     });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      document.getElementById("status").innerText = "❌ Credenciais inválidas";
-      return;
-    }
-
-    document.getElementById("status").innerText = "✅ Login OK";
-
-  } catch (err) {
-    document.getElementById("status").innerText = "❌ Erro ao conectar servidor";
   }
-}
-</script>
 
-</body>
-</html>
+  return res.status(401).json({
+    success: false
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
