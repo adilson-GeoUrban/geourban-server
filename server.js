@@ -8,7 +8,7 @@ app.get("/", (req, res) => {
   res.send("GeoUrban API ativa 🚀");
 });
 
-// 🔹 health check padrão
+// 🔹 health check
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "ok",
@@ -16,11 +16,10 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 🔹 login teste controlado
+// 🔹 login controlado
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  // validação simples
   if (!email || !password) {
     return res.status(400).json({
       success: false,
@@ -28,7 +27,7 @@ app.post("/login", (req, res) => {
     });
   }
 
-  // usuário fake (teste)
+  // 🔐 usuário de teste
   if (email === "admin@admin.com" && password === "123456") {
     return res.json({
       success: true,
