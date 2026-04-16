@@ -55,15 +55,17 @@ button {
 async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const status = document.getElementById("status");
 
-  // validação simples no front
   if (!email || !password) {
-    document.getElementById("status").innerText = "⚠️ Preencha todos os campos";
+    status.innerText = "⚠️ Preencha todos os campos";
     return;
   }
 
+  status.innerText = "⏳ Conectando...";
+
   try {
-    const res = await fetch("/login", {
+    const res = await fetch("https://geourban-server-production.up.railway.app/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -71,23 +73,28 @@ async function login() {
       body: JSON.stringify({ email, password })
     });
 
-    const data = await res.json();
-
-    if (!data.success) {
-      document.getElementById("status").innerText = "❌ Credenciais inválidas";
+    // 🔎 debug real
+    if (!res.ok) {
+      const text = await res.text();
+      status.innerText = "❌ Erro servidor: " + res.status;
+      console.error("Resposta:", text);
       return;
     }
 
-    // salva usuário no navegador
+    const data = await res.json();
+
+    if (!data.success) {
+      status.innerText = "❌ Credenciais inválidas";
+      return;
+    }
+
     localStorage.setItem("user", JSON.stringify(data.user));
 
-    document.getElementById("status").innerText = "✅ Login OK";
-
-    // 🔥 opcional: redirecionar depois
-    // window.location.href = "painel.html";
+    status.innerText = "✅ Login OK";
 
   } catch (err) {
-    document.getElementById("status").innerText = "❌ Erro ao conectar servidor";
+    console.error("Erro completo:", err);
+    status.innerText = "❌ Falha de conexão com servidor";
   }
 }
 </script>
