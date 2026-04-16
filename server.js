@@ -1,30 +1,34 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔐 credenciais teste
-const USER = "usuario_teste";
-const PASS = "senha_teste";
+// 🔓 LOGIN ABERTO (SEM SENHA)
+app.post('/login', (req, res) => {
+  const { email } = req.body;
 
-// 📂 servir arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
-
-// 🔑 rota de login
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (username === USER && password === PASS) {
-    return res.json({ success: true });
-  }
-
-  return res.status(401).json({ error: "Credenciais inválidas" });
+  res.json({
+    status: 'ok',
+    user: {
+      nome: 'Admin Teste',
+      email: email || 'admin@teste.com'
+    }
+  });
 });
 
-const PORT = 3000;
+// 🔍 ROTA DE TESTE
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    servidor: 'GeoUrban ONLINE',
+    time: new Date()
+  });
+});
+
+// 🚀 PORTA
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log('Servidor rodando na porta', PORT);
 });
