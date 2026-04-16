@@ -1,51 +1,52 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-// servir frontend
-app.use(express.static(path.join(__dirname, "public")));
-
-// rota raiz
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>GeoUrban</title>
+      <style>
+        body { background:#111; color:white; font-family:Arial; display:flex; justify-content:center; align-items:center; height:100vh; }
+        .box { background:#222; padding:30px; border-radius:10px; width:300px; text-align:center; }
+        input, button { width:100%; padding:10px; margin:10px 0; }
+        button { background:#00ff88; border:none; cursor:pointer; }
+      </style>
+    </head>
+    <body>
+      <div class="box">
+        <h2>GeoUrban</h2>
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="status"></p>
+      </div>
 
-// health check
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
+      <script>
+        async function login() {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const status = document.getElementById("status");
 
-// login
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+          try {
+            const res = await fetch("/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password })
+            });
 
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Preencha email e senha"
-    });
-  }
+            const data = await res.json();
 
-  if (email === "admin@admin.com" && password === "123456") {
-    return res.json({
-      success: true,
-      user: { email }
-    });
-  }
+            if (!data.success) {
+              status.innerText = "❌ Credenciais inválidas";
+              return;
+            }
 
-  return res.status(401).json({
-    success: false,
-    message: "Credenciais inválidas"
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
+            status.innerText = "✅ Login OK";
+          } catch {
+            status.innerText = "❌ Erro servidor";
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `);
 });
