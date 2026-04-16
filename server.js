@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔓 LOGIN ABERTO (SEM SENHA)
+// 🔓 LOGIN ABERTO (TESTE)
 app.post('/login', (req, res) => {
   const { email } = req.body;
 
@@ -18,7 +18,7 @@ app.post('/login', (req, res) => {
   });
 });
 
-// 🔍 ROTA DE TESTE
+// 🔍 HEALTH CHECK
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -27,7 +27,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// 🚀 PORTA
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Servidor rodando na porta', PORT);
