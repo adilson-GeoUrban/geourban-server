@@ -1,63 +1,3 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-// 🔹 servir frontend corretamente
-app.use(express.static(path.join(__dirname, "public")));
-
-// 🔹 rota raiz SEM ERRO
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// 🔹 health check
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "geourban"
-  });
-});
-
-// 🔹 login
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
-  // validação básica
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Preencha email e senha"
-    });
-  }
-
-  // usuário teste
-  if (email === "admin@admin.com" && password === "123456") {
-    return res.json({
-      success: true,
-      user: {
-        nome: "Admin GeoUrban",
-        email
-      }
-    });
-  }
-
-  return res.status(401).json({
-    success: false,
-    message: "Credenciais inválidas"
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-
-// 🔥 IMPORTANTE: Railway usa variável PORT
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
-});
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -116,6 +56,12 @@ async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
+  // validação simples no front
+  if (!email || !password) {
+    document.getElementById("status").innerText = "⚠️ Preencha todos os campos";
+    return;
+  }
+
   try {
     const res = await fetch("/login", {
       method: "POST",
@@ -132,10 +78,13 @@ async function login() {
       return;
     }
 
-    // salva usuário
+    // salva usuário no navegador
     localStorage.setItem("user", JSON.stringify(data.user));
 
     document.getElementById("status").innerText = "✅ Login OK";
+
+    // 🔥 opcional: redirecionar depois
+    // window.location.href = "painel.html";
 
   } catch (err) {
     document.getElementById("status").innerText = "❌ Erro ao conectar servidor";
