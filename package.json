@@ -1,1 +1,68 @@
-"sqlite3": "^5.1.6"
+const express = require("express");
+const sqlite3 = require("sqlite3").verbose();
+
+const app = express();
+app.use(express.json());
+
+// 🔹 conectar banco SQLite
+const db = new sqlite3.Database("./database.db");
+
+// 🔹 criar tabela automaticamente
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE,
+      password TEXT
+    )
+  `);
+
+  // 🔹 criar usuário padrão se não existir
+  db.get("SELECT * FROM users WHERE email = ?", ["admin@admin.com"], (err, row) => {
+    if (!row) {
+      db.run(
+        "INSERT INTO users (email, password) VALUES (?, ?)",
+        ["admin@admin.com", "123456"]
+      );
+      console.log("Usuário admin criado automaticamente 🚀");
+    }
+  });
+});
+
+// 🔹 rota raiz
+app.get("/", (req, res) => {
+  res.send("GeoUrban API ativa 🚀");
+});
+
+// 🔹 health
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// 🔹 login real com banco
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  db.get(
+    "SELECT * FROM users WHERE email = ? AND password = ?",
+    [email, password],
+    (err, user) => {
+      if (user) {
+        return res.json({
+          success: true,
+          user: user
+        });
+      } else {
+        return res.status(401).json({
+          success: false,
+          message: "Credenciais inválidas"
+        });
+      }
+    }
+  );
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
