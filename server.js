@@ -8,6 +8,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // =======================
+// LOG BÁSICO DE DEBUG (IMPORTANTE EM PRODUÇÃO)
+// =======================
+app.use((req, res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url}`);
+  next();
+});
+
+// =======================
 // FRONTEND
 // =======================
 app.get("/", (req, res) => {
@@ -108,7 +116,7 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// LOGIN API (ROBUSTO)
+// LOGIN API
 // =======================
 app.post("/login", (req, res) => {
   try {
@@ -121,7 +129,6 @@ app.post("/login", (req, res) => {
       });
     }
 
-    // credenciais fixas estáveis
     if (email === "admin@admin.com" && password === "123456") {
       return res.json({
         success: true,
@@ -145,24 +152,27 @@ app.post("/login", (req, res) => {
 });
 
 // =======================
-// HEALTH CHECK
+// HEALTH CHECK (RAILWAY SAFE)
 // =======================
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
-    service: "geourban"
+    service: "geourban",
+    uptime: process.uptime()
   });
 });
 
 // =======================
-// START SERVER (RAILWAY SAFE)
+// SERVER START (ROBUSTO)
 // =======================
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log("[OK] rodando na porta " + PORT);
+  console.log("[OK] GeoUrban rodando na porta:", PORT);
+  console.log("[OK] Health:", `/health`);
 });
 
+// captura erro crítico de porta
 server.on("error", (err) => {
   console.error("[SERVER ERROR]", err);
 });
