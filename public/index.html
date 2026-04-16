@@ -7,38 +7,141 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// servir frontend
+// 🔹 servir frontend corretamente
 app.use(express.static(path.join(__dirname, "public")));
 
+// 🔹 rota raiz SEM ERRO
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// health
+// 🔹 health check
 app.get("/health", (req, res) => {
   res.status(200).json({
-    status: "ok"
+    status: "ok",
+    service: "geourban"
   });
 });
 
-// login
+// 🔹 login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
+  // validação básica
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Preencha email e senha"
+    });
+  }
+
+  // usuário teste
   if (email === "admin@admin.com" && password === "123456") {
     return res.json({
       success: true,
-      user: { email }
+      user: {
+        nome: "Admin GeoUrban",
+        email
+      }
     });
   }
 
   return res.status(401).json({
-    success: false
+    success: false,
+    message: "Credenciais inválidas"
   });
 });
 
 const PORT = process.env.PORT || 3000;
 
+// 🔥 IMPORTANTE: Railway usa variável PORT
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GeoUrban Login</title>
+
+<style>
+body {
+  background: #111;
+  color: white;
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.box {
+  background: #222;
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+button {
+  background: #00ff88;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+#status {
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>GeoUrban</h2>
+
+  <input type="text" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Senha">
+
+  <button onclick="login()">Entrar</button>
+
+  <p id="status"></p>
+</div>
+
+<script>
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    const res = await fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById("status").innerText = "❌ Credenciais inválidas";
+      return;
+    }
+
+    // salva usuário
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    document.getElementById("status").innerText = "✅ Login OK";
+
+  } catch (err) {
+    document.getElementById("status").innerText = "❌ Erro ao conectar servidor";
+  }
+}
+</script>
+
+</body>
+</html>
