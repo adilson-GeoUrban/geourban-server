@@ -1,13 +1,19 @@
 const express = require("express");
+const cors = require("cors");
+const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
-// 🔹 conectar banco SQLite
+// 🔹 servir frontend
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🔹 banco SQLite
 const db = new sqlite3.Database("./database.db");
 
-// 🔹 criar tabela automaticamente
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -17,21 +23,20 @@ db.serialize(() => {
     )
   `);
 
-  // 🔹 criar usuário padrão se não existir
   db.get("SELECT * FROM users WHERE email = ?", ["admin@admin.com"], (err, row) => {
     if (!row) {
       db.run(
         "INSERT INTO users (email, password) VALUES (?, ?)",
         ["admin@admin.com", "123456"]
       );
-      console.log("Usuário admin criado automaticamente 🚀");
+      console.log("Usuário admin criado 🚀");
     }
   });
 });
 
-// 🔹 rota raiz
+// 🔹 rota raiz (carrega frontend)
 app.get("/", (req, res) => {
-  res.send("GeoUrban API ativa 🚀");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 🔹 health
@@ -39,7 +44,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// 🔹 login real com banco
+// 🔹 login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -50,7 +55,7 @@ app.post("/login", (req, res) => {
       if (user) {
         return res.json({
           success: true,
-          user: user
+          user
         });
       } else {
         return res.status(401).json({
@@ -63,6 +68,7 @@ app.post("/login", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
