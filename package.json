@@ -1,6 +1,9 @@
-npm uninstall sqlite3
-npm install better-sqlite3
+rm -rf node_modules package-lock.json
+
+npm install express cors path better-sqlite3
+
+npm install
 
 git add .
-git commit -m "fix: replace sqlite3 with better-sqlite3 for railway build stability"
-git push origin main
+git commit -m "fix: full rebuild dependencies for railway stable deploy"
+git push
