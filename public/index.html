@@ -27,16 +27,16 @@ async function login() {
       return;
     }
 
-    // 🔥 AJUSTE IMPORTANTE
+    // 🔥 PADRÃO CORRETO
     localStorage.setItem("usuario", data.user.email);
     localStorage.setItem("user", data.user.email);
 
     status.innerText = "✅ Login OK";
 
-    // 🔥 REDIRECIONA PARA O SISTEMA
+    // 🔥 REDIRECIONAMENTO CORRETO
     setTimeout(() => {
-      window.location.href = "/index.html";
-    }, 1000);
+      window.location.href = "/painel.html";
+    }, 800);
 
   } catch (err) {
     status.innerText = "❌ Erro ao conectar servidor";
