@@ -1,9 +1,7 @@
 rm -rf node_modules package-lock.json
 
-npm install express cors path better-sqlite3
-
-npm install
+npm install express cors better-sqlite3
 
 git add .
-git commit -m "fix: full dependency rebuild for railway stable deploy"
+git commit -m "fix: stable railway deploy with clean dependencies and runtime fix"
 git push origin main
