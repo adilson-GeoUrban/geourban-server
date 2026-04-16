@@ -1,4 +1,46 @@
 <script>
+// 🤖 ROBÔ DE VERIFICAÇÃO GEOURBAN
+(function () {
+  try {
+    let user = localStorage.getItem("usuario");
+
+    // 🔧 Corrige caso esteja salvo errado (JSON antigo)
+    if (!user) {
+      const oldUser = localStorage.getItem("user");
+
+      if (oldUser) {
+        try {
+          const parsed = JSON.parse(oldUser);
+          user = parsed.email || oldUser;
+        } catch {
+          user = oldUser;
+        }
+
+        localStorage.setItem("usuario", user);
+      }
+    }
+
+    // 🚫 Se não houver usuário → volta pro login
+    if (!user) {
+      console.warn("🔒 Usuário não encontrado, redirecionando...");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    // 🧹 Limpa resíduos antigos que causam erro
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth");
+    localStorage.removeItem("session");
+
+    console.log("🤖 Sistema estabilizado:", user);
+
+  } catch (e) {
+    console.error("Erro no robô de verificação:", e);
+    window.location.href = "/login.html";
+  }
+})();
+</script>
+<script>
 async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
