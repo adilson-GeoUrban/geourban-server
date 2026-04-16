@@ -3,26 +3,45 @@ const app = express();
 
 app.use(express.json());
 
-// teste raiz (IMPORTANTE)
+// 🔹 rota raiz
 app.get("/", (req, res) => {
-  res.send("Servidor rodando 🚀");
+  res.send("GeoUrban API ativa 🚀");
 });
 
-// health check
+// 🔹 health check padrão
 app.get("/health", (req, res) => {
-  res.send("OK");
+  res.status(200).json({
+    status: "ok",
+    service: "geourban-server"
+  });
 });
 
-// login teste
+// 🔹 login teste controlado
 app.post("/login", (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
-  res.json({
-    success: true,
-    user: {
-      nome: "Admin Teste",
-      email: email || "teste@admin.com"
-    }
+  // validação simples
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email e senha são obrigatórios"
+    });
+  }
+
+  // usuário fake (teste)
+  if (email === "admin@admin.com" && password === "123456") {
+    return res.json({
+      success: true,
+      user: {
+        nome: "Admin GeoUrban",
+        email: email
+      }
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    message: "Credenciais inválidas"
   });
 });
 
@@ -31,4 +50,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
-https://geourban-server-production.up.railway.app/health
