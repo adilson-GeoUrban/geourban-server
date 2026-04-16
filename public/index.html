@@ -65,21 +65,13 @@ async function login() {
   status.innerText = "⏳ Conectando...";
 
   try {
-    const res = await fetch("https://geourban-server-production.up.railway.app/login", {
+    const res = await fetch("/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ email, password })
     });
-
-    // 🔎 debug real
-    if (!res.ok) {
-      const text = await res.text();
-      status.innerText = "❌ Erro servidor: " + res.status;
-      console.error("Resposta:", text);
-      return;
-    }
 
     const data = await res.json();
 
@@ -93,8 +85,7 @@ async function login() {
     status.innerText = "✅ Login OK";
 
   } catch (err) {
-    console.error("Erro completo:", err);
-    status.innerText = "❌ Falha de conexão com servidor";
+    status.innerText = "❌ Erro ao conectar servidor";
   }
 }
 </script>
