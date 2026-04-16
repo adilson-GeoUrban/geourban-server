@@ -1,64 +1,38 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>GeoUrban Painel</title>
+const express = require("express");
+const app = express();
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #111;
-  color: white;
-}
+// permite receber JSON
+app.use(express.json());
 
-header {
-  background: #000;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-}
+// 🔓 libera acesso entre frontend e backend (CORS aberto p/ teste)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  next();
+});
 
-button {
-  background: red;
-  border: none;
-  padding: 10px;
-  color: white;
-  cursor: pointer;
-}
+// 🔍 ROTA DE TESTE
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
 
-main {
-  padding: 20px;
-}
-</style>
-</head>
+// 🔐 LOGIN SIMPLES (SEM SENHA - TESTE)
+app.post("/login", (req, res) => {
+  const { email } = req.body;
 
-<body>
+  res.json({
+    success: true,
+    user: {
+      nome: "Admin Teste",
+      email: email || "teste@admin.com"
+    }
+  });
+});
 
-<header>
-  <h2>GeoUrban</h2>
-  <button onclick="logout()">Sair</button>
-</header>
+// 🚀 START SERVER
+const PORT = process.env.PORT || 3000;
 
-<main>
-  <h1 id="user"></h1>
-  <p>Sistema operacional</p>
-</main>
-
-<script>
-const user = JSON.parse(localStorage.getItem('user'));
-
-if (!user) {
-  window.location.href = "login.html";
-}
-
-document.getElementById('user').innerText = "Logado como: " + user.email;
-
-function logout() {
-  localStorage.removeItem('user');
-  window.location.href = "login.html";
-}
-</script>
-
-</body>
-</html>
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta " + PORT);
+});
