@@ -5,5 +5,5 @@ npm install express cors path better-sqlite3
 npm install
 
 git add .
-git commit -m "fix: full rebuild dependencies for railway stable deploy"
-git push
+git commit -m "fix: full dependency rebuild for railway stable deploy"
+git push origin main
