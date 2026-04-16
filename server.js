@@ -2,13 +2,13 @@ const express = require("express");
 const app = express();
 
 // =======================
-// MIDDLEWARE (OBRIGATÓRIO)
+// MIDDLEWARE
 // =======================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // =======================
-// FRONTEND (SEU CÓDIGO)
+// FRONTEND
 // =======================
 app.get("/", (req, res) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -121,7 +121,7 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// LOGIN (ROBO BACKEND)
+// LOGIN API
 // =======================
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
@@ -130,7 +130,6 @@ app.post("/login", (req, res) => {
     return res.json({ success: false, error: "missing_data" });
   }
 
-  // regra simples de teste (robô)
   if (email === "admin" && password === "123") {
     return res.json({ success: true, token: "geo-token-ok" });
   }
@@ -139,17 +138,21 @@ app.post("/login", (req, res) => {
 });
 
 // =======================
-// HEALTH CHECK (IMPORTANTE)
+// HEALTH CHECK
 // =======================
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
 // =======================
-// START (RAILWAY)
+// START RAILWAY (CORRIGIDO)
 // =======================
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log("[ROBO] GeoUrban rodando na porta " + PORT);
+});
+
+server.on("error", (err) => {
+  console.error("[ERRO SERVER]", err);
 });
