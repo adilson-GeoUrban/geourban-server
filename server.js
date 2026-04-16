@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
         body {
           background: #111;
           color: #fff;
-          font-family: Arial, sans-serif;
+          font-family: Arial;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -50,10 +50,7 @@ app.get("/", (req, res) => {
           outline: none;
         }
 
-        input {
-          background: #333;
-          color: #fff;
-        }
+        input { background: #333; color: #fff; }
 
         button {
           background: #00ff88;
@@ -61,14 +58,7 @@ app.get("/", (req, res) => {
           font-weight: bold;
         }
 
-        button:hover {
-          background: #00cc6a;
-        }
-
-        #status {
-          margin-top: 10px;
-          font-size: 14px;
-        }
+        #status { margin-top: 10px; font-size: 14px; }
       </style>
     </head>
 
@@ -76,7 +66,7 @@ app.get("/", (req, res) => {
       <div class="box">
         <h2>GeoUrban</h2>
 
-        <input id="email" type="email" placeholder="Email" />
+        <input id="email" placeholder="Email" />
         <input id="password" type="password" placeholder="Senha" />
 
         <button onclick="login()">Entrar</button>
@@ -95,9 +85,7 @@ app.get("/", (req, res) => {
           try {
             const res = await fetch("/login", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email, password })
             });
 
@@ -110,8 +98,7 @@ app.get("/", (req, res) => {
             }
 
           } catch (err) {
-            console.error(err);
-            status.innerText = "❌ Erro de conexão com servidor";
+            status.innerText = "❌ Erro servidor";
           }
         }
       </script>
@@ -121,38 +108,38 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// LOGIN API
+// LOGIN API (CORRIGIDO)
 // =======================
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.json({ success: false, error: "missing_data" });
+    return res.json({ success: false });
   }
 
-  if (email === "admin" && password === "123") {
-    return res.json({ success: true, token: "geo-token-ok" });
+  // 🔥 CREDENCIAIS ÚNICAS (UNIFICADAS)
+  if (email === "admin@admin.com" && password === "123456") {
+    return res.json({
+      success: true,
+      token: "geo-token-ok"
+    });
   }
 
   return res.json({ success: false });
 });
 
 // =======================
-// HEALTH CHECK
+// HEALTH
 // =======================
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
 // =======================
-// START RAILWAY (CORRIGIDO)
+// START
 // =======================
 const PORT = process.env.PORT || 3000;
 
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log("[ROBO] GeoUrban rodando na porta " + PORT);
-});
-
-server.on("error", (err) => {
-  console.error("[ERRO SERVER]", err);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("[OK] rodando na porta " + PORT);
 });
