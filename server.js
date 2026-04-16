@@ -1,11 +1,16 @@
 const express = require("express");
+const path = require("path");
+
 const app = express();
 
 app.use(express.json());
 
-// 🔹 rota raiz
+// 🔥 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🔹 rota raiz abre o index.html
 app.get("/", (req, res) => {
-  res.send("GeoUrban API ativa 🚀");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 🔹 health check
@@ -16,7 +21,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 🔹 login controlado
+// 🔹 login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
