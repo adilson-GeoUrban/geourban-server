@@ -40,7 +40,9 @@ button {
 <div class="box">
   <h2>GeoUrban</h2>
 
-  <input type="text" id="email" placeholder="Digite qualquer email">
+  <input type="text" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Senha">
+
   <button onclick="login()">Entrar</button>
 
   <p id="status"></p>
@@ -49,21 +51,24 @@ button {
 <script>
 function login() {
   const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
   fetch('https://geourban-server-production.up.railway.app/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ email })
+    body: JSON.stringify({ email, password })
   })
   .then(res => res.json())
   .then(data => {
 
-    // salva usuário
-    localStorage.setItem('user', JSON.stringify(data.user));
+    if (!data.success) {
+      document.getElementById('status').innerText = '❌ ' + data.message;
+      return;
+    }
 
-    // redireciona para painel
+    localStorage.setItem('user', JSON.stringify(data.user));
     window.location.href = "painel.html";
 
   })
