@@ -1,64 +1,43 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Login + Robôs</title>
-  <style>
-    body { font-family: Arial; padding: 30px; background: #f0f0f0; }
-    input, button { padding: 8px; margin: 5px; width: 200px; }
-    #status { margin-top: 20px; font-weight: bold; color: green; }
-    .robot { margin: 5px 0; font-family: monospace; color: blue; }
-  </style>
-</head>
-<body>
+const express = require("express");
+const path = require("path");
 
-<h2>Login Teste com Robôs</h2>
+const app = express();
+app.use(express.json());
 
-<input type="text" id="user" placeholder="Usuário"><br>
-<input type="password" id="pass" placeholder="Senha"><br>
-<button onclick="login()">Entrar</button>
+// 🔗 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, "app/frontend")));
 
-<div id="status"></div>
-<div id="robots"></div>
+// 🌐 ROTA PRINCIPAL
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "app/frontend/login.html"));
+});
 
-<script>
-async function login() {
-  const username = document.getElementById("user").value;
-  const password = document.getElementById("pass").value;
+// ❤️ HEALTH CHECK
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
 
-  // Simulação de login local
-  if(username === "usuario_teste" && password === "senha_teste") {
-    document.getElementById("status").innerText = "✅ Login OK! Robôs iniciando...";
-    startRobots();
-  } else {
-    document.getElementById("status").innerText = "❌ Credenciais inválidas";
+// 🔐 LOGIN REAL (TESTE UNIFICADO)
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (email === "admin@admin.com" && password === "123456") {
+    return res.json({
+      success: true,
+      user: {
+        nome: "Admin",
+        email
+      }
+    });
   }
-}
 
-// Função para simular robôs trabalhando
-function startRobots() {
-  const robotsDiv = document.getElementById("robots");
-  robotsDiv.innerHTML = ""; // limpa
-  const tasks = [
-    "🤖 Robô 1: iniciando auditoria...",
-    "🤖 Robô 2: verificando links...",
-    "🤖 Robô 3: salvando backups...",
-    "🤖 Robô 1: limpando caches...",
-    "🤖 Robô 2: atualizando credenciais...",
-    "✅ Todos os robôs concluíram as tarefas!"
-  ];
+  return res.status(401).json({
+    success: false,
+    message: "Credenciais inválidas"
+  });
+});
 
-  let i = 0;
-  const interval = setInterval(() => {
-    const line = document.createElement("div");
-    line.className = "robot";
-    line.innerText = tasks[i];
-    robotsDiv.appendChild(line);
-    i++;
-    if(i >= tasks.length) clearInterval(interval);
-  }, 1000);
-}
-</script>
-
-</body>
-</html>
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Servidor rodando 🚀 na porta " + PORT);
+});
