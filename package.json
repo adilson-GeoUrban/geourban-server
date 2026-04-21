@@ -1,9 +1,22 @@
-npm uninstall better-sqlite3
+cat << 'EOF' > package.json
+{
+  "name": "geourban-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
+EOF
 
 rm -rf node_modules package-lock.json
 
-npm install express cors
+npm install
 
 git add .
-git commit -m "fix: remove native deps and stabilize railway build"
+git commit -m "fix: package.json válido para deploy Railway"
 git push origin main
