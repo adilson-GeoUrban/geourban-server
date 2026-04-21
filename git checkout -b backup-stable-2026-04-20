@@ -1,1 +1,98 @@
 
+GEOURBAN - RELATÓRIO DE AUDITORIA (PRÉ-ANÁLISE)
+Data: 2026-04-21 02:18:20
+
+====================================================
+1. RESUMO EXECUTIVO
+====================================================
+O serviço geourban-oficial está em execução no Render, com backend Node.js ativo.
+Logs indicam inicialização bem-sucedida ("Servidor rodando"), porém sem evidência
+de conexão com banco de dados ou validação completa de rotas.
+
+Status geral: PARCIALMENTE OPERACIONAL
+
+====================================================
+2. INFRAESTRUTURA (RENDER)
+====================================================
+- Deploy: OK (processo Node iniciado)
+- Serviço: ativo (não crashando)
+- Possível risco: aplicação "viva porém incompleta"
+- Health check: não confirmado
+- Porta dinâmica (process.env.PORT): não validada
+
+====================================================
+3. BACKEND (NODE SERVER)
+====================================================
+Observações:
+- server.js inicia corretamente
+- log genérico: "Servidor rodando"
+- ausência de logs críticos (DB, auth, env)
+
+Risco identificado:
+- servidor pode estar rodando sem dependências essenciais
+
+====================================================
+4. BANCO DE DADOS (SUSPEITA CRÍTICA)
+====================================================
+- Sem confirmação de conexão ativa
+- Possível falha em:
+  - DATABASE_URL
+  - SSL config
+  - pool de conexão
+
+Impacto:
+- login pode falhar silenciosamente
+- API pode responder sem persistência real
+
+====================================================
+5. AUTENTICAÇÃO (JWT / LOGIN)
+====================================================
+Riscos comuns detectados no padrão do projeto:
+- JWT_SECRET ausente ou inconsistente
+- divergência entre ambientes (dev vs prod)
+- hash incompatível entre usuários
+
+====================================================
+6. FRONTEND / API INTEGRAÇÃO
+====================================================
+Possíveis falhas:
+- endpoint API incorreto
+- CORS bloqueando requisições
+- uso de localhost em produção
+
+====================================================
+7. RISCOS CRÍTICOS
+====================================================
+- Deploy "verde" não garante sistema funcional
+- Possível backend sem banco conectado
+- Login potencialmente quebrado
+- Falta de health check validado
+
+====================================================
+8. AÇÕES RECOMENDADAS (PRÓXIMO PASSO)
+====================================================
+OBRIGATÓRIO PARA CONTINUIDADE:
+
+1. Revisar server.js
+2. Validar package.json scripts
+3. Confirmar variáveis de ambiente no Render:
+   - DATABASE_URL
+   - JWT_SECRET
+   - API_BASE_URL
+
+4. Implementar endpoint /health
+5. Validar conexão com banco em logs
+
+====================================================
+9. PONTO DE RECUPERAÇÃO (BACKUP)
+====================================================
+Criar branch:
+backup-stable-2026-04-20
+
+Commit recomendado após estabilização:
+fix: production stabilization (auth + api + db)
+
+====================================================
+FIM DO RELATÓRIO
+====================================================
+
