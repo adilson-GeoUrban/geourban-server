@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // 🔐 ENV CHECK
 if (!process.env.JWT_SECRET) {
-  console.warn("⚠️ JWT_SECRET não definido!");
+  console.warn("⚠️ JWT_SECRET não definido! Usando fallback dev");
 }
 
 // 🔥 HEALTH CHECK
@@ -63,13 +63,8 @@ app.post("/login", (req, res) => {
   });
 });
 
-// 🚀 SERVER START (CORRIGIDO)
-const PORT = process.env.PORT;
-
-if (!PORT) {
-  console.error("❌ PORT não definida pelo Render");
-  process.exit(1);
-}
+// 🚀 SERVER START (RENDER SAFE)
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 GeoUrban rodando na porta ${PORT}`);
