@@ -1,70 +1,12 @@
-const express = require("express");
-const path = require("path");
-
-const app = express();
-
-app.use(express.json());
-
-// 🔥 ESSENCIAL
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// health check
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-const PORT = process.env.PORT;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("Rodando na porta", PORT);
-});
 (function () {
-
-  // 🔐 pega sessão
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("usuario");
 
-  // 🚫 SEM LOGIN → volta pro login
-  if (!token || !user) {
-    console.warn("🔒 Sem sessão - redirecionando para login");
-    window.location.replace("/");
-    return;
-  }
-
-  // 🧠 anti-loop (evita redirecionamento infinito)
-  const alreadyLocked = sessionStorage.getItem("geo_lock");
-
-  if (alreadyLocked === "1") {
-    return;
-  }
-
-  sessionStorage.setItem("geo_lock", "1");
-
-  console.log("🤖 GeoRobot blindado ativo");
-
-})();
-(function () {
-
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("usuario");
-
-  // 🚫 sem login → volta
+  // sem sessão → volta
   if (!token || !user) {
     window.location.replace("/");
     return;
   }
 
-  // 🧠 evita loop infinito
-  if (sessionStorage.getItem("geo_lock") === "1") {
-    return;
-  }
-
-  sessionStorage.setItem("geo_lock", "1");
-
-  console.log("🛡️ GeoUrban blindado ativo");
-
+  console.log("🛡️ Sistema autenticado OK");
 })();
