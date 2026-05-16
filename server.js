@@ -5,14 +5,21 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled Rejection:", err);
 });
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const path = require("path");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-// 🔐 ENV CHECK (evita deploy silencioso quebrado)
+// 🔐 Servir frontend
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🔐 ENV CHECK
 if (!process.env.JWT_SECRET) {
   console.warn("⚠️ JWT_SECRET não definido!");
 }
@@ -28,14 +35,13 @@ app.get("/health", (req, res) => {
 
 // 🔥 ROOT
 app.get("/", (req, res) => {
-  res.status(200).send("GeoUrban online");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 🔐 LOGIN (AGORA COM JWT REAL)
+// 🔐 LOGIN
 app.post("/login", (req, res) => {
   const { email, password } = req.body || {};
 
-  // ⚠️ versão provisória (sem banco ainda)
   if (email === "admin@admin.com" && password === "123456") {
 
     const token = jwt.sign(
@@ -46,7 +52,10 @@ app.post("/login", (req, res) => {
 
     return res.json({
       success: true,
-      token
+      token,
+      user: {
+        email
+      }
     });
   }
 
@@ -57,7 +66,7 @@ app.post("/login", (req, res) => {
 });
 
 // 🚀 SERVER START
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("GeoUrban rodando na porta", PORT);
