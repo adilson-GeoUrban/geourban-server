@@ -1,28 +1,24 @@
-async function goPanel() {
-  try {
+const express = require("express");
+const path = require("path");
 
-    // 🔍 tenta validar existência do arquivo
-    const res = await fetch("/ia.html", {
-      method: "HEAD",
-      cache: "no-store"
-    });
+const app = express();
 
-    // 🧠 validação mais segura
-    const ok = res && res.ok;
+app.use(express.json());
 
-    if (ok) {
-      window.location.replace("/ia.html");
-      return;
-    }
+// 🔥 ESSENCIAL
+app.use(express.static(path.join(__dirname, "public")));
 
-    // ⚠️ fallback seguro
-    window.location.replace("/");
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-  } catch (e) {
+// health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
-    console.error("Erro ao acessar painel:", e);
+const PORT = process.env.PORT;
 
-    // 🔁 fallback total em caso de rede/proxy/cache quebrado
-    window.location.replace("/");
-  }
-}
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Rodando na porta", PORT);
+});
