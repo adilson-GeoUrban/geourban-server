@@ -47,3 +47,24 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log("🤖 GeoRobot blindado ativo");
 
 })();
+(function () {
+
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("usuario");
+
+  // 🚫 sem login → volta
+  if (!token || !user) {
+    window.location.replace("/");
+    return;
+  }
+
+  // 🧠 evita loop infinito
+  if (sessionStorage.getItem("geo_lock") === "1") {
+    return;
+  }
+
+  sessionStorage.setItem("geo_lock", "1");
+
+  console.log("🛡️ GeoUrban blindado ativo");
+
+})();
