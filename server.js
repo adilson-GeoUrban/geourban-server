@@ -53,9 +53,7 @@ app.post("/login", (req, res) => {
     return res.json({
       success: true,
       token,
-      user: {
-        email
-      }
+      user: { email }
     });
   }
 
@@ -65,9 +63,14 @@ app.post("/login", (req, res) => {
   });
 });
 
-// 🚀 SERVER START
-const PORT = process.env.PORT || 8080;
+// 🚀 SERVER START (CORRIGIDO)
+const PORT = process.env.PORT;
+
+if (!PORT) {
+  console.error("❌ PORT não definida pelo Render");
+  process.exit(1);
+}
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("GeoUrban rodando na porta", PORT);
+  console.log(`🚀 GeoUrban rodando na porta ${PORT}`);
 });
