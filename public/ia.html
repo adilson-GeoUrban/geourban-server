@@ -1,21 +1,19 @@
-(function () {
+async function goPanel() {
+  try {
 
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("usuario");
+    const res = await fetch("/ia.html", {
+      method: "HEAD",
+      cache: "no-store"
+    });
 
-  // 🚫 sem sessão válida → volta pro login
-  if (!token || !user) {
+    if (res.ok) {
+      window.location.replace("/ia.html");
+    } else {
+      window.location.replace("/");
+    }
+
+  } catch (e) {
+    console.error("Erro ao acessar painel:", e);
     window.location.replace("/");
-    return;
   }
-
-  // 🧠 trava loop de redirect infinito
-  if (sessionStorage.getItem("geo_lock") === "1") {
-    return;
-  }
-
-  sessionStorage.setItem("geo_lock", "1");
-
-  console.log("🛡️ GeoUrban anti-loop ativo");
-
-})();
+}
