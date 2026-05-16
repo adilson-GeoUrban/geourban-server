@@ -15,18 +15,15 @@ async function login() {
     const data = await res.json();
 
     if (!data.success) {
-      status.innerText = "Credenciais inválidas";
+      status.innerText = "Erro login";
       return;
     }
 
-    // sessão
     localStorage.setItem("token", data.token);
     localStorage.setItem("usuario", data.user.email);
 
-    status.innerText = "OK";
+    window.location.href = "/ia";
 
-    // 🔥 REDIRECIONAMENTO LIMPO (SEM HEAD, SEM CHECK)
-    window.location.replace("/ia");
   } catch (e) {
     status.innerText = "Erro servidor";
   }
