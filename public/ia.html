@@ -6,7 +6,8 @@ async function goPanel() {
       cache: "no-store"
     });
 
-    if (res.ok) {
+    // ⚠️ alguns hosts retornam 403/404 mesmo com arquivo válido
+    if (res.ok || res.status === 0 || res.status === 200) {
       window.location.replace("/ia.html");
     } else {
       window.location.replace("/");
