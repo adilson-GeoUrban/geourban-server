@@ -1,22 +1,28 @@
 async function goPanel() {
   try {
 
+    // 🔍 tenta validar existência do arquivo
     const res = await fetch("/ia.html", {
       method: "HEAD",
       cache: "no-store"
     });
 
-    // ✔ considera sucesso real do servidor
-    const ok = res && (res.ok || (res.status >= 200 && res.status < 300));
+    // 🧠 validação mais segura
+    const ok = res && res.ok;
 
     if (ok) {
       window.location.replace("/ia.html");
-    } else {
-      window.location.replace("/");
+      return;
     }
 
+    // ⚠️ fallback seguro
+    window.location.replace("/");
+
   } catch (e) {
+
     console.error("Erro ao acessar painel:", e);
+
+    // 🔁 fallback total em caso de rede/proxy/cache quebrado
     window.location.replace("/");
   }
 }
