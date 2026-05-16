@@ -1,53 +1,49 @@
-const express = require("express");
-const path = require("path");
+async function login() {
 
-const app = express();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const status = document.getElementById("status");
 
-app.disable("x-powered-by");
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-// 🔥 health check (Render)
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "geourban",
-    uptime: process.uptime()
-  });
-});
-
-// 🔥 raiz
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// 🔐 login simples (dev)
-app.post("/login", (req, res) => {
-  const { email, password } = req.body || {};
-
-  if (email === "admin@admin.com" && password === "123456") {
-    return res.json({
-      success: true,
-      token: "geo-token-demo",
-      user: { email }
-    });
+  if (!email || !password) {
+    status.innerText = "Preencha todos os campos";
+    return;
   }
 
-  return res.status(401).json({
-    success: false,
-    message: "invalid_credentials"
-  });
-});
+  status.innerText = "Conectando...";
 
-// 🚀 PORTA RENDER (OBRIGATÓRIO)
-const PORT = process.env.PORT;
+  try {
 
-if (!PORT) {
-  console.error("PORT não definida pelo Render");
-  process.exit(1);
+    const res = await fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!data || !data.success) {
+      status.innerText = "Credenciais inválidas";
+      return;
+    }
+
+    // 🔐 proteção contra backend incompleto
+    const userEmail = data.user?.email || email;
+
+    // 💾 sessão blindada
+    localStorage.setItem("token", data.token || "demo");
+    localStorage.setItem("usuario", userEmail);
+
+    status.innerText = "OK";
+
+    // 🚀 redirect seguro (SEM HEAD, SEM fetch, SEM Render bug)
+    setTimeout(() => {
+      window.location.replace("/ia.html");
+    }, 400);
+
+  } catch (e) {
+    console.error(e);
+    status.innerText = "Erro servidor";
+  }
 }
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("GeoUrban rodando na porta", PORT);
-});
