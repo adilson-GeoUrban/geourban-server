@@ -1,1 +1,14 @@
-/ia.html
+async function goPanel() {
+  try {
+    const res = await fetch("/ia.html", { method: "HEAD" });
+
+    if (res.ok) {
+      window.location.href = "/ia.html";
+    } else {
+      window.location.href = "/";
+    }
+
+  } catch (e) {
+    window.location.href = "/";
+  }
+}
