@@ -1,14 +1,21 @@
-async function goPanel() {
-  try {
-    const res = await fetch("/ia.html", { method: "HEAD" });
+(function () {
 
-    if (res.ok) {
-      window.location.href = "/ia.html";
-    } else {
-      window.location.href = "/";
-    }
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("usuario");
 
-  } catch (e) {
-    window.location.href = "/";
+  // 🚫 sem sessão válida → volta pro login
+  if (!token || !user) {
+    window.location.replace("/");
+    return;
   }
-}
+
+  // 🧠 trava loop de redirect infinito
+  if (sessionStorage.getItem("geo_lock") === "1") {
+    return;
+  }
+
+  sessionStorage.setItem("geo_lock", "1");
+
+  console.log("🛡️ GeoUrban anti-loop ativo");
+
+})();
