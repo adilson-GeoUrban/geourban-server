@@ -118,3 +118,41 @@ async function login() {
 
 </body>
 </html>
+async function login() {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const status = document.getElementById("status");
+
+  status.innerText = "Conectando...";
+
+  try {
+
+    const res = await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      status.innerText = "Credenciais inválidas";
+      return;
+    }
+
+    // 💾 sessão
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("usuario", data.user.email);
+
+    status.innerText = "OK";
+
+    // 🚀 SEM VERIFICAÇÃO HEAD (isso quebrava Render)
+    setTimeout(() => {
+      window.location.replace("/ia.html");
+    }, 500);
+
+  } catch (e) {
+    status.innerText = "Erro servidor";
+  }
+}
