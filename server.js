@@ -13,10 +13,13 @@ const cors = require("cors");
 
 const app = express();
 
+// 🧠 segurança básica
+app.disable("x-powered-by");
+
 app.use(cors());
 app.use(express.json());
 
-// 🔐 Servir frontend
+// 📦 frontend estático
 app.use(express.static(path.join(__dirname, "public")));
 
 // 🔐 ENV CHECK
@@ -24,7 +27,7 @@ if (!process.env.JWT_SECRET) {
   console.warn("⚠️ JWT_SECRET não definido! Usando fallback dev");
 }
 
-// 🔥 HEALTH CHECK
+// 🔥 HEALTH CHECK (Render usa isso para saber se está vivo)
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "ok",
@@ -33,7 +36,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 🔥 ROOT
+// 🔥 ROOT (frontend)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -42,6 +45,7 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body || {};
 
+  // 🔑 credencial fixa (dev)
   if (email === "admin@admin.com" && password === "123456") {
 
     const token = jwt.sign(
@@ -63,9 +67,14 @@ app.post("/login", (req, res) => {
   });
 });
 
-// 🚀 SERVER START (RENDER SAFE)
-const PORT = process.env.PORT || 10000;
+// 🚀 PORTA RENDER (CRÍTICO)
+const PORT = process.env.PORT;
+
+if (!PORT) {
+  console.error("❌ PORT não definida pelo Render");
+  process.exit(1);
+}
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 GeoUrban rodando na porta ${PORT}`);
+  console.log("🚀 GeoUrban rodando na porta:", PORT);
 });
