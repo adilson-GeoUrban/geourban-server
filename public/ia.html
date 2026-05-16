@@ -1,3 +1,15 @@
+(function () {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("usuario");
+
+  // 🚫 sem sessão válida
+  if (!token || !user) {
+    window.location.replace("/");
+    return;
+  }
+
+  console.log("🛡️ Sistema autenticado OK");
+})();
 async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
