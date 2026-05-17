@@ -1,12 +1,10 @@
 const express = require("express");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const helmet = require("helmet");
 
 const app = express();
 
 app.use(express.json());
-app.use(helmet());
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -81,8 +79,8 @@ app.get("/health", (req, res) => {
 
 });
 
-// PORTA
-const PORT = process.env.PORT || 10000;
+// PORTA RENDER
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
 
