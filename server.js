@@ -3,36 +3,35 @@ const path = require("path");
 
 const app = express();
 
-// 🔥 IMPORTANTE: servir arquivos corretamente
+// arquivos estáticos
 app.use(express.static(__dirname));
 
-// 🟢 ROTA PRINCIPAL (LOGIN)
+// 🔥 GARANTE QUE "/" FUNCIONE SEM FALHA
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
-// 🟢 DASHBOARD
+// páginas
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 🟢 IA PAGE
 app.get("/ia", (req, res) => {
   res.sendFile(path.join(__dirname, "ia.html"));
 });
 
-// 🟢 HEALTH CHECK (Railway obrigatório)
+// health check obrigatório Railway
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", service: "GeoUrban" });
+  res.status(200).send("OK");
 });
 
-// ❗ IMPORTANTE: fallback evita “Not Found” seco
+// fallback seguro
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "login.html"));
+  res.redirect("/");
 });
 
-// 🚀 PORTA RAILWAY
+// PORTA RAILWAY (OBRIGATÓRIO)
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`GeoUrban rodando na porta ${PORT}`);
+  console.log("GeoUrban rodando na porta", PORT);
 });
