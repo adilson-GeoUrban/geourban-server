@@ -4,16 +4,22 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
+// JSON
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "public")));
+// ARQUIVOS PÚBLICOS
+app.use(
+  express.static(
+    path.join(__dirname, "public")
+  )
+);
 
 // LOGIN
 app.post("/login", (req, res) => {
 
   const { email, password } = req.body;
 
-  // validação
+  // validação básica
   if (!email || !password) {
 
     return res.status(400).json({
@@ -23,7 +29,7 @@ app.post("/login", (req, res) => {
 
   }
 
-  // LOGIN FIXO TEMPORÁRIO
+  // LOGIN TEMPORÁRIO
   if (
     email === "admin@admin.com" &&
     password === "123456"
@@ -33,7 +39,8 @@ app.post("/login", (req, res) => {
 
       { email },
 
-      process.env.JWT_SECRET || "geoUrban-dev-secret",
+      process.env.JWT_SECRET ||
+      "geoUrban-dev-secret",
 
       {
         expiresIn: "24h"
@@ -42,16 +49,26 @@ app.post("/login", (req, res) => {
     );
 
     return res.json({
+
       success: true,
+
       token,
-      user: { email }
+
+      user: {
+        email
+      }
+
     });
 
   }
 
+  // LOGIN INVÁLIDO
   return res.status(401).json({
+
     success: false,
+
     message: "Login inválido"
+
   });
 
 });
@@ -60,7 +77,13 @@ app.post("/login", (req, res) => {
 app.get("/", (req, res) => {
 
   res.sendFile(
-    path.join(__dirname, "public", "index.html")
+
+    path.join(
+      __dirname,
+      "public",
+      "index.html"
+    )
+
   );
 
 });
@@ -69,7 +92,13 @@ app.get("/", (req, res) => {
 app.get("/ia", (req, res) => {
 
   res.sendFile(
-    path.join(__dirname, "public", "ia.html")
+
+    path.join(
+      __dirname,
+      "public",
+      "ia.html"
+    )
+
   );
 
 });
@@ -83,11 +112,25 @@ app.get("/health", (req, res) => {
 
 });
 
-// PORTA
-const PORT = process.env.PORT || 8080;
+// 404
+app.use((req, res) => {
 
+  res.status(404).json({
+    success: false,
+    message: "Rota não encontrada"
+  });
+
+});
+
+// PORTA
+const PORT =
+  process.env.PORT || 8080;
+
+// START
 app.listen(PORT, "0.0.0.0", () => {
 
-  console.log(`RUN OK ${PORT}`);
+  console.log(
+    `RUN OK ${PORT}`
+  );
 
 });
