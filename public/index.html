@@ -14,16 +14,6 @@ async function login() {
 
   status.innerText = "Conectando...";
 
-  // validação
-  if (!email || !password) {
-
-    status.innerText =
-      "Preencha email e senha";
-
-    return;
-
-  }
-
   try {
 
     const res = await fetch("/login", {
@@ -43,22 +33,23 @@ async function login() {
 
     const data = await res.json();
 
-    // ❌ login inválido
+    // ❌ erro login
     if (!data.success) {
 
       status.innerText =
-        data.message || "Erro login";
+        "Erro login";
 
       return;
 
     }
 
-    // ✅ salva sessão
+    // ✅ salva token
     localStorage.setItem(
       "token",
       data.token
     );
 
+    // ✅ salva usuário
     localStorage.setItem(
       "usuario",
       data.user.email
@@ -67,7 +58,7 @@ async function login() {
     status.innerText =
       "Login realizado";
 
-    // ✅ redireciona
+    // ✅ abre IA
     setTimeout(() => {
 
       window.location.href =
@@ -85,37 +76,5 @@ async function login() {
   }
 
 }
-
-// 🔒 VERIFICA SESSÃO
-(function () {
-
-  const token =
-    localStorage.getItem("token");
-
-  const user =
-    localStorage.getItem("usuario");
-
-  // evita bloquear tela login
-  if (
-    window.location.pathname === "/" ||
-    window.location.pathname === "/index.html"
-  ) {
-
-    return;
-
-  }
-
-  // 🚫 sem sessão
-  if (!token || !user) {
-
-    window.location.replace("/");
-
-    return;
-
-  }
-
-  console.log("🛡️ Sistema autenticado OK");
-
-})();
 
 </script>
