@@ -23,17 +23,17 @@ app.post("/login", (req, res) => {
 
   }
 
-  // login simples
+  // LOGIN FIXO TEMPORÁRIO
   if (
-    email === process.env.ADMIN_EMAIL &&
-    password === process.env.ADMIN_PASSWORD
+    email === "admin@admin.com" &&
+    password === "123456"
   ) {
 
     const token = jwt.sign(
 
       { email },
 
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "geoUrban-dev-secret",
 
       {
         expiresIn: "24h"
@@ -59,14 +59,18 @@ app.post("/login", (req, res) => {
 // ROOT
 app.get("/", (req, res) => {
 
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(
+    path.join(__dirname, "public", "index.html")
+  );
 
 });
 
 // IA
 app.get("/ia", (req, res) => {
 
-  res.sendFile(path.join(__dirname, "public", "ia.html"));
+  res.sendFile(
+    path.join(__dirname, "public", "ia.html")
+  );
 
 });
 
@@ -79,7 +83,7 @@ app.get("/health", (req, res) => {
 
 });
 
-// PORTA RENDER
+// PORTA
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
