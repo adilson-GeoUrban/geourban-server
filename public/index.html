@@ -1,25 +1,5 @@
 <script>
 
-// 🔒 VERIFICA SESSÃO
-(function () {
-
-  const token = localStorage.getItem("token");
-
-  const user = localStorage.getItem("usuario");
-
-  // 🚫 sem sessão válida
-  if (!token || !user) {
-
-    window.location.replace("/");
-
-    return;
-
-  }
-
-  console.log("🛡️ Sistema autenticado OK");
-
-})();
-
 // 🔑 LOGIN
 async function login() {
 
@@ -33,6 +13,16 @@ async function login() {
     document.getElementById("status");
 
   status.innerText = "Conectando...";
+
+  // validação
+  if (!email || !password) {
+
+    status.innerText =
+      "Preencha email e senha";
+
+    return;
+
+  }
 
   try {
 
@@ -53,33 +43,35 @@ async function login() {
 
     const data = await res.json();
 
-    // ❌ erro login
+    // ❌ login inválido
     if (!data.success) {
 
-      status.innerText = "Erro login";
+      status.innerText =
+        data.message || "Erro login";
 
       return;
 
     }
 
-    // ✅ salva token
+    // ✅ salva sessão
     localStorage.setItem(
       "token",
       data.token
     );
 
-    // ✅ salva usuário
     localStorage.setItem(
       "usuario",
       data.user.email
     );
 
-    status.innerText = "Login realizado";
+    status.innerText =
+      "Login realizado";
 
     // ✅ redireciona
     setTimeout(() => {
 
-      window.location.href = "/ia.html";
+      window.location.href =
+        "/ia.html";
 
     }, 500);
 
@@ -87,10 +79,43 @@ async function login() {
 
     console.error(e);
 
-    status.innerText = "Erro servidor";
+    status.innerText =
+      "Erro servidor";
 
   }
 
 }
+
+// 🔒 VERIFICA SESSÃO
+(function () {
+
+  const token =
+    localStorage.getItem("token");
+
+  const user =
+    localStorage.getItem("usuario");
+
+  // evita bloquear tela login
+  if (
+    window.location.pathname === "/" ||
+    window.location.pathname === "/index.html"
+  ) {
+
+    return;
+
+  }
+
+  // 🚫 sem sessão
+  if (!token || !user) {
+
+    window.location.replace("/");
+
+    return;
+
+  }
+
+  console.log("🛡️ Sistema autenticado OK");
+
+})();
 
 </script>
