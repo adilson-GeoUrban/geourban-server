@@ -3,7 +3,7 @@ const path = require("path");
 
 const app = express();
 
-// arquivos estáticos (CSS, JS, imagens)
+// permite acessar arquivos HTML, JS, imagens direto
 app.use(express.static(__dirname));
 
 // 🔥 ROTA PRINCIPAL → login
@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
-// dashboard (se existir fluxo depois)
+// dashboard
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
