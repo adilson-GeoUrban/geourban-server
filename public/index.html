@@ -1,178 +1,96 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<script>
 
-<head>
+// 🔒 VERIFICA SESSÃO
+(function () {
 
-  <meta charset="UTF-8">
+  const token = localStorage.getItem("token");
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  const user = localStorage.getItem("usuario");
 
-  <title>GeoUrban Login</title>
+  // 🚫 sem sessão válida
+  if (!token || !user) {
 
-  <style>
+    window.location.replace("/");
 
-    body {
+    return;
 
-      margin: 0;
-      background: #111;
-      color: white;
-      font-family: Arial;
+  }
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  console.log("🛡️ Sistema autenticado OK");
 
-      height: 100vh;
+})();
 
-    }
+// 🔑 LOGIN
+async function login() {
 
-    .box {
+  const email =
+    document.getElementById("email").value.trim();
 
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      width: 320px;
+  const password =
+    document.getElementById("password").value;
 
-    }
+  const status =
+    document.getElementById("status");
 
-    input {
+  status.innerText = "Conectando...";
 
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
+  try {
 
-      border: none;
-      border-radius: 5px;
+    const res = await fetch("/login", {
 
-    }
+      method: "POST",
 
-    button {
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-      width: 100%;
-      padding: 12px;
+      body: JSON.stringify({
+        email,
+        password
+      })
 
-      margin-top: 15px;
+    });
 
-      border: none;
-      border-radius: 5px;
+    const data = await res.json();
 
-      background: #00aa88;
-      color: white;
+    // ❌ erro login
+    if (!data.success) {
 
-      cursor: pointer;
+      status.innerText = "Erro login";
 
-      font-size: 16px;
+      return;
 
     }
 
-    #status {
+    // ✅ salva token
+    localStorage.setItem(
+      "token",
+      data.token
+    );
 
-      margin-top: 15px;
-      text-align: center;
+    // ✅ salva usuário
+    localStorage.setItem(
+      "usuario",
+      data.user.email
+    );
 
-    }
+    status.innerText = "Login realizado";
 
-  </style>
+    // ✅ redireciona
+    setTimeout(() => {
 
-</head>
+      window.location.href = "/ia.html";
 
-<body>
+    }, 500);
 
-  <div class="box">
+  } catch (e) {
 
-    <h2>GeoUrban</h2>
+    console.error(e);
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Email"
-    >
+    status.innerText = "Erro servidor";
 
-    <input
-      type="password"
-      id="password"
-      placeholder="Senha"
-    >
+  }
 
-    <button onclick="login()">
-      Entrar
-    </button>
+}
 
-    <div id="status"></div>
-
-  </div>
-
-  <script>
-
-    async function login() {
-
-      const email =
-        document.getElementById("email").value.trim();
-
-      const password =
-        document.getElementById("password").value;
-
-      const status =
-        document.getElementById("status");
-
-      status.innerText = "Conectando...";
-
-      try {
-
-        const res = await fetch("/login", {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            email,
-            password
-          })
-
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-
-          status.innerText = "Erro login";
-          return;
-
-        }
-
-        localStorage.setItem(
-          "token",
-          data.token
-        );
-
-        localStorage.setItem(
-          "usuario",
-          data.user.email
-        );
-
-        status.innerText = "Login realizado";
-
-        setTimeout(() => {
-
-          window.location.href = "/ia";
-
-        }, 500);
-
-      } catch (e) {
-
-        console.error(e);
-
-        status.innerText = "Erro servidor";
-
-      }
-
-    }
-
-  </script>
-
-</body>
-
-</html>
+</script>
