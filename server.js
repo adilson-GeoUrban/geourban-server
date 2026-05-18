@@ -3,25 +3,27 @@ const path = require("path");
 
 const app = express();
 
-// static
+// 🔥 força servir tudo da raiz SEM confusão
 app.use(express.static(__dirname));
 
-// routes
+// rota principal
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
+// dashboard
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// ia
 app.get("/ia", (req, res) => {
   res.sendFile(path.join(__dirname, "ia.html"));
 });
 
-// 🔥 HEALTH CHECK FORÇADO (CRÍTICO NO RAILWAY)
+// health check
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+  res.status(200).send("ok");
 });
 
 // fallback
@@ -29,12 +31,7 @@ app.use((req, res) => {
   res.redirect("/");
 });
 
-// PORTA RAILWAY
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log("GeoUrban rodando na porta", PORT);
 });
-
-// 🔥 MANTER PROCESSO VIVO (IMPORTANTE NO RAILWAY)
-setInterval(() => {}, 1000 * 60 * 60);
