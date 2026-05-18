@@ -14,6 +14,16 @@ async function login() {
 
   status.innerText = "Conectando...";
 
+  // validação
+  if (!email || !password) {
+
+    status.innerText =
+      "Preencha email e senha";
+
+    return;
+
+  }
+
   try {
 
     const res = await fetch("/login", {
@@ -33,7 +43,7 @@ async function login() {
 
     const data = await res.json();
 
-    // ❌ erro login
+    // ❌ login inválido
     if (!data.success) {
 
       status.innerText =
@@ -58,11 +68,11 @@ async function login() {
     status.innerText =
       "Login realizado";
 
-    // ✅ abre IA
+    // ✅ redireciona
     setTimeout(() => {
 
       window.location.href =
-        "/ia.html";
+        "/ia";
 
     }, 500);
 
