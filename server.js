@@ -1,66 +1,41 @@
-const express = require("express");
-const path = require("path");
-
-const app = express();
-
-// 🔥 força servir tudo da raiz SEM confusão
-app.use(express.static(__dirname));
-
-// rota principal
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "login.html"));
-});
-
-// dashboard
-app.get("/dashboard", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// ia
-app.get("/ia", (req, res) => {
-  res.sendFile(path.join(__dirname, "ia.html"));
-});
-
-// health check
-app.get("/health", (req, res) => {
-  res.status(200).send("ok");
-});
-
-// fallback
-app.use((req, res) => {
-  res.redirect("/");
-});
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("GeoUrban rodando na porta", PORT);
-});
-// GEOURBAN - ROTAS BLINDADAS
-
 const express = require('express');
 const path = require('path');
+
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// FRONTEND ESTÁTICO
+// arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// HEALTHCHECK RAILWAY
+// health
 app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'online',
-    service: 'GeoUrban',
-    server: 'Railway'
-  });
+  res.json({ status: 'ok' });
 });
 
-// ROTA PRINCIPAL
+// login
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// dashboard
+app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// FALLBACK BLINDADO
+// ia
+app.get('/ia', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ia.html'));
+});
+
+// fallback
 app.use((req, res) => {
   res.redirect('/');
+});
+
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`GeoUrban online ${PORT}`);
 });
