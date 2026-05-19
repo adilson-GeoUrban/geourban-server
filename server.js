@@ -6,30 +6,34 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// servir arquivos estáticos da raiz
-app.use(express.static(__dirname));
+// Servir arquivos estáticos da pasta public
+app.use(express.static(path.join(__dirname, 'public')));
 
-// healthcheck Railway
+// Healthcheck Railway
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.status(200).json({ 
+    status: 'online',
+    service: 'GeoUrban',
+    server: 'Railway'
+  });
 });
 
-// rota principal
+// Rota principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// dashboard
+// Dashboard
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // IA
 app.get('/ia', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ia.html'));
+  res.sendFile(path.join(__dirname, 'public', 'ia.html'));
 });
 
-// fallback
+// Fallback - redireciona rotas desconhecidas para home
 app.use((req, res) => {
   res.redirect('/');
 });
