@@ -6,27 +6,27 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+// servir arquivos estáticos da raiz
+app.use(express.static(__dirname));
 
-// health
+// healthcheck Railway
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// login
+// rota principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 // dashboard
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ia
+// IA
 app.get('/ia', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'ia.html'));
+  res.sendFile(path.join(__dirname, 'ia.html'));
 });
 
 // fallback
@@ -37,5 +37,5 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`GeoUrban online ${PORT}`);
+  console.log(`🌍 GeoUrban online na porta ${PORT}`);
 });
