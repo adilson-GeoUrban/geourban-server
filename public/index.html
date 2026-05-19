@@ -1,90 +1,27 @@
-<script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>GeoUrban Teste</title>
+</head>
+<body style="font-family: Arial; text-align:center; margin-top:80px;">
+  <h1>🔍 GeoUrban Teste</h1>
+  <p>Frontend carregado com sucesso</p>
 
-// 🔑 LOGIN
-async function login() {
+  <form action="https://www.google.com/search" method="GET" target="_blank">
+    <input
+      type="text"
+      name="q"
+      placeholder="Pesquisar no Google"
+      style="padding:10px; width:300px;"
+    >
+    <button type="submit" style="padding:10px;">
+      Pesquisar
+    </button>
+  </form>
 
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const status =
-    document.getElementById("status");
-
-  status.innerText = "Conectando...";
-
-  // validação
-  if (!email || !password) {
-
-    status.innerText =
-      "Preencha email e senha";
-
-    return;
-
-  }
-
-  try {
-
-    const res = await fetch("/login", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        email,
-        password
-      })
-
-    });
-
-    const data = await res.json();
-
-    // ❌ login inválido
-    if (!data.success) {
-
-      status.innerText =
-        "Erro login";
-
-      return;
-
-    }
-
-    // ✅ salva token
-    localStorage.setItem(
-      "token",
-      data.token
-    );
-
-    // ✅ salva usuário
-    localStorage.setItem(
-      "usuario",
-      data.user.email
-    );
-
-    status.innerText =
-      "Login realizado";
-
-    // ✅ redireciona
-    setTimeout(() => {
-
-      window.location.href =
-        "/ia";
-
-    }, 500);
-
-  } catch (e) {
-
-    console.error(e);
-
-    status.innerText =
-      "Erro servidor";
-
-  }
-<script src="app.js"></script>
-}
-
-</script>
+  <h2 style="color:green;">
+    LOGIN OK - FRONT FUNCIONANDO
+  </h2>
+</body>
+</html>
