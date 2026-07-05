@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -20,7 +19,7 @@ app.get('/health', (req, res) => {
 });
 
 
-// 🔐 LOGIN API (JWT)
+// 🔐 LOGIN API (VERSÃO ESTÁVEL SEM JWT)
 app.post('/api/login', (req, res) => {
 
   const { email, senha } = req.body;
@@ -37,19 +36,9 @@ app.post('/api/login', (req, res) => {
 
   if (email === adminEmail && senha === adminPassword) {
 
-    const token = jwt.sign(
-      {
-        email: adminEmail,
-        role: 'admin'
-      },
-      process.env.JWT_SECRET || 'geourban_secret',
-      { expiresIn: '1d' }
-    );
-
     return res.status(200).json({
       success: true,
-      message: 'Login autorizado',
-      token
+      message: 'Login autorizado'
     });
   }
 
@@ -82,7 +71,6 @@ app.get('/ia', (req, res) => {
 app.use((req, res) => {
   res.redirect('/');
 });
-
 
 const PORT = process.env.PORT || 8080;
 
