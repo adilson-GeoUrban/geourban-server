@@ -1,159 +1,223 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <title>GeoUrban Control</title>
 
 <style>
-body {
+
+*{
     margin:0;
-    font-family:Arial;
-    background:#0b0f1a;
-    color:#00ffcc;
+    padding:0;
+    box-sizing:border-box;
 }
 
-.topo {
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    color:#fff;
+
+    background-image:url("/bg.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.60);
+    z-index:-1;
+}
+
+.topo{
     background:#111;
-    padding:15px;
+    color:#FFD100;
+    padding:18px;
     text-align:center;
-    font-size:20px;
+    font-size:26px;
+    font-weight:bold;
+    border-bottom:3px solid #FFD100;
 }
 
-.painel {
+.painel{
     display:flex;
+    min-height:calc(100vh - 65px);
 }
 
-.menu {
-    width:200px;
-    background:#111;
-    height:100vh;
-    padding:10px;
+.menu{
+    width:230px;
+    background:rgba(15,15,15,.92);
+    padding:15px;
+    border-right:2px solid #FFD100;
 }
 
-.menu button {
+.menu button{
+
     width:100%;
-    margin:5px 0;
-    padding:10px;
-    background:#00ffcc;
+    margin:8px 0;
+    padding:12px;
+
+    background:#FFD100;
+    color:#000;
+
     border:none;
+    border-radius:8px;
+
+    font-size:15px;
+    font-weight:bold;
     cursor:pointer;
+    transition:.30s;
 }
 
-.conteudo {
+.menu button:hover{
+    background:#ffe45c;
+    transform:scale(1.02);
+}
+
+.conteudo{
     flex:1;
-    padding:20px;
+    padding:30px;
+    font-size:18px;
 }
 
-.monitor {
-    width:250px;
-    background:#111;
-    padding:10px;
-    font-size:12px;
+.monitor{
+    width:260px;
+    background:rgba(15,15,15,.92);
+    border-left:2px solid #FFD100;
+    padding:15px;
 }
 
-.box {
-    border:1px solid #00ffcc;
-    padding:10px;
-    margin-bottom:10px;
+.box{
+
+    background:rgba(0,0,0,.45);
+
+    border:1px solid #FFD100;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    margin-bottom:15px;
+
 }
+
+h3{
+    color:#FFD100;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="topo">🚀 GEOURBAN CONTROLE TOTAL</div>
+<div class="topo">
+🚀 GEOURBAN CONTROLE TOTAL
+</div>
 
 <div class="painel">
 
 <div class="menu">
-<button onclick="login()">Login</button>
-<button onclick="verLogs()">Logs</button>
-<button onclick="verIntel()">Inteligência</button>
+
+<button onclick="login()">🔐 Login</button>
+
+<button onclick="verLogs()">📄 Logs</button>
+
+<button onclick="verIntel()">🧠 Inteligência</button>
+
 </div>
 
 <div class="conteudo" id="conteudo">
-Sistema pronto
+
+<h2>Bem-vindo ao GeoUrban</h2>
+
+<p>Sistema carregado com sucesso.</p>
+
 </div>
 
 <div class="monitor">
+
 <div class="box" id="sessao"></div>
+
 <div class="box" id="status"></div>
+
 <div class="box" id="risco"></div>
+
 </div>
 
 </div>
 
 <script>
-let token = "";
-let risco = 0;
 
-// 👁️ MONITOR
+let token="";
+let risco=0;
+
 setInterval(()=>{
-    document.getElementById("sessao").innerText = "Sessão ativa";
-    document.getElementById("status").innerText = "Status: ONLINE";
-    document.getElementById("risco").innerText = "Risco: " + risco;
+
+document.getElementById("sessao").innerHTML="🟢 Sessão ativa";
+
+document.getElementById("status").innerHTML="Servidor: ONLINE";
+
+document.getElementById("risco").innerHTML="Risco: "+risco;
+
 },1000);
 
-// 🔐 LOGIN
+
+// LOGIN
 async function login(){
-    const res = await fetch("http://localhost:3000/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({user:"admin", pass:"1234"})
-    });
 
-    const data = await res.json();
+const res = await fetch("/api/login",{
 
-    if(res.ok){
-        token = data.token;
-        conteudo.innerHTML = "🔐 Login OK";
-    } else {
-        conteudo.innerHTML = "❌ Falha login";
-    }
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+email:"admin@geourban.com.br",
+
+senha:"1234"
+
+})
+
+});
+
+const data=await res.json();
+
+if(res.ok){
+
+conteudo.innerHTML="<h2>✅ Login realizado</h2>";
+
+}else{
+
+conteudo.innerHTML="<h2>❌ "+data.message+"</h2>";
+
 }
 
-// 📊 LOGS
+}
+
+
+// LOGS
 async function verLogs(){
-    const res = await fetch("http://localhost:3000/logs",{
-        headers:{Authorization: token}
-    });
 
-    if(!res.ok){
-        conteudo.innerHTML = "🚫 Sem acesso";
-        return;
-    }
+conteudo.innerHTML="<h2>📄 Área de Logs</h2><p>Módulo em desenvolvimento.</p>";
 
-    const data = await res.json();
-
-    let html = "<h3>Logs</h3>";
-    data.forEach(l=>{
-        html += "<p>"+l.tipo+" | "+l.msg+"</p>";
-    });
-
-    conteudo.innerHTML = html;
 }
 
-// 🧠 INTEL
+
+// IA
 async function verIntel(){
-    const res = await fetch("http://localhost:3000/intel",{
-        headers:{Authorization: token}
-    });
 
-    if(!res.ok){
-        conteudo.innerHTML = "🚫 Sem acesso";
-        return;
-    }
+conteudo.innerHTML="<h2>🧠 Inteligência Artificial</h2><p>Módulo em desenvolvimento.</p>";
 
-    const data = await res.json();
+risco=0;
 
-    let html = "<h3>Inteligência</h3>";
-    for(let ip in data){
-        html += "<p>"+ip+" | risco: "+data[ip].risco+"</p>";
-        risco = data[ip].risco;
-    }
-
-    conteudo.innerHTML = html;
 }
+
 </script>
 
 </body>
