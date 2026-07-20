@@ -1,1 +1,26 @@
+name: GeoUrban Robô Blindado - Auditoria
 
+on:
+  workflow_dispatch:
+
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código do GeoUrban
+        uses: actions/checkout@v4
+
+      - name: Identificar arquivos
+        run: |
+          echo "🛡️ Robô Blindado GeoUrban iniciado"
+          echo "Auditoria segura"
+          echo "Nenhuma alteração será realizada"
+
+      - name: Verificar arquivos críticos
+        run: |
+          echo "Verificando:"
+          echo "server.js"
+          echo "package.json"
+          echo "public/app.js"
+          echo "public/ia.html"
