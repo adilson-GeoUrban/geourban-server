@@ -1,1 +1,80 @@
+name: 🔍 GeoUrban Auditoria Blindada
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auditoria:
+    name: Auditoria Técnica GeoUrban
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: 📥 Baixar código atual
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🧾 Registrar informações do projeto
+        run: |
+          mkdir -p auditoria-geourban
+
+          echo "GEOURBAN - RELATÓRIO DE AUDITORIA" > auditoria-geourban/relatorio.txt
+          echo "" >> auditoria-geourban/relatorio.txt
+
+          echo "Data da auditoria:" >> auditoria-geourban/relatorio.txt
+          date >> auditoria-geourban/relatorio.txt
+
+          echo "" >> auditoria-geourban/relatorio.txt
+          echo "Commit analisado:" >> auditoria-geourban/relatorio.txt
+          git rev-parse HEAD >> auditoria-geourban/relatorio.txt
+
+      - name: 📂 Verificar estrutura do projeto
+        run: |
+          echo "ESTRUTURA DO PROJETO" > auditoria-geourban/estrutura.txt
+          find . -maxdepth 2 -type f | sort >> auditoria-geourban/estrutura.txt
+
+      - name: 🔎 Verificar arquivos críticos
+        run: |
+          echo "ARQUIVOS IMPORTANTES" > auditoria-geourban/arquivos-criticos.txt
+
+          for arquivo in \
+          server.js \
+          package.json \
+          public/index.html \
+          public/login.html \
+          public/dashboard.html
+          do
+            if [ -f "$arquivo" ]; then
+              echo "OK - encontrado: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
+            else
+              echo "ATENÇÃO - não encontrado: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
+            fi
+          done
+
+      - name: 📦 Verificar dependências
+        run: |
+          echo "PACKAGE.JSON" > auditoria-geourban/dependencias.txt
+
+          if [ -f package.json ]; then
+            cat package.json >> auditoria-geourban/dependencias.txt
+          else
+            echo "package.json não encontrado" >> auditoria-geourban/dependencias.txt
+          fi
+
+      - name: 📊 Salvar relatório da auditoria
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoUrban-Auditoria-Blindada
+          path: auditoria-geourban/
+
+      - name: ✅ Finalização
+        run: |
+          echo "================================="
+          echo "🔍 AUDITORIA GEOURBAN CONCLUÍDA"
+          echo "Relatório salvo como artefato"
+          echo "Nenhuma alteração realizada"
+          echo "================================="
