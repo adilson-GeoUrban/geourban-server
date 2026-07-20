@@ -3,6 +3,9 @@ name: GeoUrban Robô Blindado - Auditoria Frontend
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   auditoria-frontend:
     runs-on: ubuntu-latest
@@ -19,21 +22,24 @@ jobs:
           echo "MISSÃO 01 - AUDITORIA FRONTEND"
           echo "================================="
 
-      - name: Verificar arquivos
+      - name: Verificar arquivos críticos
         run: |
           echo "Analisando arquivos..."
 
-          if [ -f public/app.js ]; then
-            echo "✅ Encontrado: public/app.js"
-          else
-            echo "❌ Não encontrado: public/app.js"
-          fi
-
-          if [ -f public/ia.html ]; then
-            echo "✅ Encontrado: public/ia.html"
-          else
-            echo "❌ Não encontrado: public/ia.html"
-          fi
+          for arquivo in \
+            public/app.js \
+            public/ia.html \
+            public/login.html \
+            public/dashboard.html \
+            server.js \
+            package.json
+          do
+            if [ -f "$arquivo" ]; then
+              echo "✅ Encontrado: $arquivo"
+            else
+              echo "❌ Não encontrado: $arquivo"
+            fi
+          done
 
       - name: Procurar código legado JWT
         run: |
@@ -41,7 +47,8 @@ jobs:
 
           grep -n "token" public/app.js || true
           grep -n "localStorage" public/app.js || true
-          grep -n "/login" public/app.js || true
+          grep -n "jsonwebtoken" server.js || true
+          grep -n "jwt" server.js || true
 
       - name: Verificar compatibilidade API
         run: |
@@ -49,6 +56,7 @@ jobs:
 
           grep -n "/api/login" public/login.html || true
           grep -n "/login" public/app.js || true
+          grep -n "POST" server.js || true
 
       - name: Gerar relatório final
         run: |
@@ -57,4 +65,5 @@ jobs:
           echo "================================="
           echo "Auditoria concluída."
           echo "Nenhuma alteração realizada."
+          echo "Modo somente leitura ativo."
           echo "Aguardando autorização."
