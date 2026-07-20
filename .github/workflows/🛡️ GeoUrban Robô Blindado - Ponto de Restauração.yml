@@ -1,1 +1,71 @@
+name: 🛡️ GeoUrban Backup Restauração - Ponto Seguro
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup-restauracao:
+    name: Criar Ponto de Restauração Seguro
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: 📥 Baixar código atual
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔎 Registrar commit atual
+        id: commit
+        run: |
+          COMMIT=$(git rev-parse HEAD)
+          DATA=$(date +"%Y-%m-%d_%H-%M-%S")
+
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          echo "data=$DATA" >> $GITHUB_OUTPUT
+
+          echo "Commit protegido:"
+          echo $COMMIT
+
+      - name: 🛡️ Criar identificação do ponto de restauração
+        run: |
+          mkdir -p backup-restauracao
+
+          cat <<EOF > backup-restauracao/ponto-restauracao.txt
+          GEOURBAN - PONTO DE RESTAURAÇÃO
+
+          Data:
+          ${{ steps.commit.outputs.data }}
+
+          Commit protegido:
+          ${{ steps.commit.outputs.commit }}
+
+          Objetivo:
+          Preservar estado funcional anterior às próximas alterações.
+
+          Este ponto permite auditoria e recuperação.
+          EOF
+
+      - name: 📊 Gerar relatório de segurança
+        run: |
+          git log -1 --pretty=format:"Commit: %H%nAutor: %an%nData: %ad%nMensagem: %s" > backup-restauracao/relatorio-commit.txt
+
+          echo "Arquivos monitorados:"
+          find . -maxdepth 2 -type f | sort >> backup-restauracao/relatorio-arquivos.txt
+
+      - name: 📦 Salvar artefato do backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeoUrban-Ponto-Restauracao-${{ steps.commit.outputs.data }}
+          path: backup-restauracao/
+
+      - name: ✅ Confirmar proteção criada
+        run: |
+          echo "================================="
+          echo "🛡️ PONTO DE RESTAURAÇÃO CRIADO"
+          echo "Commit protegido:"
+          echo "${{ steps.commit.outputs.commit }}"
+          echo "================================="
