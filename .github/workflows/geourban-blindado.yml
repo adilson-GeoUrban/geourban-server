@@ -1,26 +1,60 @@
-name: GeoUrban Robô Blindado - Auditoria
+name: GeoUrban Robô Blindado - Auditoria Frontend
 
 on:
   workflow_dispatch:
 
 jobs:
-  auditoria:
+  auditoria-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar código do GeoUrban
+
+      - name: Baixar código GeoUrban
         uses: actions/checkout@v4
 
-      - name: Identificar arquivos
+      - name: Iniciar Auditoria
         run: |
-          echo "🛡️ Robô Blindado GeoUrban iniciado"
-          echo "Auditoria segura"
-          echo "Nenhuma alteração será realizada"
+          echo "================================="
+          echo "🛡️ ROBÔ BLINDADO GEOURBAN"
+          echo "MISSÃO 01 - AUDITORIA FRONTEND"
+          echo "================================="
 
-      - name: Verificar arquivos críticos
+      - name: Verificar arquivos
         run: |
-          echo "Verificando:"
-          echo "server.js"
-          echo "package.json"
-          echo "public/app.js"
-          echo "public/ia.html"
+          echo "Analisando arquivos..."
+
+          if [ -f public/app.js ]; then
+            echo "✅ Encontrado: public/app.js"
+          else
+            echo "❌ Não encontrado: public/app.js"
+          fi
+
+          if [ -f public/ia.html ]; then
+            echo "✅ Encontrado: public/ia.html"
+          else
+            echo "❌ Não encontrado: public/ia.html"
+          fi
+
+      - name: Procurar código legado JWT
+        run: |
+          echo "Analisando possíveis restos de autenticação antiga..."
+
+          grep -n "token" public/app.js || true
+          grep -n "localStorage" public/app.js || true
+          grep -n "/login" public/app.js || true
+
+      - name: Verificar compatibilidade API
+        run: |
+          echo "Comparando chamadas de login..."
+
+          grep -n "/api/login" public/login.html || true
+          grep -n "/login" public/app.js || true
+
+      - name: Gerar relatório final
+        run: |
+          echo "================================="
+          echo "RELATÓRIO FINAL"
+          echo "================================="
+          echo "Auditoria concluída."
+          echo "Nenhuma alteração realizada."
+          echo "Aguardando autorização."
