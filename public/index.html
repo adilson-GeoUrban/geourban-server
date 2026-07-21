@@ -121,8 +121,6 @@ h3{
 
 <div class="menu">
 
-<button onclick="login()">🔐 Login</button>
-
 <button onclick="verLogs()">📄 Logs</button>
 
 <button onclick="verIntel()">🧠 Inteligência</button>
@@ -163,42 +161,6 @@ document.getElementById("status").innerHTML="Servidor: ONLINE";
 document.getElementById("risco").innerHTML="Risco: "+risco;
 
 },1000);
-
-
-// LOGIN
-async function login(){
-
-const res = await fetch("/api/login",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-email:"admin@geourban.com.br",
-
-senha:"1234"
-
-})
-
-});
-
-const data=await res.json();
-
-if(res.ok){
-
-conteudo.innerHTML="<h2>✅ Login realizado</h2>";
-
-}else{
-
-conteudo.innerHTML="<h2>❌ "+data.message+"</h2>";
-
-}
-
-}
 
 
 // LOGS
