@@ -1,5 +1,5 @@
 ```yaml
-name: 🛡️ GeoUrban Controlador - Auditoria 360°
+name: GeoUrban Auditoria 360
 
 on:
   workflow_dispatch:
@@ -8,272 +8,60 @@ permissions:
   contents: read
 
 jobs:
-  auditoria-360:
-    name: 🤖 Auditoria Completa GeoUrban
+  auditoria:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Baixar código GeoUrban
+      - name: Baixar repositorio
         uses: actions/checkout@v4
 
-      - name: 🧭 Identificar ambiente
+      - name: Testar controlador
         run: |
-          echo "=============================================="
-          echo "🛡️ GEOURBAN CONTROLADOR"
-          echo "MISSÃO: AUDITORIA 360°"
-          echo "MODO: SOMENTE LEITURA"
-          echo "=============================================="
-          echo "Commit: $(git rev-parse HEAD)"
-          echo "Branch: $(git branch --show-current)"
-          echo "Data: $(date)"
+          echo "======================================"
+          echo "GEOURBAN CONTROLADOR"
+          echo "AUDITORIA 360"
+          echo "MODO SOMENTE LEITURA"
+          echo "======================================"
+          echo "Commit:"
+          git rev-parse HEAD
+          echo "Branch:"
+          git branch --show-current
+          echo "Data:"
+          date
 
-      - name: 📦 Inventário do repositório
+      - name: Verificar arquivos
+        run: |
+          echo "Arquivos principais:"
+          [ -f server.js ] && echo "OK - server.js" || echo "AUSENTE - server.js"
+          [ -f package.json ] && echo "OK - package.json" || echo "AUSENTE - package.json"
+          [ -d public ] && echo "OK - public" || echo "AUSENTE - public"
+          [ -d .github/workflows ] && echo "OK - workflows" || echo "AUSENTE - workflows"
+
+      - name: Criar relatorio
         run: |
           mkdir -p auditoria-geourban
 
-          find . \
-            -type f \
-            -not -path "./.git/*" \
-            | sort \
-            > auditoria-geourban/inventario-arquivos.txt
+          echo "GEOURBAN AUDITORIA 360" > auditoria-geourban/relatorio.txt
+          echo "" >> auditoria-geourban/relatorio.txt
+          echo "Commit:" >> auditoria-geourban/relatorio.txt
+          git rev-parse HEAD >> auditoria-geourban/relatorio.txt
+          echo "" >> auditoria-geourban/relatorio.txt
+          echo "Arquivos:" >> auditoria-geourban/relatorio.txt
+          find . -maxdepth 3 -type f -not -path "./.git/*" | sort >> auditoria-geourban/relatorio.txt
 
-          echo "Inventário criado:"
-          cat auditoria-geourban/inventario-arquivos.txt
+          cat auditoria-geourban/relatorio.txt
 
-      - name: 🦴 Analisar estrutura
-        run: |
-          find . \
-            -maxdepth 4 \
-            -type d \
-            -not -path "./.git*" \
-            | sort \
-            | tee auditoria-geourban/estrutura-diretorios.txt
-
-      - name: 🔎 Verificar arquivos críticos
-        run: |
-          arquivos=(
-            "server.js"
-            "package.json"
-            "package-lock.json"
-            "public/login.html"
-            "public/index.html"
-            "public/dashboard.html"
-            "public/ia.html"
-            "public/app.js"
-            "app/frontend"
-            "src"
-            ".github/workflows"
-          )
-
-          for arquivo in "${arquivos[@]}"; do
-            if [ -e "$arquivo" ]; then
-              echo "✅ EXISTE: $arquivo"
-              echo "✅ EXISTE: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
-            else
-              echo "❌ AUSENTE: $arquivo"
-              echo "❌ AUSENTE: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
-            fi
-          done
-
-      - name: 📦 Auditar dependências
-        run: |
-          if [ -f package.json ]; then
-            cat package.json | tee auditoria-geourban/package-json.txt
-          else
-            echo "❌ package.json não encontrado" \
-              | tee auditoria-geourban/package-json.txt
-          fi
-
-      - name: 🔐 Auditar autenticação e sessão
-        run: |
-          {
-            echo "=== TOKEN ==="
-            grep -Rni "token" public src app 2>/dev/null || true
-
-            echo ""
-            echo "=== LOCALSTORAGE ==="
-            grep -Rni "localStorage" public src app 2>/dev/null || true
-
-            echo ""
-            echo "=== SESSIONSTORAGE ==="
-            grep -Rni "sessionStorage" public src app 2>/dev/null || true
-
-            echo ""
-            echo "=== JWT ==="
-            grep -RniE "jsonwebtoken|jwt|JWT" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-
-            echo ""
-            echo "=== LOGIN ==="
-            grep -RniE "/api/login|/login" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-          } | tee auditoria-geourban/autenticacao-sessao.txt
-
-      - name: 🌐 Auditar rotas
-        run: |
-          grep -RniE \
-            "app\.(get|post|put|patch|delete)" \
-            . \
-            --exclude-dir=.git \
-            2>/dev/null \
-            | tee auditoria-geourban/rotas.txt || true
-
-      - name: 🛡️ Auditar segurança
-        run: |
-          {
-            echo "=== HELMET ==="
-            grep -Rni "helmet" . --exclude-dir=.git 2>/dev/null || true
-
-            echo ""
-            echo "=== CORS ==="
-            grep -Rni "cors" . --exclude-dir=.git 2>/dev/null || true
-
-            echo ""
-            echo "=== RATE LIMIT ==="
-            grep -RniE "rate.?limit|rateLimit" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-
-            echo ""
-            echo "=== PASSWORD ==="
-            grep -RniE "password|senha|ADMIN_PASSWORD" . \
-              --exclude-dir=.git \
-              --exclude="package-lock.json" \
-              2>/dev/null || true
-
-            echo ""
-            echo "=== SECRET ==="
-            grep -RniE "secret|SECRET|API_KEY|PRIVATE_KEY" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-          } | tee auditoria-geourban/seguranca.txt
-
-      - name: 🤖 Auditar workflows
-        run: |
-          find .github \
-            -type f \
-            2>/dev/null \
-            | sort \
-            | tee auditoria-geourban/workflows-lista.txt
-
-          {
-            while IFS= read -r arquivo; do
-              echo ""
-              echo "----------------------------------------------"
-              echo "ARQUIVO: $arquivo"
-              echo "----------------------------------------------"
-              cat "$arquivo"
-            done < auditoria-geourban/workflows-lista.txt
-          } | tee auditoria-geourban/workflows-conteudo.txt
-
-      - name: 🚨 Detectar anomalias de workflows
-        run: |
-          {
-            echo "=== TODOS OS ARQUIVOS .GITHUB ==="
-            find .github -type f 2>/dev/null | sort
-
-            echo ""
-            echo "=== DIRETÓRIOS WORKFLOWS ==="
-            find .github \
-              -type d \
-              -name workflows \
-              2>/dev/null \
-              | sort
-
-            echo ""
-            echo "=== ARQUIVOS YAML ==="
-            find .github \
-              -type f \
-              \( -name "*.yml" -o -name "*.yaml" \) \
-              2>/dev/null \
-              | sort
-          } | tee auditoria-geourban/workflows-anomalias.txt
-
-      - name: 🧹 Procurar código legado
-        run: |
-          {
-            echo "=== JWT ==="
-            grep -RniE "jsonwebtoken|jwt" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-
-            echo ""
-            echo "=== LOGIN ANTIGO ==="
-            grep -RniE "function login|fetch.*\/login" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-
-            echo ""
-            echo "=== TOKEN LOCAL ==="
-            grep -Rni "localStorage.*token" . \
-              --exclude-dir=.git \
-              2>/dev/null || true
-          } | tee auditoria-geourban/codigo-legado.txt
-
-      - name: ❤️ Verificar estrutura mínima
-        run: |
-          {
-            echo "Servidor:"
-            [ -f server.js ] \
-              && echo "🟢 server.js encontrado" \
-              || echo "🔴 server.js ausente"
-
-            echo ""
-            echo "Package:"
-            [ -f package.json ] \
-              && echo "🟢 package.json encontrado" \
-              || echo "🔴 package.json ausente"
-
-            echo ""
-            echo "Public:"
-            [ -d public ] \
-              && echo "🟢 public encontrado" \
-              || echo "🔴 public ausente"
-
-            echo ""
-            echo "Workflows:"
-            [ -d .github/workflows ] \
-              && echo "🟢 workflows encontrado" \
-              || echo "🔴 workflows ausente"
-          } | tee auditoria-geourban/health-estrutural.txt
-
-      - name: 📊 Gerar relatório final
-        run: |
-          {
-            echo "GEOURBAN — AUDITORIA 360°"
-            echo ""
-            echo "Commit: $(git rev-parse HEAD)"
-            echo "Branch: $(git branch --show-current)"
-            echo "Data: $(date)"
-            echo ""
-            echo "=============================================="
-            echo "MODO SOMENTE LEITURA"
-            echo "=============================================="
-            echo ""
-            echo "Nenhuma alteração foi realizada."
-            echo "Nenhum deploy foi realizado."
-            echo "Nenhum merge foi realizado."
-            echo ""
-            echo "Relatórios:"
-            find auditoria-geourban -type f | sort
-          } | tee auditoria-geourban/RELATORIO-FINAL.txt
-
-      - name: 📦 Salvar relatório da auditoria
+      - name: Salvar relatorio
         uses: actions/upload-artifact@v4
         with:
-          name: GeoUrban-Auditoria-360-${{ github.run_number }}
-          path: auditoria-geourban/
+          name: GeoUrban-Auditoria-360
+          path: auditoria-geourban
 
-      - name: 🛑 Encerrar em modo seguro
+      - name: Finalizar
         run: |
-          echo "=============================================="
-          echo "🛡️ AUDITORIA GEOURBAN CONCLUÍDA"
-          echo "=============================================="
-          echo "Modo: SOMENTE LEITURA"
-          echo "Alterações: NENHUMA"
-          echo "Deploy: NÃO REALIZADO"
-          echo "Merge: NÃO REALIZADO"
-          echo "Aguardando análise e autorização humana."
+          echo "======================================"
+          echo "AUDITORIA CONCLUIDA"
+          echo "NENHUMA ALTERACAO REALIZADA"
+          echo "NENHUM DEPLOY REALIZADO"
+          echo "======================================"
 ```
