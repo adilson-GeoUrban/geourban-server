@@ -8,23 +8,13 @@ permissions:
   contents: read
 
 jobs:
-
   auditoria-360:
     name: 🤖 Auditoria Completa GeoUrban
     runs-on: ubuntu-latest
 
     steps:
-
-      # ==========================================================
-      # 1. BAIXAR REPOSITÓRIO
-      # ==========================================================
-
       - name: 📥 Baixar código GeoUrban
         uses: actions/checkout@v4
-
-      # ==========================================================
-      # 2. IDENTIFICAÇÃO
-      # ==========================================================
 
       - name: 🧭 Identificar ambiente
         run: |
@@ -33,27 +23,13 @@ jobs:
           echo "MISSÃO: AUDITORIA 360°"
           echo "MODO: SOMENTE LEITURA"
           echo "=============================================="
-
-          echo "Commit:"
-          git rev-parse HEAD
-
-          echo "Branch:"
-          git branch --show-current
-
-          echo "Data:"
-          date
-
-      # ==========================================================
-      # 3. INVENTÁRIO COMPLETO
-      # ==========================================================
+          echo "Commit: $(git rev-parse HEAD)"
+          echo "Branch: $(git branch --show-current)"
+          echo "Data: $(date)"
 
       - name: 📦 Inventário do repositório
         run: |
           mkdir -p auditoria-geourban
-
-          echo "=============================================="
-          echo "📦 INVENTÁRIO DO REPOSITÓRIO"
-          echo "=============================================="
 
           find . \
             -type f \
@@ -61,18 +37,11 @@ jobs:
             | sort \
             > auditoria-geourban/inventario-arquivos.txt
 
+          echo "Inventário criado:"
           cat auditoria-geourban/inventario-arquivos.txt
-
-      # ==========================================================
-      # 4. ESTRUTURA DE DIRETÓRIOS
-      # ==========================================================
 
       - name: 🦴 Analisar estrutura
         run: |
-          echo "=============================================="
-          echo "🦴 ESTRUTURA DO PROJETO"
-          echo "=============================================="
-
           find . \
             -maxdepth 4 \
             -type d \
@@ -80,16 +49,8 @@ jobs:
             | sort \
             | tee auditoria-geourban/estrutura-diretorios.txt
 
-      # ==========================================================
-      # 5. ARQUIVOS CRÍTICOS
-      # ==========================================================
-
       - name: 🔎 Verificar arquivos críticos
         run: |
-          echo "=============================================="
-          echo "🔎 ARQUIVOS CRÍTICOS"
-          echo "=============================================="
-
           arquivos=(
             "server.js"
             "package.json"
@@ -105,7 +66,6 @@ jobs:
           )
 
           for arquivo in "${arquivos[@]}"; do
-
             if [ -e "$arquivo" ]; then
               echo "✅ EXISTE: $arquivo"
               echo "✅ EXISTE: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
@@ -113,41 +73,19 @@ jobs:
               echo "❌ AUSENTE: $arquivo"
               echo "❌ AUSENTE: $arquivo" >> auditoria-geourban/arquivos-criticos.txt
             fi
-
           done
-
-      # ==========================================================
-      # 6. PACKAGE.JSON
-      # ==========================================================
 
       - name: 📦 Auditar dependências
         run: |
-          echo "=============================================="
-          echo "📦 DEPENDÊNCIAS"
-          echo "=============================================="
-
           if [ -f package.json ]; then
-
-            cat package.json \
-              | tee auditoria-geourban/package-json.txt
-
+            cat package.json | tee auditoria-geourban/package-json.txt
           else
-
             echo "❌ package.json não encontrado" \
               | tee auditoria-geourban/package-json.txt
-
           fi
-
-      # ==========================================================
-      # 7. AUTENTICAÇÃO E SESSÃO
-      # ==========================================================
 
       - name: 🔐 Auditar autenticação e sessão
         run: |
-          echo "=============================================="
-          echo "🔐 AUTENTICAÇÃO E SESSÃO"
-          echo "=============================================="
-
           {
             echo "=== TOKEN ==="
             grep -Rni "token" public src app 2>/dev/null || true
@@ -171,19 +109,10 @@ jobs:
             grep -RniE "/api/login|/login" . \
               --exclude-dir=.git \
               2>/dev/null || true
-
           } | tee auditoria-geourban/autenticacao-sessao.txt
-
-      # ==========================================================
-      # 8. ROTAS DO SERVIDOR
-      # ==========================================================
 
       - name: 🌐 Auditar rotas
         run: |
-          echo "=============================================="
-          echo "🌐 ROTAS"
-          echo "=============================================="
-
           grep -RniE \
             "app\.(get|post|put|patch|delete)" \
             . \
@@ -191,16 +120,8 @@ jobs:
             2>/dev/null \
             | tee auditoria-geourban/rotas.txt || true
 
-      # ==========================================================
-      # 9. SEGURANÇA
-      # ==========================================================
-
       - name: 🛡️ Auditar segurança
         run: |
-          echo "=============================================="
-          echo "🛡️ SEGURANÇA"
-          echo "=============================================="
-
           {
             echo "=== HELMET ==="
             grep -Rni "helmet" . --exclude-dir=.git 2>/dev/null || true
@@ -227,81 +148,51 @@ jobs:
             grep -RniE "secret|SECRET|API_KEY|PRIVATE_KEY" . \
               --exclude-dir=.git \
               2>/dev/null || true
-
           } | tee auditoria-geourban/seguranca.txt
-
-      # ==========================================================
-      # 10. WORKFLOWS
-      # ==========================================================
 
       - name: 🤖 Auditar workflows
         run: |
-          echo "=============================================="
-          echo "🤖 WORKFLOWS GITHUB ACTIONS"
-          echo "=============================================="
-
           find .github \
             -type f \
             2>/dev/null \
             | sort \
             | tee auditoria-geourban/workflows-lista.txt
 
-          echo ""
-          echo "=== CONTEÚDO DOS WORKFLOWS ==="
-
-          while IFS= read -r arquivo; do
-
-            echo ""
-            echo "----------------------------------------------"
-            echo "ARQUIVO: $arquivo"
-            echo "----------------------------------------------"
-
-            cat "$arquivo"
-
-          done < auditoria-geourban/workflows-lista.txt \
-            | tee auditoria-geourban/workflows-conteudo.txt
-
-      # ==========================================================
-      # 11. DETECTAR ESTRUTURA DUPLICADA DE WORKFLOWS
-      # ==========================================================
-
-      - name: 🚨 Detectar workflows fora do padrão
-        run: |
-          echo "=============================================="
-          echo "🚨 VERIFICAÇÃO DE WORKFLOWS"
-          echo "=============================================="
-
           {
-            echo "Arquivos encontrados dentro de .github:"
+            while IFS= read -r arquivo; do
+              echo ""
+              echo "----------------------------------------------"
+              echo "ARQUIVO: $arquivo"
+              echo "----------------------------------------------"
+              cat "$arquivo"
+            done < auditoria-geourban/workflows-lista.txt
+          } | tee auditoria-geourban/workflows-conteudo.txt
+
+      - name: 🚨 Detectar anomalias de workflows
+        run: |
+          {
+            echo "=== TODOS OS ARQUIVOS .GITHUB ==="
             find .github -type f 2>/dev/null | sort
 
             echo ""
-            echo "Possíveis caminhos duplicados:"
-            find .github -type d \
-              -path "*/.github/workflows" \
+            echo "=== DIRETÓRIOS WORKFLOWS ==="
+            find .github \
+              -type d \
+              -name workflows \
               2>/dev/null \
               | sort
 
             echo ""
-            echo "Arquivos YAML:"
+            echo "=== ARQUIVOS YAML ==="
             find .github \
               -type f \
               \( -name "*.yml" -o -name "*.yaml" \) \
               2>/dev/null \
               | sort
-
           } | tee auditoria-geourban/workflows-anomalias.txt
-
-      # ==========================================================
-      # 12. CÓDIGO LEGADO
-      # ==========================================================
 
       - name: 🧹 Procurar código legado
         run: |
-          echo "=============================================="
-          echo "🧹 CÓDIGO LEGADO"
-          echo "=============================================="
-
           {
             echo "=== JWT ==="
             grep -RniE "jsonwebtoken|jwt" . \
@@ -310,7 +201,7 @@ jobs:
 
             echo ""
             echo "=== LOGIN ANTIGO ==="
-            grep -RniE "function login|fetch\\(\"/login\"|fetch\\('/login'" . \
+            grep -RniE "function login|fetch.*\/login" . \
               --exclude-dir=.git \
               2>/dev/null || true
 
@@ -319,58 +210,43 @@ jobs:
             grep -Rni "localStorage.*token" . \
               --exclude-dir=.git \
               2>/dev/null || true
-
           } | tee auditoria-geourban/codigo-legado.txt
-
-      # ==========================================================
-      # 13. HEALTH CHECK DA ESTRUTURA
-      # ==========================================================
 
       - name: ❤️ Verificar estrutura mínima
         run: |
-          echo "=============================================="
-          echo "❤️ HEALTH CHECK ESTRUTURAL"
-          echo "=============================================="
-
           {
             echo "Servidor:"
-            [ -f server.js ] && echo "🟢 server.js encontrado" || echo "🔴 server.js ausente"
+            [ -f server.js ] \
+              && echo "🟢 server.js encontrado" \
+              || echo "🔴 server.js ausente"
 
             echo ""
             echo "Package:"
-            [ -f package.json ] && echo "🟢 package.json encontrado" || echo "🔴 package.json ausente"
+            [ -f package.json ] \
+              && echo "🟢 package.json encontrado" \
+              || echo "🔴 package.json ausente"
 
             echo ""
             echo "Public:"
-            [ -d public ] && echo "🟢 public encontrado" || echo "🔴 public ausente"
+            [ -d public ] \
+              && echo "🟢 public encontrado" \
+              || echo "🔴 public ausente"
 
             echo ""
             echo "Workflows:"
-            [ -d .github/workflows ] && echo "🟢 workflows encontrado" || echo "🔴 workflows ausente"
-
+            [ -d .github/workflows ] \
+              && echo "🟢 workflows encontrado" \
+              || echo "🔴 workflows ausente"
           } | tee auditoria-geourban/health-estrutural.txt
-
-      # ==========================================================
-      # 14. RELATÓRIO FINAL
-      # ==========================================================
 
       - name: 📊 Gerar relatório final
         run: |
-          echo "=============================================="
-          echo "📊 GEOURBAN — RELATÓRIO DE AUDITORIA 360°"
-          echo "=============================================="
-
           {
             echo "GEOURBAN — AUDITORIA 360°"
             echo ""
-            echo "Commit:"
-            git rev-parse HEAD
-            echo ""
-            echo "Branch:"
-            git branch --show-current
-            echo ""
-            echo "Data:"
-            date
+            echo "Commit: $(git rev-parse HEAD)"
+            echo "Branch: $(git branch --show-current)"
+            echo "Data: $(date)"
             echo ""
             echo "=============================================="
             echo "MODO SOMENTE LEITURA"
@@ -380,14 +256,9 @@ jobs:
             echo "Nenhum deploy foi realizado."
             echo "Nenhum merge foi realizado."
             echo ""
-            echo "Relatórios disponíveis:"
+            echo "Relatórios:"
             find auditoria-geourban -type f | sort
-
           } | tee auditoria-geourban/RELATORIO-FINAL.txt
-
-      # ==========================================================
-      # 15. SALVAR RELATÓRIO COMO ARTEFATO
-      # ==========================================================
 
       - name: 📦 Salvar relatório da auditoria
         uses: actions/upload-artifact@v4
@@ -395,22 +266,14 @@ jobs:
           name: GeoUrban-Auditoria-360-${{ github.run_number }}
           path: auditoria-geourban/
 
-      # ==========================================================
-      # 16. FINALIZAÇÃO
-      # ==========================================================
-
       - name: 🛑 Encerrar em modo seguro
         run: |
           echo "=============================================="
           echo "🛡️ AUDITORIA GEOURBAN CONCLUÍDA"
           echo "=============================================="
-          echo ""
           echo "Modo: SOMENTE LEITURA"
           echo "Alterações: NENHUMA"
           echo "Deploy: NÃO REALIZADO"
           echo "Merge: NÃO REALIZADO"
-          echo ""
-          echo "O GeoUrban permanece protegido."
           echo "Aguardando análise e autorização humana."
-          echo "=============================================="
 ```
