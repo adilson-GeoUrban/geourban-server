@@ -18,54 +18,224 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🔎 Registrar commit atual
-        id: commit
+      - name: 🔎 Registrar estado atual
+        id: estado
+        shell: bash
         run: |
+          set -euo pipefail
+
           COMMIT=$(git rev-parse HEAD)
-          DATA=$(date +"%Y-%m-%d_%H-%M-%S")
+          BRANCH=$(git branch --show-current || true)
+          DATA=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
 
-          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
-          echo "data=$DATA" >> $GITHUB_OUTPUT
+          if [ -z "$BRANCH" ]; then
+            BRANCH="detached"
+          fi
 
-          echo "Commit protegido:"
-          echo $COMMIT
+          echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "data=$DATA" >> "$GITHUB_OUTPUT"
 
-      - name: 🛡️ Criar identificação do ponto de restauração
+          echo "================================="
+          echo "🛡️ GEOURBAN - ESTADO PROTEGIDO"
+          echo "================================="
+          echo "Commit: $COMMIT"
+          echo "Branch: $BRANCH"
+          echo "Data UTC: $DATA"
+          echo "================================="
+
+      - name: 🛡️ Preparar área de restauração
+        shell: bash
         run: |
+          set -euo pipefail
+
+          rm -rf backup-restauracao
           mkdir -p backup-restauracao
 
-          cat <<EOF > backup-restauracao/ponto-restauracao.txt
-          GEOURBAN - PONTO DE RESTAURAÇÃO
+      - name: 📋 Criar manifesto do ponto de restauração
+        shell: bash
+        run: |
+          set -euo pipefail
 
-          Data:
-          ${{ steps.commit.outputs.data }}
+          cat > backup-restauracao/ponto-restauracao.txt <<EOF
+          GEOURBAN - PONTO DE RESTAURAÇÃO SEGURO
+
+          Data UTC:
+          ${{ steps.estado.outputs.data }}
 
           Commit protegido:
-          ${{ steps.commit.outputs.commit }}
+          ${{ steps.estado.outputs.commit }}
+
+          Branch:
+          ${{ steps.estado.outputs.branch }}
+
+          Repositório:
+          $GITHUB_REPOSITORY
+
+          Workflow:
+          $GITHUB_WORKFLOW
+
+          Run ID:
+          $GITHUB_RUN_ID
 
           Objetivo:
-          Preservar estado funcional anterior às próximas alterações.
+          Preservar o estado exato do projeto antes de qualquer
+          alteração estrutural ou evolução automatizada.
 
-          Este ponto permite auditoria e recuperação.
+          Política:
+          Este ponto deve ser utilizado como referência de recuperação,
+          auditoria e comparação de integridade.
+
+          Observação:
+          O workflow não altera o código do projeto e não realiza deploy.
           EOF
 
-      - name: 📊 Gerar relatório de segurança
+      - name: 📊 Registrar informações do Git
+        shell: bash
         run: |
-          git log -1 --pretty=format:"Commit: %H%nAutor: %an%nData: %ad%nMensagem: %s" > backup-restauracao/relatorio-commit.txt
+          set -euo pipefail
 
-          echo "Arquivos monitorados:"
-          find . -maxdepth 2 -type f | sort >> backup-restauracao/relatorio-arquivos.txt
+          git log -1 \
+            --pretty=format:"Commit: %H%nAutor: %an%nData: %ad%nMensagem: %s" \
+            > backup-restauracao/relatorio-commit.txt
 
-      - name: 📦 Salvar artefato do backup
+          git status --short \
+            > backup-restauracao/relatorio-status.txt
+
+          git branch -a \
+            > backup-restauracao/relatorio-branches.txt
+
+      - name: 📁 Registrar inventário completo de arquivos
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find . \
+            -path './.git' -prune -o \
+            -type f -print \
+            | sort \
+            > backup-restauracao/relatorio-arquivos.txt
+
+      - name: 📦 Criar cópia compactada do estado atual
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git archive \
+            --format=tar.gz \
+            --output="backup-restauracao/geourban-${{ steps.estado.outputs.commit }}.tar.gz" \
+            HEAD
+
+      - name: 🔐 Gerar integridade SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd backup-restauracao
+
+          sha256sum geourban-${{ steps.estado.outputs.commit }}.tar.gz \
+            > checksum-sha256.txt
+
+      - name: 🧪 Validar backup criado
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ARQUIVO="backup-restauracao/geourban-${{ steps.estado.outputs.commit }}.tar.gz"
+
+          if [ ! -f "$ARQUIVO" ]; then
+            echo "❌ ERRO: Backup não foi criado."
+            exit 1
+          fi
+
+          if [ ! -s "$ARQUIVO" ]; then
+            echo "❌ ERRO: Backup está vazio."
+            exit 1
+          fi
+
+          echo "🔐 Validando SHA-256..."
+
+          cd backup-restauracao
+          sha256sum -c checksum-sha256.txt
+
+          echo "✅ Backup e integridade validados."
+
+      - name: 📄 Gerar relatório final
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > backup-restauracao/RELATORIO-FINAL.txt <<EOF
+          =========================================
+          GEOURBAN - RELATÓRIO FINAL
+          PONTO DE RESTAURAÇÃO SEGURO
+          =========================================
+
+          STATUS: BACKUP VALIDADO
+
+          Commit:
+          ${{ steps.estado.outputs.commit }}
+
+          Branch:
+          ${{ steps.estado.outputs.branch }}
+
+          Data UTC:
+          ${{ steps.estado.outputs.data }}
+
+          Repositório:
+          $GITHUB_REPOSITORY
+
+          Run ID:
+          $GITHUB_RUN_ID
+
+          Backup:
+          geourban-${{ steps.estado.outputs.commit }}.tar.gz
+
+          Integridade:
+          SHA-256 VALIDADO
+
+          Código do projeto:
+          NÃO ALTERADO
+
+          Deploy:
+          NÃO EXECUTADO
+
+          Próxima etapa recomendada:
+          Executar auditoria arquitetural em modo somente leitura.
+
+          =========================================
+          🛡️ PONTO DE RESTAURAÇÃO APROVADO
+          =========================================
+          EOF
+
+          cat backup-restauracao/RELATORIO-FINAL.txt
+
+      - name: 📦 Salvar artefato do ponto de restauração
         uses: actions/upload-artifact@v4
         with:
-          name: GeoUrban-Ponto-Restauracao-${{ steps.commit.outputs.data }}
+          name: GeoUrban-Ponto-Restauracao-${{ steps.estado.outputs.data }}
           path: backup-restauracao/
+          if-no-files-found: error
+          retention-days: 90
 
       - name: ✅ Confirmar proteção criada
+        shell: bash
         run: |
           echo "================================="
           echo "🛡️ PONTO DE RESTAURAÇÃO CRIADO"
+          echo "================================="
           echo "Commit protegido:"
-          echo "${{ steps.commit.outputs.commit }}"
+          echo "${{ steps.estado.outputs.commit }}"
+          echo
+          echo "Backup:"
+          echo "geourban-${{ steps.estado.outputs.commit }}.tar.gz"
+          echo
+          echo "Integridade:"
+          echo "SHA-256 VALIDADO"
+          echo
+          echo "Código alterado:"
+          echo "NÃO"
+          echo
+          echo "Deploy:"
+          echo "NÃO"
           echo "================================="
