@@ -36,3 +36,19 @@ Qualquer alteração realizada na nova arquitetura deverá permanecer isolada at
 🔒 MAIN CONGELADA
 🛡️ RECOVERY POINT REGISTRADO
 🌿 PRÓXIMA ETAPA: CRIAÇÃO DA BRANCH ISOLADA
+🔒 RECOVERY POINT — PLANEJAMENTO ARQUITETURA-MÃE
+
+Estado: PLANEJAMENTO
+Situação: congelado e preservado.
+Imagem do fluxograma mestre: ainda não gerada/disponível.
+Execução de código: NÃO iniciada.
+Alterações no repositório: nenhuma.
+Deploy: não autorizado.
+Integração com GeoUrban: não iniciada.
+
+Regra: este Recovery Point passa a ser nossa referência. Quando retomarmos, primeiro concluiremos o fluxograma completo da Arquitetura-Mãe e somente depois seguiremos rigorosamente suas etapas.
+
+PONTO DE PARADA OFICIAL:
+PLANEJAMENTO → FLUXOGRAMA MESTRE → CONSTRUÇÃO
+
+E mesmo que surja outra solicitação no caminho, não vou executar uma etapa da Arquitetura-Mãe fora dessa sequência sem você encerrar formalmente o bloqueio.
