@@ -52,3 +52,178 @@ PONTO DE PARADA OFICIAL:
 PLANEJAMENTO → FLUXOGRAMA MESTRE → CONSTRUÇÃO
 
 E mesmo que surja outra solicitação no caminho, não vou executar uma etapa da Arquitetura-Mãe fora dessa sequência sem você encerrar formalmente o bloqueio.
+                         ┌──────────────────────────────┐
+                         │      CORE IMUTÁVEL LUIZA     │
+                         │                              │
+                         │ • Núcleo                     │
+                         │ • Mission Registry           │
+                         │ • Mission Orchestrator       │
+                         │ • Contratos fundamentais     │
+                         └──────────────┬───────────────┘
+                                        │
+════════════════════════════════════════╪════════════════════════════════════
+                                        │
+                 CONTROLES TRANSVERSAIS DA ARQUITETURA
+                                        │
+        SECURITY • AUTORIZAÇÃO • RBAC • POLÍTICAS • LGPD
+        OBSERVABILIDADE • AUDITORIA • AUTONOMIA L0–L6
+        GOVERNANÇA • RECOVERY • ISOLAMENTO • SANDBOX
+                                        │
+════════════════════════════════════════╪════════════════════════════════════
+                                        │
+
+
+┌──────────┐
+│ ENTRADA  │
+│ API/CLI  │
+│ EVENTO   │
+└────┬─────┘
+     ↓
+┌────────────────────┐
+│ SEGURANÇA          │
+│ Auth               │
+│ Autorização        │
+│ RBAC               │
+│ Políticas          │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ PERCEPÇÃO          │
+│ Parse              │
+│ Validação          │
+│ Intenção           │
+│ Entidades          │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ CONTEXTO           │
+│ Missão             │
+│ Usuário            │
+│ Ambiente           │
+│ Histórico          │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ MEMÓRIA            │
+│ Sessão             │
+│ Operacional        │
+│ Persistente        │
+│ Conhecimento       │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ RACIOCÍNIO         │
+│ Análise            │
+│ Inferência         │
+│ Decisão            │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ PLANEJAMENTO       │
+│ Plano              │
+│ Etapas             │
+│ Dependências       │
+│ Timeout / Retry    │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ ORQUESTRAÇÃO       │
+│ Mission Registry   │
+│ Mission Orchestr.  │
+│ Estado da missão   │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ AGENT GATEWAY      │
+│ Controle de acesso │
+│ aos agentes        │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ AGENTES            │
+│ Execução de tarefa │
+│ específica         │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ TOOL GATEWAY       │
+│ Autorização        │
+│ Política           │
+│ Sandbox            │
+│ Auditoria          │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ SANDBOX            │
+│ Isolamento         │
+│ Limites            │
+│ Timeout            │
+│ Recursos           │
+│ Filesystem/Network │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ EXECUÇÃO           │
+│ Ação autorizada    │
+│ Resultado          │
+│ Erro / duração     │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ AUDITORIA          │
+│ correlation_id     │
+│ mission_id         │
+│ actor              │
+│ timestamp          │
+│ action             │
+│ result             │
+│ error / duration   │
+│ autonomy_level     │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ RECOVERY           │
+│ Checkpoint         │
+│ Rollback           │
+│ Restauração        │
+│ Estado recuperado  │
+└────┬───────────────┘
+     ↓
+┌────────────────────┐
+│ RESPOSTA           │
+│ Sucesso            │
+│ Erro               │
+│ Parcial            │
+└────────────────────┘
+
+
+══════════════════════════════════════════════════════════════════════════════
+
+                    CONTROLE HUMANO
+                         ↓
+              ┌─────────────────────┐
+              │ APROVAÇÃO HUMANA    │
+              │ EVIDÊNCIA            │
+              │ REGISTRO             │
+              │ RECOVERY POINT       │
+              └─────────────────────┘
+
+══════════════════════════════════════════════════════════════════════════════
+
+SEQUÊNCIA OFICIAL DE CONSTRUÇÃO
+
+DIAGNÓSTICO
+     ↓
+PLANEJAMENTO
+     ↓
+CONSTRUÇÃO
+     ↓
+TESTES
+     ↓
+AUDITORIA
+     ↓
+RECOVERY
+     ↓
+APROVAÇÃO HUMANA
+     ↓
+PRÓXIMA ETAPA
